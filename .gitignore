@@ -1,7 +1,5 @@
-dino\__pycache__
-dinoapp\__pycache__
-dinoapp\migrations\__pycache__
-dino\__pycache__\__init__.cpython-312.pyc
-dino\__pycache__\settings.cpython-312.pyc
-dino\__pycache__\urls.cpython-312.pyc
-dino\__pycache__\wsgi.cpython-312.pyc
+# ignore ALL .log files
+*.log
+
+# ignore ALL files in ANY directory named temp
+dino/__pycache__/
