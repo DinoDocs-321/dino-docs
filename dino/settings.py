@@ -25,8 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-l$5$msnhqn3*hd(!g%xe0r^qk303v@ky@azm6#w&v(%$xm#apl"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
 ALLOWED_HOSTS = [
   'localhost', 
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "dinoapp",
+    "dinoDB",
     # 'myapp',
 ]
 
@@ -82,10 +83,26 @@ WSGI_APPLICATION = "dino.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#    "default": {
+#       "ENGINE": "django.db.backends.sqlite3",
+#        "NAME": BASE_DIR / "db.sqlite3",
+#    }
+#}
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'dinodocsDB01',
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': 'mongodb+srv://terenceyuan:tydino1@cluster0.hwtjmmu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', # Replace with your MongoDB server address
+            'port': 27017,               # Replace with your MongoDB port if different
+            'username': 'terenceyuan', # Replace with your MongoDB username (optional)
+            'password': 'tydino1', # Replace with your MongoDB password (optional)
+            'authSource': 'admin', # Replace with your MongoDB authentication database (optional)
+            'authMechanism': 'SCRAM-SHA-1',
+        },
     }
 }
 
