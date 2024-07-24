@@ -24,6 +24,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include('dinoapp.urls')),
     # path('myapp/', include('myapp.urls'))
+    path("reactapi/", include('reactapi.urls'))
 ]
 
 
