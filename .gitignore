@@ -7,3 +7,4 @@ dinoapp/__pycache__
 dinoDB/__pycache__
 reactapi/__pycache__
 dinoapp/migrations/__pycache__
+dinoDB/migrations/__pycache__
