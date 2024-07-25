@@ -2,4 +2,8 @@
 *.log
 
 # ignore ALL files in ANY directory named temp
-dino/__pycache__/
+dino/__pycache__
+dinoapp/__pycache__
+dinoDB/__pycache__
+reactapi/__pycache__
+dinoapp/migrations/__pycache__
