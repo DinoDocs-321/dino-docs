@@ -4,12 +4,7 @@ from bson import BSON
 json_string = ""
 
 with open("data.json", 'r', encoding='utf-8') as json_data:
-    print ("data.json TYPE:", type(json_data))
-
-    # iterate over the _io.TextIOWrapper returned by open() using enumerate()
-    for i, line in enumerate(json_data):
-        # append the parsed IO string to the JSON string
-        json_string += line
+    json_string = json_data.read()
 
 try:
     # use json.loads() to validate the string and create JSON dict
