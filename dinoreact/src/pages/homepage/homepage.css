@@ -1,0 +1,19 @@
+.homepage{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.homepageleft{
+    flex: 1;
+}
+
+.homepageright{
+    flex: 1;
+}
+
+.homepageimg {
+    max-width: 100%; 
+    height: auto; 
+}
