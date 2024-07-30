@@ -1,17 +1,19 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import HelloWorld from './HelloWorld'
 import { useState } from 'react'
 import Homepage from './pages/homepage/homepage'
 import Converter from './pages/converter/converter'
+import Navbar from './components/navbar/navbar'
+import Contact from './pages/contact/contact'
 
 function App() {
   return (
     <div>
+      <Navbar />
       <Routes>
-         <HelloWorld />
          <Route path='/homepage' element={<Homepage />} />
          <Route path='/converter' element={<Converter />} />
+         <Route path='/contact' element={<Contact />} />
       </Routes> 
     </div>
   );
