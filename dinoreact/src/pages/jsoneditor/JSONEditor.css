@@ -1,0 +1,50 @@
+/* src/css/JSONEditor.css */
+.json-editor-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+  }
+
+  .visual-editor, .code-editor {
+    flex: 1;
+    margin-right: 10px;
+  }
+
+  .visual-editor label, .code-editor label {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .visual-editor input, .code-editor textarea {
+    width: calc(100% - 20px);
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .code-editor textarea {
+    height: 400px;
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  button {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }

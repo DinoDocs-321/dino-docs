@@ -12,14 +12,14 @@ const Navbar = () => {
       <ul className="navbar-menu">
         <Link to='/'><img src={assets.dinologo} alt="Logo" className="logo" /> </Link>
         <Link to='/homepage' onClick={() => setMenu("home")} className={menu === "home" ? "active" : ""}>Home</Link>
-        <Link to='/Generator' onClick={() => setMenu("Generator")} className={menu === "Generator" ? "active" : ""}>Generator</Link>
+        <Link to='/JSONEditor' onClick={() => setMenu("Generator")} className={menu === "Generator" ? "active" : ""}>Generator</Link>
         <Link to='/Schema' onClick={() => setMenu("Schema")} className={menu === "Schema" ? "active" : ""}>Schema</Link>
         <Link to='/contact' onClick={() => setMenu("Contact")} className={menu === "contact-us" ? "active" : ""}>Contact</Link>
         <Link to='/About' onClick={() => setMenu("About")} className={menu === "about-us" ? "active" : ""}>About</Link>
       </ul>
 
       <div className="navbar-right">
-            <button onClick={()=>setShowLogin(true)}>Sign In</button>
+        <button onClick={() => window.location.href = 'http://localhost:8000/login/'}>Sign In</button>
       </div>
 
     </div>
