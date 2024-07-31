@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { BSON } from 'bson';
+import './converter.css'
 
 const Converter = () => {
   const [textFieldValue, setTextFieldValue] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
-      // fetch data from database, needs tweaking
       const preLoadedData = 'This is pre-loaded data';
       setTextFieldValue(preLoadedData);
     };
@@ -41,13 +41,13 @@ const Converter = () => {
   };
 
   return (
-    <div>
+    <div className='container'>
       <input
         type="text"
         value={textFieldValue}
         onChange={handleInputChange}
         placeholder="BSON data"
-        className="bsontextField"
+        className="bsonTextField"
       />
       <div className="bsonbtns">
         <button onClick={handleGenerateSave}>Save Schema & Document</button>

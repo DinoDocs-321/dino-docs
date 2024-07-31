@@ -1,0 +1,37 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 20px;
+    height: 70vh;
+    box-sizing: border-box;
+  }
+
+.bsonTextField{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; 
+    align-items: center;
+    width: 1400px;
+    padding: 10px; 
+    height: 400px;
+}
+
+.bsonbtns {
+    margin-top: 20px;
+    display: flex;
+    
+}
+  
+.bsonbtns button {
+   margin-right: 10px;
+   background: transparent;
+    font-size: 16px;
+    color: #ffffff;
+    background-color: #8CB8CA;
+    padding: 10px 30px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s; 
+}
