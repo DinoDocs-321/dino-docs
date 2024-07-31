@@ -26,7 +26,7 @@ def loginpage_view(request):
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('home')  # Replace 'home' with the URL name for your homepage
+                return redirect('http://localhost:3000')  # Replace 'home' with the URL name for your homepage
             else:
                 messages.error(request, 'Invalid email or password.')
     else:
