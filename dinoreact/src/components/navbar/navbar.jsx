@@ -19,7 +19,7 @@ const Navbar = () => {
       </ul>
 
       <div className="navbar-right">
-            <button onClick={()=>setShowLogin(true)}>Sign In</button>
+        <button onClick={() => window.location.href = 'http://localhost:8000/login/'}>Sign In</button>
       </div>
 
     </div>

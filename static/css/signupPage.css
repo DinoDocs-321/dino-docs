@@ -1,0 +1,101 @@
+/* Custom CSS to match the design */
+body {
+    background-color: #f8f9fa; /* Light background */
+}
+
+.card {
+    background-color: #f8f9fa;
+    border: none;
+    border-radius: 10px;
+    margin: auto; /* Center the card horizontally */
+    padding: 40px; /* Add padding inside the card */
+}
+
+.card-title {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Adjust gap between elements */
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-control {
+    border-radius: 5px;
+    padding: 10px; /* Adjust padding for better spacing */
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+/* static/css/signupPage.css */
+
+.signup-image {
+    width: 470px;
+    height: 724px;
+    flex-shrink: 0;
+    border-radius: 30px;
+    background: lightgray 50% / cover no-repeat;
+}
+
+
+.btn {
+    color: white;
+    background-color: #395C6B;
+    border: none;
+    border-radius: 5px;
+    width: 100%; /* Ensure button width matches the form control width */
+    margin-bottom: 1.5rem;
+    padding: 8px 16px;
+}
+
+.btn-outline-dark {
+    border-radius: 5px;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    padding: 8px 16px;
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+.container {
+    margin-top: 5rem; /* Adjust top margin for the container */
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+}
+
+.form-check input {
+    margin-right: 10px;
+}
+
+@media (min-width: 768px) {
+    .mainContainer {
+        display: flex;
+        align-items: center; /* Center items vertically */
+        justify-content: center; /* Center items horizontally */
+        height: 100vh; /* Full viewport height */
+    }
+}

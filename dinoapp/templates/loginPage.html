@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Login {% endblock %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/loginPage.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <h3 class="card-title text-left text-lg">Login</h3>
+                <div class="card-body">
+
+
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <div class="form-group">
+
+                            {{ form.email }}
+                        </div>
+                        <div class="form-group">
+
+                            {{ form.password }}
+                        </div>
+                        <div class="two">
+                            <div  class="form-group form-check  mt-3">
+                                {{ form.remember_me }}
+                                {{ form.remember_me.label_tag }}
+                                <a href="#">Forgot Password?</a>
+                            </div>
+
+
+
+                        </div>
+                        <button type="submit" class="btn">Login</button>
+
+                        <div class="form-group text-center">
+                            <span>Don't have an account? <a href="{% url 'signupPage' %}">Sign up</a></span>
+                        </div>
+                        <div class="form-group text-center mt-3">
+
+                            <span>Or login with</span>
+                            <br>
+                            <button type="button" class="btn btn-outline-danger ">Google</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 d-none d-md-block">
+            <img src="{% static 'media/rec11.png' %}" alt="Login Image" class="img-fluid">
+        </div>
+    </div>
+</div>
+{% endblock %}
