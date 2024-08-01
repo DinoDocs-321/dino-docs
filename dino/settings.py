@@ -100,17 +100,16 @@ DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'dinodocsDB01',
-        'ENFORCE_SCHEMA': False,
         'CLIENT': {
-            'host': 'mongodb+srv://terenceyuan:tydino1@cluster0.hwtjmmu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', # Replace with your MongoDB server address
-            'port': 27017,               # Replace with your MongoDB port if different
-            'username': 'terenceyuan', # Replace with your MongoDB username (optional)
-            'password': 'tydino1', # Replace with your MongoDB password (optional)
-            'authSource': 'admin', # Replace with your MongoDB authentication database (optional)
+            'host': 'mongodb+srv://terenceyuan:tydino1@cluster0.hwtjmmu.mongodb.net/dinodocsDB01?retryWrites=true&w=majority',
+            'username': 'terenceyuan',  # Optional if included in the URI
+            'password': 'tydino1',      # Optional if included in the URI
+            'authSource': 'admin',
             'authMechanism': 'SCRAM-SHA-1',
         },
     }
 }
+
 
 
 # Password validation
