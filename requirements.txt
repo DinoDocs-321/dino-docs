@@ -3,6 +3,6 @@ django-cors-headers
 djangorestframework
 djongo
 dnspython
-pymongo==3.12.1
 pytz
 sqlparse
+pymongo==3.12.1
