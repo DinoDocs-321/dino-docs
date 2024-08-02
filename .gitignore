@@ -8,5 +8,7 @@ dinoDB/__pycache__
 reactapi/__pycache__
 dinoapp/migrations/__pycache__
 dinoDB/migrations/__pycache__
-dinoDB/migrations/__pycache__/__init__.cpython-311.pyc
-reactapi/migrations/__pycache__/__init__.cpython-311.pyc
+dinoDB/migrations/__pycache__/
+reactapi/migrations/__pycache__/
+reactapi/__pycache__
+reactapi/migrations/__pycache__
