@@ -45,6 +45,7 @@ pip install -r requirements.txt
 Apply the database migrations:
 
 `python manage.py makemigrations`
+
 `python manage.py migrate`
 
 ### Step 4: Run the Django Server
