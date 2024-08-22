@@ -5,15 +5,33 @@
     gap: 20px;
 }
 
-.homepageleft{
-    flex: 1;
-}
-
-.homepageright{
-    flex: 1;
-}
 
 .homepageimg {
     max-width: 100%; 
     height: auto; 
+}
+
+.GFSbtn{
+    width: 350px;
+    height: 130px;
+    background-color: #C09DFA;
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 50px;
+}
+
+.PSbtn{
+    width: 350px;
+    height: 130px;
+    background-color: #33D4E5;
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }

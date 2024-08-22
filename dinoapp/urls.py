@@ -1,4 +1,4 @@
-from django.urls import include, re_path
+from django.urls import include, re_path, path
 from . import views
 
 
@@ -8,4 +8,5 @@ urlpatterns = [
     re_path(r'^login/$', views.loginpage_view, name='loginPage'),
     re_path(r'^signup/$', views.signup_view, name='signupPage'),
     re_path(r'^forgot_password/$', views.forgotpass_view, name='forgotPass'),
+    path('', include('reactapi.urls')),
 ]
