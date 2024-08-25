@@ -1,18 +1,21 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .forms import SchemaForm
 import json
-import bson
-import openai
-from django.conf import settings
+from openai import OpenAI
 
-openai.api_key = ''
+client = OpenAI(api_key='sk-6CxFr8GVnSv9wYp-F_5SsdzwRNjWfkrPFI0WbwucUIT3BlbkFJ08FTGm0XLlaMvMu3EPCo-lNT1uFHyaDR-6Asuoa50A')
+
+# Set your OpenAI API key
 
 @csrf_exempt
 def generate_documents(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON format in request body."}, status=400)
+
         json_schema = data.get('schema')
         output_format = data.get('format', 'json')
         num_samples = data.get('num_samples', 10)
@@ -20,8 +23,8 @@ def generate_documents(request):
         if not json_schema:
             return JsonResponse({"error": "No JSON schema provided."}, status=400)
 
-        # Generate sample documents logic...
-        generated_samples = [{"sample": "data"}]  # Placeholder response
+        # Generate sample documents
+        generated_samples = generate_sample_documents(json_schema, num_samples)
 
         if output_format == 'json':
             return JsonResponse(generated_samples, safe=False)
@@ -30,22 +33,29 @@ def generate_documents(request):
 
     return JsonResponse({"error": "Only POST method is allowed"}, status=405)
 
-
 def generate_sample_documents(json_schema, num_samples):
     generated_samples = []
     for _ in range(num_samples):
-        response = openai.Completion.create(
-            engine="text-davinci-003",  # or another appropriate model
-            prompt=f"Generate a JSON document based on this schema: {json_schema}",
-            max_tokens=500
-        )
-        sample_document = response.choices[0].text.strip()
-        generated_samples.append(json.loads(sample_document))
+        try:
+            response = client.chat.completions.create(model="gpt-3.5-turbo",  # Or use "gpt-4" if you have access
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": f"Generate a JSON document based on this schema: {json_schema}"}
+            ],
+            max_tokens=500)
+            sample_document = response.choices[0].message.content.strip()
+            try:
+                sample_json = json.loads(sample_document)
+                generated_samples.append(sample_json)
+            except json.JSONDecodeError as json_error:
+                print(f"JSON decode error: {json_error}")
+                generated_samples.append({"error": "Failed to generate valid JSON document"})
+        except Exception as e:
+            print(f"An error occurred during document generation: {e}")
+            generated_samples.append({"error": f"Error during document generation: {e}"})
     return generated_samples
 
-def export_bson_documents(generated_samples):
-    bson_samples = [bson.dumps(sample) for sample in generated_samples]
-    return [bson_sample.hex() for bson_sample in bson_samples]
+
 
 def schema_form_view(request):
     if request.method == 'POST':
