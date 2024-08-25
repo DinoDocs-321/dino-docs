@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     # 'myapp',
     'rest_framework',
     'corsheaders',
-    'reactapi'
+    'reactapi',
+    'generator'
 ]
 
 MIDDLEWARE = [
@@ -64,6 +65,10 @@ MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
 
 ROOT_URLCONF = "dino.urls"
 
