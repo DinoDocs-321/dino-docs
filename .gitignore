@@ -13,3 +13,5 @@ reactapi/migrations/__pycache__/
 reactapi/__pycache__
 reactapi/migrations/__pycache__
 .env
+generator/__pycache__
+generator/migrations/__pycache__

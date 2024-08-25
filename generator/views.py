@@ -7,8 +7,7 @@ import bson
 import openai
 from django.conf import settings
 
-# Set your OpenAI API key
-openai.api_key = settings.OPENAI_API_KEY
+openai.api_key = ''
 
 @csrf_exempt
 def generate_documents(request):
