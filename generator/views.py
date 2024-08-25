@@ -5,9 +5,10 @@ from .forms import SchemaForm
 import json
 import bson
 import openai
+from django.conf import settings
 
 # Set your OpenAI API key
-openai.api_key = 'sk-AisFq8U9Y-LsoxtyMIluzI7yAWmLq81Ercf15SHJaHT3BlbkFJHkhcWsvYbZI2x5IlF9l8nrvdLBA7FBuCJQP7gtLBwAs'
+openai.api_key = settings.OPENAI_API_KEY
 
 @csrf_exempt
 def generate_documents(request):
