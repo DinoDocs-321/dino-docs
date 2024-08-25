@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from openai import OpenAI
 
-client = OpenAI(api_key='sk-6CxFr8GVnSv9wYp-F_5SsdzwRNjWfkrPFI0WbwucUIT3BlbkFJ08FTGm0XLlaMvMu3EPCo-lNT1uFHyaDR-6Asuoa50A')
+client = OpenAI(api_key='')
 
 # Set your OpenAI API key
 
