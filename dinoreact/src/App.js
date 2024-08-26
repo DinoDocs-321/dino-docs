@@ -1,11 +1,11 @@
-import React from 'react'
-import { Route, Routes } from 'react-router-dom'
-import { useState } from 'react'
-import Homepage from './pages/homepage/homepage'
-import Converter from './pages/converter/converter'
-import Navbar from './components/navbar/navbar'
-import Contact from './pages/contact/contact'
-import JSONEditor from './pages/jsoneditor/App'
+import React from 'react';
+import { Route, Routes } from 'react-router-dom';
+import Navbar from './components/navbar/navbar';
+import Homepage from './pages/homepage/homepage';
+import Converter from './pages/converter/converter';
+import Contact from './pages/contact/contact';
+import JSONEditor from './pages/jsoneditor/App';
+import SchemaForm from './SchemaForm';
 
 function App() {
   return (
@@ -17,6 +17,7 @@ function App() {
         <Route path='/converter' element={<Converter />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/JSONEditor' element={<JSONEditor />} />
+        <Route path='/schema-form' element={<SchemaForm />} />
       </Routes> 
     </div>
   );
