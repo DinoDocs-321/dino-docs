@@ -5,34 +5,53 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from openai import OpenAI
 import bson
+import re
 
 # Initialize OpenAI client
-client = OpenAI(api_key="key")
+client = OpenAI(api_key="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")
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def generate_documents(schema: dict, num_docs: int = 1):
-    """Generates documents based on a schema using the OpenAI API."""
+    """Generates multiple unique documents by making separate API calls for each document."""
+    generated_documents = []
+    
     try:
-        prompt = f"Generate {num_docs} sample JSON document(s) based on the following schema: {json.dumps(schema)}"
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a JSON document generator."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-        
-        generated_documents = [json.loads(choice.message.content) for choice in response.choices]
-        logging.info(f"Successfully generated {len(generated_documents)} document(s) using the OpenAI API")
+        for _ in range(num_docs):
+            prompt = f"Generate a unique sample JSON document based on the following schema: {json.dumps(schema)}"
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a JSON document generator."},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            
+            # Access the content correctly using dot notation
+            document_content = response.choices[0].message.content
+            
+            # Attempt to extract and parse JSON from the response
+            try:
+                # Look for the first occurrence of valid JSON in the content
+                json_match = re.search(r'\{.*\}', document_content, re.DOTALL)
+                if json_match:
+                    document = json.loads(json_match.group())
+                    generated_documents.append(document)
+                    logging.info(f"Successfully generated document: {document}")
+                else:
+                    raise ValueError("No valid JSON found in the response.")
+
+            except (json.JSONDecodeError, ValueError) as decode_error:
+                logging.error(f"Failed to parse JSON: {decode_error}")
+                raise Exception("Failed to parse generated JSON document.")
+
         return generated_documents
 
     except Exception as e:
-        # Extract the specific error message
         error_message = str(e).split(':')[-1].strip()
         logging.error(f"Error generating documents using OpenAI API: {error_message}")
-        raise Exception(error_message)  # Raise the specific error message
+        raise Exception(error_message)
 
 @csrf_exempt
 @require_POST
@@ -42,7 +61,7 @@ def generate_documents_view(request):
         data = json.loads(request.body)
         schema = data.get('schema')
         output_format = data.get('format', 'json')
-        num_samples = data.get('num_samples', 1)
+        num_samples = int(data.get('num_samples', 1))  # Ensure num_samples is an integer
 
         if not schema:
             return HttpResponseBadRequest("Schema is required.")
