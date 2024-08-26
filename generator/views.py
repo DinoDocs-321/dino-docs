@@ -1,13 +1,13 @@
-# generator/views.py
 import json
 import logging
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from openai import OpenAI
+import bson
 
 # Initialize OpenAI client
-client = OpenAI(api_key="key")
+client = OpenAI(api_key="")
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -17,7 +17,7 @@ def generate_documents(schema: dict, num_docs: int = 1):
     try:
         prompt = f"Generate {num_docs} sample JSON document(s) based on the following schema: {json.dumps(schema)}"
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a JSON document generator."},
                 {"role": "user", "content": prompt}
@@ -29,8 +29,10 @@ def generate_documents(schema: dict, num_docs: int = 1):
         return generated_documents
 
     except Exception as e:
-        logging.error(f"Error generating documents using OpenAI API: {str(e)}")
-        raise e
+        # Extract the specific error message
+        error_message = str(e).split(':')[-1].strip()
+        logging.error(f"Error generating documents using OpenAI API: {error_message}")
+        raise Exception(error_message)  # Raise the specific error message
 
 @csrf_exempt
 @require_POST
