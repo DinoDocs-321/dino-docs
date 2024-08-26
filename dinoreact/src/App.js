@@ -1,6 +1,7 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { useState } from 'react'
+import 'bootstrap/dist/css/bootstrap.min.css';
 import Homepage from './pages/homepage/homepage'
 import Converter from './pages/converter/converter'
 import Navbar from './components/navbar/navbar'
