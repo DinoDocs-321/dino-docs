@@ -15,3 +15,4 @@ reactapi/migrations/__pycache__
 .env
 generator/__pycache__
 generator/migrations/__pycache__
+supervisord.pid
