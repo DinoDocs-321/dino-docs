@@ -9,7 +9,7 @@ const Homepage = () => {
     <Container className="justify-content-md-center">
       <div className='homepage'>
         <div className='homepageleft'>
-          <p className="justify-content-md-center">Select an option</p>
+          <p>Select an option</p>
           <Link to="/converter">
             <button className='GFSbtn'>
               Generate From Scratch

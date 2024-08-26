@@ -59,7 +59,7 @@ const Contact = () => {
             <Form.Group as={Row} className="mb-3">
               <Col sm={12}>
                   <Form.Label as="legend" column>
-                      Select Subject
+                      Select Inquiry Type
                   </Form.Label>
               </Col>
 
@@ -96,7 +96,7 @@ const Contact = () => {
             </Form.Group>
           </fieldset>
           <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-            <Form.Label>Example textarea</Form.Label>
+            <Form.Label>Message</Form.Label>
             <Form.Control as="textarea" rows={7} onChange={handleChange}/>
           </Form.Group>
           <input type="submit" />

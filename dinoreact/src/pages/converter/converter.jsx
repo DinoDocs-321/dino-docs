@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BSON } from 'bson';
+import Form from 'react-bootstrap/Form';
 import './converter.css';
 
 const Converter = () => {
@@ -56,13 +57,14 @@ const Converter = () => {
 
   return (
     <div className='container'>
-      <input
-        type="text"
-        value={textFieldValue}
-        onChange={handleInputChange}
-        placeholder="Enter JSON or BSON data"
-        className="bsonTextField"
-      />
+      <Form.Group className="bsonTextField" controlId="exampleForm.ControlTextarea1">
+            <Form.Control
+              as="textarea" rows={10}
+              value={textFieldValue}
+              onChange={handleInputChange}
+              placeholder="Enter JSON or BSON data"
+            />
+      </Form.Group>
       <div className="bsonbtns">
         <button onClick={handleGenerateSave}>Save Schema & Document</button>
         <button onClick={handleGenerateBSONFile}>Generate BSON Document</button>
