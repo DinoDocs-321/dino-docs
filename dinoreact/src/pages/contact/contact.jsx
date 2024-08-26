@@ -22,7 +22,7 @@ const Contact = () => {
   return (
     <div className="contact-container">
       <div className="contact-info">
-        <p>Contact information</p>
+        <p className="justify-content-md-center">Contact information</p>
         <ul>
           <p>+61123456789</p>
           <p>demo@gmail.com</p>
