@@ -5,7 +5,7 @@ import Homepage from './pages/homepage/homepage';
 import Converter from './pages/converter/converter';
 import Contact from './pages/contact/contact';
 import JSONEditor from './pages/jsoneditor/App';
-import SchemaForm from './SchemaForm';
+import SchemaForm from './pages/SchemaForm/App';
 
 function App() {
   return (
