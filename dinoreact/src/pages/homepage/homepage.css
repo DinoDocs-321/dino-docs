@@ -2,9 +2,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
 }
 
+.selectoption{
+    font-weight: bold;
+    font-size: larger;
+    color: #32464F;
+}
 
 .homepageimg {
     max-width: 100%; 

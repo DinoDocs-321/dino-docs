@@ -9,7 +9,7 @@ const Homepage = () => {
     <Container className="justify-content-md-center">
       <div className='homepage'>
         <div className='homepageleft'>
-          <p>Select an option</p>
+          <p className="text-center mt-4 mb-4 selectoption">Select an option</p>
           <Link to="/converter">
             <button className='GFSbtn'>
               Generate From Scratch
@@ -21,7 +21,7 @@ const Homepage = () => {
               Provide Schema
             </button>
           </Link>
-          <p className="justify-content-center">Login or Sign Up to save in cloud your generated data</p>
+          <p className="justify-content-center text-center mt-4 mb-4">Login or Sign Up to save in cloud your generated data</p>
         </div>
         <div className='homepageright'>
           <img src={assets.homepageimg} alt="homepageimg" className='homepageimg' />
