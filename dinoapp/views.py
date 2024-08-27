@@ -7,9 +7,6 @@ from .forms import LoginForm, RegisterForm
 
 # Create your views here.
 
-def home(request):
-  return HttpResponse("Hello dinoapp")  
-
 class HomePageView(TemplateView):
     template_name = "index.html"
     
