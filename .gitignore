@@ -17,8 +17,6 @@ reactapi/migrations/__pycache__
 generator/__pycache__
 generator/migrations/__pycache__
 supervisord.pid
-dinoDB/migrations/__pycache__/__init__.cpython-311.pyc
-generator/migrations/__pycache__
 generator/__pycache__
 
 # adding a comment
