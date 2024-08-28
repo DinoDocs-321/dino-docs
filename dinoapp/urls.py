@@ -10,3 +10,6 @@ urlpatterns = [
     re_path(r'^forgot_password/$', views.forgotpass_view, name='forgotPass'),
     path('', include('reactapi.urls')),
 ]
+
+# refer to dino/urls.py
+# these urls not working...

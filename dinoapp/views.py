@@ -11,9 +11,6 @@ from .utils.converter import json_to_bson, bson_to_json
 
 # Create your views here.
 
-def home(request):
-  return HttpResponse("Hello dinoapp")  
-
 class HomePageView(TemplateView):
     template_name = "index.html"
     
