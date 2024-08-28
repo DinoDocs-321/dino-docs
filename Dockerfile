@@ -23,8 +23,10 @@ EXPOSE 3000
 
 # Create supervisord configuration file
 RUN echo "[supervisord]\nnodaemon=true\n" > /etc/supervisor/supervisord.conf && \
-    echo "[program:django]\ncommand=bash -c 'echo \"Backend is running at: http://localhost:8000\" && python manage.py runserver 0.0.0.0:8000'\ndirectory=/usr/src/app\nautostart=true\nautorestart=true\n" >> /etc/supervisor/supervisord.conf && \
-    echo "[program:npm]\ncommand=bash -c 'echo \"Frontend is running at: http://localhost:3000\" && npm start'\ndirectory=/usr/src/app/dinoreact\nautostart=true\nautorestart=true\n" >> /etc/supervisor/supervisord.conf
+    echo "[program:echo]\ncommand=bash -c 'echo \"Visit the front-end at: http://localhost:3000\" && echo \"Visit the back-end at: http://localhost:8000\"'\nautostart=true\nautorestart=false\nstartsecs=0\npriority=1\n" >> /etc/supervisor/supervisord.conf && \
+    echo "[program:django]\ncommand=python manage.py runserver 0.0.0.0:8000\ndirectory=/usr/src/app\nautostart=true\nautorestart=true\n" >> /etc/supervisor/supervisord.conf && \
+    echo "[program:npm]\ncommand=npm start\ndirectory=/usr/src/app/dinoreact\nautostart=true\nautorestart=true\n" >> /etc/supervisor/supervisord.conf
+
 
 # Set environment variables for front-end and back-end URLs
 ENV FRONTEND_URL=http://localhost:3000

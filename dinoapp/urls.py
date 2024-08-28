@@ -9,3 +9,6 @@ urlpatterns = [
     re_path(r'^signup/$', views.signup_view, name='signupPage'),
     re_path(r'^forgot_password/$', views.forgotpass_view, name='forgotPass'),
 ]
+
+# refer to dino/urls.py
+# these urls not working...
