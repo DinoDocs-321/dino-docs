@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { assets } from '../../assets/assets';
 import './contact.css';
 import Button from 'react-bootstrap/Button';
+import axios from 'axios';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
