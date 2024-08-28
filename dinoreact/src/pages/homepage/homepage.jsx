@@ -1,25 +1,34 @@
-import React, {useState} from 'react'
+import React from 'react';
 import { Link } from 'react-router-dom';
 import './homepage.css';
-import { assets } from '../../assets/assets'
+import { assets } from '../../assets/assets';
+import Container from 'react-bootstrap/Container';
 
-const homepage = () => {
-
-  //const [category] =useState("All"); 
-
+const Homepage = () => {
   return (
-    <div className='homepage'>
-      <div className='homepageleft'>
-        <p>Select an option</p>
-        <Link to="" className='GFSbtn'>Generate From Scratch</Link>
-        <Link to="" className='PSbtn'>Provide Schema</Link>
-        <p>Login or Sign Up to save in cloud your generated data</p>
+    <Container className="justify-content-md-center">
+      <div className='homepage'>
+        <div className='homepageleft'>
+          <p className="text-center mt-4 mb-4 selectoption">Select an option</p>
+          <Link to="/converter">
+            <button className='GFSbtn'>
+              Generate From Scratch
+            </button>
+          </Link>
+          <br />
+          <Link to="/converter">
+            <button className='PSbtn'>
+              Provide Schema
+            </button>
+          </Link>
+          <p className="justify-content-center text-center mt-4 mb-4">Login or Sign Up to save in cloud your generated data</p>
+        </div>
+        <div className='homepageright'>
+          <img src={assets.homepageimg} alt="homepageimg" className='homepageimg' />
+        </div>
       </div>
-      <div className='homepageright'>
-        <img src={assets.homepageimg} alt="homepageimg" className='homepageimg' />
-      </div>
-    </div>
-  )
-}
+    </Container>
+  );
+};
 
-export default homepage
+export default Homepage;

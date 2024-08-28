@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Navbar from './components/navbar/navbar';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import Homepage from './pages/homepage/homepage';
 import Converter from './pages/converter/converter';
 import Contact from './pages/contact/contact';

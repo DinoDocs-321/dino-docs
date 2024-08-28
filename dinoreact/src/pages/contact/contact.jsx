@@ -1,25 +1,29 @@
 import React, { useState } from 'react';
 import { assets } from '../../assets/assets';
-import './contact.css'; // Import the CSS file for styling
+import './contact.css';
+import Button from 'react-bootstrap/Button';
+import axios from 'axios';
+import Col from 'react-bootstrap/Col';
+import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
 
 const Contact = () => {
   const [inputs, setInputs] = useState({});
 
   const handleChange = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setInputs(values => ({...values, [name]: value}));
+    const { name, value } = event.target;
+    setInputs(values => ({ ...values, [name]: value }));
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    alert(JSON.stringify(inputs)); // Convert inputs to string for alert
+    alert(JSON.stringify(inputs));
   };
 
   return (
     <div className="contact-container">
       <div className="contact-info">
-        <p>Contact information</p>
+        <p className="justify-content-md-center">Contact information</p>
         <ul>
           <p>+61123456789</p>
           <p>demo@gmail.com</p>
@@ -28,63 +32,76 @@ const Contact = () => {
         </ul>
       </div>
       <div className="contact-form">
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>
-              First Name:
-            </label>
-            <input 
-              type="text" 
-              name="firstName" 
-              value={inputs.firstName || ""} 
-              onChange={handleChange}
-            />
+        <Form onSubmit={handleSubmit}>
+          <Row className="mb-3">
+            <Form.Group as={Col} controlId="formGridFirstName">
+              <Form.Label>First Name</Form.Label>
+              <Form.Control placeholder="First Name" onChange={handleChange}/>
+            </Form.Group>
 
-            <label>
-              Email:
-            </label>
-            <input 
-              type="text" 
-              name="email" 
-              value={inputs.email || ""} 
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label>
-              Last Name:
-            </label>
-            <input 
-              type="text" 
-              name="lastName" 
-              value={inputs.lastName || ""} 
-              onChange={handleChange}
-            />
+            <Form.Group as={Col} controlId="formGridLastName">
+              <Form.Label>Last Name</Form.Label>
+              <Form.Control placeholder="Last Name" onChange={handleChange}/>
+            </Form.Group>
+          </Row>
+          <Row className="mb-3">
+            <Form.Group as={Col} controlId="formGridEmail">
+              <Form.Label>Email</Form.Label>
+              <Form.Control type="email" placeholder="Enter email" onChange={handleChange}/>
+            </Form.Group>
 
-            <label>
-              Phone Number:
-            </label>
-            <input 
-              type="text" 
-              name="phoneNumber" 
-              value={inputs.phoneNumber || ""} 
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group message-group">
-            <label>
-              Message:
-            </label>
-            <input 
-              type="text" 
-              name="message" 
-              value={inputs.message || ""} 
-              onChange={handleChange}
-              className="message-input"
-            />
-          </div>
+            <Form.Group as={Col} controlId="formGridPhoneNum">
+              <Form.Label>Phone Number</Form.Label>
+              <Form.Control placeholder="0412345678" onChange={handleChange}/>
+            </Form.Group>
+          </Row>
+
+          <fieldset>
+            <Form.Group as={Row} className="mb-3">
+              <Col sm={12}>
+                  <Form.Label as="legend" column>
+                      Select Inquiry Type
+                  </Form.Label>
+              </Col>
+
+              <Col sm={12} className="radio-group">
+                  <Form.Check
+                      type="radio"
+                      label="General Inquiry"
+                      name="formHorizontalRadios"
+                      id="formHorizontalRadios1"
+                      onChange={handleChange}
+                  />
+                  <Form.Check
+                      type="radio"
+                      label="Booking Inquiry"
+                      name="formHorizontalRadios"
+                      id="formHorizontalRadios2"
+                      onChange={handleChange}
+                  />
+                  <Form.Check
+                      type="radio"
+                      label="Business Inquiry"
+                      name="formHorizontalRadios"
+                      id="formHorizontalRadios3"
+                      onChange={handleChange}
+                  />
+                  <Form.Check
+                      type="radio"
+                      label="Other Inquiry"
+                      name="formHorizontalRadios"
+                      id="formHorizontalRadios4"
+                      onChange={handleChange}
+                  />
+              </Col>
+            </Form.Group>
+          </fieldset>
+          <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+            <Form.Label>Message</Form.Label>
+            <Form.Control as="textarea" rows={7} onChange={handleChange}/>
+          </Form.Group>
           <input type="submit" />
-        </form>
+        </Form>
       </div>
     </div>
   );

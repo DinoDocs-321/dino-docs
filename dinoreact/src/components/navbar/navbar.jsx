@@ -7,9 +7,9 @@ const Navbar = () => {
   const [menu, setMenu, setShowLogin] = useState("home");
 
   return (
-    <div className='navbar'>
+    <div className='dinonavbar'>
       
-      <ul className="navbar-menu">
+      <ul className="dinonavbar-menu">
         <Link to='/'><img src={assets.dinologo} alt="Logo" className="logo" /> </Link>
         <Link to='/homepage' onClick={() => setMenu("home")} className={menu === "home" ? "active" : ""}>Home</Link>
         <Link to='/JSONEditor' onClick={() => setMenu("Generator")} className={menu === "Generator" ? "active" : ""}>Generator</Link>
@@ -18,7 +18,7 @@ const Navbar = () => {
         <Link to='/About' onClick={() => setMenu("About")} className={menu === "about-us" ? "active" : ""}>About</Link>
       </ul>
 
-      <div className="navbar-right">
+      <div className="dinonavbar-right">
         <button onClick={() => window.location.href = 'http://localhost:8000/login/'}>Sign In</button>
       </div>
 

@@ -3,6 +3,7 @@
 
 # ignore ALL files in ANY directory named temp
 dino/__pycache__
+
 dinoapp/__pycache__
 dinoDB/__pycache__
 reactapi/__pycache__
@@ -16,3 +17,7 @@ reactapi/migrations/__pycache__
 generator/__pycache__
 generator/migrations/__pycache__
 supervisord.pid
+generator/__pycache__
+
+# adding a comment
+dinoDB/migrations/__pycache__/__init__.cpython-311.pyc

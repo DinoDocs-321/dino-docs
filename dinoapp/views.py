@@ -3,6 +3,10 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.views.generic import TemplateView
 from .forms import LoginForm, RegisterForm
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .utils.converter import json_to_bson, bson_to_json
 
 
 # Create your views here.
@@ -44,3 +48,25 @@ def signup_view(request):
 
 def forgotpass_view(request):
     return render(request, 'forgotPass.html')
+
+class ConvertView(APIView):
+    def post(self, request):
+        conversion_type = request.data.get('type')
+        data = request.data.get('data')
+
+        if conversion_type == 'json_to_bson':
+            try:
+                converted_data = json_to_bson(data)
+                return Response({'converted': converted_data}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        elif conversion_type == 'bson_to_json':
+            try:
+                bson_docs = [bytes(doc, 'utf-8') for doc in data]
+                converted_data = bson_to_json(bson_docs)
+                return Response({'converted': converted_data}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({'error': 'Invalid conversion type'}, status=status.HTTP_400_BAD_REQUEST)

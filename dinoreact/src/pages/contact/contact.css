@@ -24,16 +24,15 @@
   
   .contact-info .logo {
     margin-top: 20px;
-    width: 100px; /* Adjust as needed */
+    width: 100px;
   }
   
   .contact-form {
-    flex: 2;
+
     width: 550px;
   }
   
-  .contact-form form {
-    display: flex;
+  .contact-form{
     flex-direction: column;
     gap: 10px; /* Add gap between form groups */
   }
@@ -47,14 +46,6 @@
   
   .contact-form label {
     margin-bottom: 5px;
-  }
-  
-  .contact-form input[type="text"],
-  .contact-form input[type="email"] {
-    padding: 8px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
   }
 
 
@@ -83,3 +74,12 @@
 
   }
   
+
+  .radio-group {
+    display: flex;
+    font-size: small;
+    font-weight: bold;
+    gap: flex;
+    justify-content: space-between;
+    align-items: center;
+}
