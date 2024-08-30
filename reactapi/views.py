@@ -7,6 +7,34 @@ from openai import OpenAI
 import bson
 import re
 
+
+
+# -------------------------------
+# ----- Login/Signup Views ------
+
+# create your views here
+
+# ----- Login/Signup Views ------
+# -------------------------------
+
+
+
+
+# ----------------------------
+# ----- JSON/BSON Views ------
+
+# create your views here
+
+# ----- JSON/BSON Views ------
+# ----------------------------
+
+
+
+
+
+# ------------------------------
+# ----- Schema form Views ------
+
 # Initialize OpenAI client
 client = OpenAI(api_key="#key")
 
@@ -85,3 +113,10 @@ def generate_documents_view(request):
     except Exception as e:
         logging.error(f"Failed to generate documents: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
+
+
+# ----- .Schema form Views ------
+# -------------------------------
+
+
+
