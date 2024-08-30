@@ -8,7 +8,7 @@ import bson
 import re
 
 # Initialize OpenAI client
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="#key")
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
