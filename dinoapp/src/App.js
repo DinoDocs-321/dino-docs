@@ -7,6 +7,8 @@ import Converter from './pages/converter/converter';
 import Contact from './pages/contact/contact';
 import JSONEditor from './pages/jsoneditor/App';
 import SchemaForm from './pages/SchemaForm/App';
+import SignIn from './pages/signin/signin'
+import SignUp from './pages/signup/signup'
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         <Route path='/contact' element={<Contact />} />
         <Route path='/JSONEditor' element={<JSONEditor />} />
         <Route path='/schema-form' element={<SchemaForm />} />
+        <Route path='/signin' element={<SignIn />} />
+        <Route path='/signup' element={<SignUp />} />
         {/* define path for url not found ! */}
       </Routes> 
     </div>

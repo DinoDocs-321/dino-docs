@@ -13,7 +13,7 @@ import bson
 
 # create your views here
 
-# ----- Login/Signup Views ------
+# ----- .Login/Signup Views ------
 # -------------------------------
 
 
@@ -24,7 +24,7 @@ import bson
 
 # create your views here
 
-# ----- JSON/BSON Views ------
+# ----- .JSON/BSON Views ------
 # ----------------------------
 
 

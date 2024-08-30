@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,9 +28,7 @@ SECRET_KEY = "django-insecure-k39w2m*jf!57uazai7tv#+vl$8-5r%vv&fgg@gt=dp5=m@$*n+
 DEBUG = True
 
 ALLOWED_HOSTS = [
-  'localhost', 
-  '127.0.0.1', 
-  '0.0.0.0'
+  '*'
 ]
 
 
@@ -45,6 +43,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     'reactapi',
+    'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +58,21 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+      'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True
+}
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = "dino.urls"
 
