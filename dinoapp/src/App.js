@@ -19,6 +19,7 @@ function App() {
         <Route path='/contact' element={<Contact />} />
         <Route path='/JSONEditor' element={<JSONEditor />} />
         <Route path='/schema-form' element={<SchemaForm />} />
+        {/* define path for url not found ! */}
       </Routes> 
     </div>
   );

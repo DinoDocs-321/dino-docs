@@ -10,11 +10,11 @@ const SchemaForm = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const result = await axios.post('http://127.0.0.1:8000/generate/', {
-                schema,
-                format,
-                num_samples: numSamples,
-            });
+          const result = await axios.post('http://127.0.0.1:8000/api/generate/', {
+            schema,
+            format,
+            num_samples: numSamples,
+        });
             setResponse(result.data);
         } catch (error) {
             console.error('There was an error generating the documents!', error);
