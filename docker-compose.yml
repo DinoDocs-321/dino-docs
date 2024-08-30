@@ -1,9 +1,24 @@
 services:
-  web:
-    build: .
-    command: supervisord -c /etc/supervisor/supervisord.conf
+  django:
+    build:
+      context: dino  # Root directory where the Django Dockerfile is located
+      dockerfile: Dockerfile
+    container_name: django_app
     volumes:
       - .:/usr/src/app
     ports:
       - "8000:8000"
+    environment:
+      - DEBUG=1
+      - SECRET_KEY="h_qq3+(%*4v)7r_@hzphjdef+2gmzzs@6o6qszai=zgsm10i4"
+
+  react:
+    build:
+      context: ./dinoapp  # Path to the React Dockerfile
+    container_name: react_app
+    volumes:
+      - ./dinoapp:/usr/src/app
+    ports:
       - "3000:3000"
+    stdin_open: true
+    tty: true

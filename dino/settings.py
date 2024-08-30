@@ -22,11 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-l$5$msnhqn3*hd(!g%xe0r^qk303v@ky@azm6#w&v(%$xm#apl"
+SECRET_KEY = "django-insecure-k39w2m*jf!57uazai7tv#+vl$8-5r%vv&fgg@gt=dp5=m@$*n+"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-# DEBUG = False
 
 ALLOWED_HOSTS = [
   'localhost', 
@@ -44,29 +43,20 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "dinoapp",
-    # 'myapp',
-    'rest_framework',
-    'corsheaders',
+    "corsheaders",
     'reactapi',
-    'generator'
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-]
+    "corsheaders.middleware.CorsMiddleware",
 
-CORS_ORIGIN_ALLOW_ALL = True
-
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
 ]
 
 ROOT_URLCONF = "dino.urls"
@@ -89,16 +79,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "dino.wsgi.application"
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
+
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 # DATABASES = {
-#    "default": {
-#       "ENGINE": "django.db.backends.sqlite3",
-#        "NAME": BASE_DIR / "db.sqlite3",
-#    }
-#}
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
+
 
 DATABASES = {
     'default': {
@@ -113,7 +112,6 @@ DATABASES = {
         },
     }
 }
-
 
 
 # Password validation
@@ -153,7 +151,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'dinoreact/build/static'),
+    os.path.join(BASE_DIR, 'dinoapp/build/static'),
 )
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

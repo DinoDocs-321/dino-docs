@@ -3,7 +3,7 @@
 
 # ignore ALL files in ANY directory named temp
 dino/__pycache__
-
+venv/
 dinoapp/__pycache__
 dinoDB/__pycache__
 reactapi/__pycache__
