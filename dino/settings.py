@@ -72,6 +72,8 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True
 }
 
+AUTH_USER_MODEL = 'reactapi.CustomUser'
+
 CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = "dino.urls"
@@ -120,8 +122,6 @@ DATABASES = {
         'NAME': 'dinodocsDB01',
         'CLIENT': {
             'host': 'mongodb+srv://terenceyuan:tydino1@cluster0.hwtjmmu.mongodb.net/dinodocsDB01?retryWrites=true&w=majority',
-            'username': 'terenceyuan',  # Optional if included in the URI
-            'password': 'tydino1',      # Optional if included in the URI
             'authSource': 'admin',
             'authMechanism': 'SCRAM-SHA-1',
         },

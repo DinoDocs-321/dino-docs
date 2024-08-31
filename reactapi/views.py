@@ -3,6 +3,11 @@ import logging
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenObtainPairSerializer, RegisterSerializer
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from openai import OpenAI
 import bson
 
@@ -11,7 +16,20 @@ import bson
 # -------------------------------
 # ----- Login/Signup Views ------
 
-# create your views here
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+@api_view(['POST'])
+def register_user(request):
+    """
+    Register a new user.
+    """
+    if request.method == 'POST':
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()  # Create the new user
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # ----- .Login/Signup Views ------
 # -------------------------------
@@ -43,7 +61,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 def generate_documents(schema: dict, num_docs: int = 1):
     """Generates multiple unique documents by making separate API calls for each document."""
     generated_documents = []
-    
+
     try:
         for _ in range(num_docs):
             prompt = f"Generate a unique sample JSON document based on the following schema: {json.dumps(schema)}"
@@ -54,10 +72,10 @@ def generate_documents(schema: dict, num_docs: int = 1):
                     {"role": "user", "content": prompt}
                 ]
             )
-            
+
             # Access the content correctly using dot notation
             document_content = response.choices[0].message.content
-            
+
             # Attempt to extract and parse JSON from the response
             try:
                 # Look for the first occurrence of valid JSON in the content
@@ -96,7 +114,7 @@ def generate_documents_view(request):
         # Convert schema string to dict if necessary
         if isinstance(schema, str):
             schema = json.loads(schema)
-        
+
         # Generate documents using the OpenAI API
         documents = generate_documents(schema, num_samples)
 

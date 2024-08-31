@@ -2,18 +2,20 @@
 
 from django.urls import path
 from . import views
-from .views import generate_documents_view
 from rest_framework_simplejwt import views as jwt_views
+from .views import generate_documents_view, CustomTokenObtainPairView, register_user
+from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
     path('generate/', generate_documents_view, name='generate_documents'),
-    path('token/', 
-          jwt_views.TokenObtainPairView.as_view(), 
-          name ='token_obtain_pair'),
-     path('token/refresh/', 
-          jwt_views.TokenRefreshView.as_view(), 
-          name ='token_refresh')
+        # Custom token obtain view to use email for authentication
+    path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
 
-    # login url mapping here
-    # create api endpoint url here for port 8000
+    # Default token refresh view
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('register/', register_user, name='register')
+
+    # Other endpoints
+    # path('login/', views.login_view, name='login'),
+    # Add additional endpoints as needed
 ]
