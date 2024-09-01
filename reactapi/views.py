@@ -1,10 +1,16 @@
 import json
 import logging
+import re
 from django.http import JsonResponse, HttpResponseBadRequest
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from openai import OpenAI
 import bson
+from reactapi.models import JSONData
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 
 
@@ -23,7 +29,21 @@ import bson
 # ----- JSON/BSON Views ------
 
 # create your views here
+def convert_json_to_bson(APIView):
+    def post(self, request):
+        try:
 
+            json_data = json.loads(request.body)
+
+            bson_data = bson.BSON.encode(json_data)
+
+            bson_str = bson_data.hex()
+
+            return JsonResponse({'bson_data': bson_str})
+        except json.JSONDecodeError:
+            return HttpResponseBadRequest("Invalid JSON")
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))
 # ----- .JSON/BSON Views ------
 # ----------------------------
 
