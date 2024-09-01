@@ -29,21 +29,28 @@ from rest_framework import status
 # ----- JSON/BSON Views ------
 
 # create your views here
-def convert_json_to_bson(APIView):
+class ConvertJsonToBson(APIView):
     def post(self, request):
         try:
+            # Parsing JSON data from the request body
+            request_data = json.loads(request.body.decode('utf-8'))
+            json_data = request_data.get('data')
 
-            json_data = json.loads(request.body)
+            if not json_data:
+                return HttpResponseBadRequest("No data provided")
 
-            bson_data = bson.BSON.encode(json_data)
+            # Convert JSON to BSON
+            bson_data = bson.BSON.encode({"data": json_data})
 
+            # Convert BSON to hexadecimal string for easy representation
             bson_str = bson_data.hex()
 
-            return JsonResponse({'bson_data': bson_str})
+            return JsonResponse({'converted_data': bson_str})
         except json.JSONDecodeError:
             return HttpResponseBadRequest("Invalid JSON")
         except Exception as e:
             return HttpResponseBadRequest(str(e))
+
 # ----- .JSON/BSON Views ------
 # ----------------------------
 
