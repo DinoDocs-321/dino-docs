@@ -1,0 +1,41 @@
+.container {
+    margin-top: 50px;
+  }
+
+  .card {
+    border: 1px solid #e3e3e3;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .form-control {
+    margin-bottom: 15px;
+  }
+
+  .btn {
+    background-color: #333;
+    color: white;
+    margin-top: 10px;
+  }
+
+  .btn-outline-danger {
+    margin-top: 10px;
+  }
+
+  .two {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }

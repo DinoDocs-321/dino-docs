@@ -8,6 +8,13 @@ from .serializers import CustomTokenObtainPairSerializer, RegisterSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from django.contrib.auth import authenticate
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+import json
+
 from openai import OpenAI
 import bson
 
@@ -32,6 +39,32 @@ def register_user(request):
     else:
         # Log the errors or return them in the response
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])  # Allow any user to access this view (including unauthenticated users)
+def signin_view(request):
+    try:
+        # Parse JSON body
+        data = request.data
+        email = data.get('email')
+        password = data.get('password')
+
+        # Authenticate user
+        user = authenticate(request, username=email, password=password)
+
+        if user is not None:
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }, status=200)
+        else:
+            return Response({'error': 'Invalid email or password'}, status=401)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
 
 # ----- .Login/Signup Views ------
 # -------------------------------
