@@ -49,3 +49,11 @@
     cursor: pointer;
     transition: 0.3s; 
 }
+
+.dinonavbar-menu a:hover {
+  color: #ffffff; /* Change color on hover */
+}
+
+.dinonavbar button:hover {
+  background-color: #77A7B5; /* Slightly darker shade */
+}
