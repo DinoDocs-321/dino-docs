@@ -45,7 +45,7 @@ const Signup = () => {
         // Save JWT token to localStorage or cookie
         localStorage.setItem('token', response.data.token);
         setMessage('Sign up successful!');
-        navigate('/dashboard'); // Redirect to a protected route
+        navigate('/homepage'); // Redirect to a protected route
       }
     } catch (error) {
       if (error.response && error.response.data) {
