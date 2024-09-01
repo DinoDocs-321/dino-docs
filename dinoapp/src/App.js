@@ -9,6 +9,7 @@ import JSONEditor from './pages/jsoneditor/App';
 import SchemaForm from './pages/SchemaForm/App';
 import SignIn from './pages/signin/signin'
 import SignUp from './pages/signup/signup'
+import NotFound from './pages/notfound/notfound'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path='/schema-form' element={<SchemaForm />} />
         <Route path='/signin' element={<SignIn />} />
         <Route path='/signup' element={<SignUp />} />
+        <Route path="*" element={<NotFound />} />
         {/* define path for url not found ! */}
       </Routes> 
     </div>

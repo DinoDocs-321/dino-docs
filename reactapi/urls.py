@@ -1,22 +1,14 @@
-# reactapi/urls.py
-
 from django.urls import path
-from . import views
-from rest_framework_simplejwt import views as jwt_views
-from .views import generate_documents_view, CustomTokenObtainPairView, register_user
-from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from .views import generate_documents_view, RegisterUser
 
 urlpatterns = [
     path('generate/', generate_documents_view, name='generate_documents'),
-
-        # Custom token obtain view to use email for authentication
-    path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
-
-    # Default token refresh view
+    
+    # JWT Authentication paths
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('register/', register_user, name='register'),
-
-    # Other endpoints
-    # path('login/', views.login_view, name='login'),
-    # Add additional endpoints as needed
+    
+    # User registration path
+    path('signup/', RegisterUser.as_view(), name='register_user'),
 ]

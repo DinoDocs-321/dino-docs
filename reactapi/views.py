@@ -1,37 +1,37 @@
 import json
 import logging
+import re
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import CustomTokenObtainPairSerializer, RegisterSerializer
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from openai import OpenAI
 import bson
 
-
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.contrib.auth.models import User
+from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import UserSerializer
 
 # -------------------------------
 # ----- Login/Signup Views ------
 
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
 
 
-@api_view(['POST'])
-def register_user(request):
-    """
-    Register a new user.
-    """
-    serializer = RegisterSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()  # Create the new user
-        return Response({"message": "User created successfully!"}, status=status.HTTP_201_CREATED)
-    else:
-        # Log the errors or return them in the response
+
+class RegisterUser(APIView):
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'token': str(refresh.access_token),
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # ----- .Login/Signup Views ------
 # -------------------------------
