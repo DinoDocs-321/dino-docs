@@ -1,70 +1,76 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation after signup
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Alert from 'react-bootstrap/Alert';
-import axios from 'axios';
-import './signup.css'; // Import custom CSS for additional styling
-
-// Import assets from the specified path
-import { assets } from '../../assets/assets';
+import { assets } from '../../assets/assets';  // Adjust the path as needed for your assets
+import './signup.css';
 
 const Signup = () => {
-const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+  // State to handle form inputs
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
     email: '',
-    phone: '',
+    phone_number: '',
     password: '',
-    confirmPassword: '',
+    confirm_password: '',
     termsAccepted: false,
-});
+  });
 
-const [message, setMessage] = useState('');
-const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({});  // State to handle validation errors
+  const [message, setMessage] = useState('');  // State to handle general messages
 
-const handleChange = (e) => {
+  const navigate = useNavigate();  // Hook to navigate to different routes
+
+  // Handle input changes
+  const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
-    ...formData,
-    [name]: type === 'checkbox' ? checked : value,
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value,
     });
-};
+  };
 
-const handleSubmit = async (e) => {
+  // Handle form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const { password, confirmPassword, termsAccepted } = formData;
+    setErrors({});  // Clear previous errors
 
-    // Reset errors
-    setErrors({});
+    const { password, confirm_password, termsAccepted } = formData;
 
-    // Validation checks
-    if (password !== confirmPassword) {
-    setErrors({ ...errors, confirmPassword: "Passwords do not match!" });
-    return;
+    // Client-side validation
+    if (password !== confirm_password) {
+      setErrors({ ...errors, confirm_password: "Passwords do not match!" });
+      return;
     }
 
     if (!termsAccepted) {
-    setErrors({ ...errors, termsAccepted: "You must accept the terms and privacy policies." });
-    return;
+      setErrors({ ...errors, termsAccepted: "You must accept the terms and privacy policies." });
+      return;
     }
 
     try {
-      // Make the API call to register the user
-    const response = await axios.post('http://localhost:8000/api/register/', formData);
+      // Make the API request to the Django backend
+      const response = await axios.post('http://localhost:8000/api/register/', formData);
 
-    if (response.status === 201) {
-        setMessage("Registration successful! Please login.");
-    } else {
-        setMessage("Registration failed. Please try again.");
-    }
+      if (response.status === 201) {
+        setMessage("Registration successful! Redirecting to homepage...");
+
+        setTimeout(() => navigate('/generate'), 2000);  // Redirect to homepage after 2 seconds
+      }
     } catch (error) {
-    console.error("There was an error!", error);
-    setMessage("An error occurred. Please try again.");
+      console.error('There was an error registering the user!', error);
+      setMessage("An error occurred. Please try again.");
+      if (error.response && error.response.data) {
+        setErrors(error.response.data);  // Set errors from server response
+      }
     }
-};
+  };
 
 return (
     <Container className="my-5">
@@ -88,15 +94,15 @@ return (
                 </ul>
                 </Alert>
             )}
-            <Form onSubmit={handleSubmit}>
+            <Form onSubmit={handleSubmit} method="POST">
                 <Row className="mb-3" style={{ gap: '1%' }}>
                 <Col>
                     <Form.Group controlId="formFirstName">
                     <Form.Control
                         type="text"
-                        name="firstName"
+                        name="first_name"
                         placeholder="First Name"
-                        value={formData.firstName}
+                        value={formData.first_name}
                         onChange={handleChange}
                         required
                     />
@@ -106,9 +112,9 @@ return (
                     <Form.Group controlId="formLastName">
                       <Form.Control
                         type="text"
-                        name="lastName"
+                        name="last_name"
                         placeholder="Last Name"
-                        value={formData.lastName}
+                        value={formData.last_name}
                         onChange={handleChange}
                         required
                       />
@@ -133,9 +139,9 @@ return (
                     <Form.Group controlId="formPhone">
                       <Form.Control
                         type="text"
-                        name="phone"
+                        name="phone_number"
                         placeholder="Phone Number"
-                        value={formData.phone}
+                        value={formData.phone_number}
                         onChange={handleChange}
                         required
                       />
@@ -157,9 +163,9 @@ return (
                 <Form.Group controlId="formConfirmPassword" className="mb-3">
                   <Form.Control
                     type="password"
-                    name="confirmPassword"
+                    name="confirm_password"
                     placeholder="Confirm Password"
-                    value={formData.confirmPassword}
+                    value={formData.confirm_password}
                     onChange={handleChange}
                     required
                   />
@@ -188,7 +194,7 @@ return (
                 {message && <p className="mt-3 text-center">{message}</p>}
 
                 <div className="mt-3 text-center">
-                  <p>Already have an account? <a href="/login">Login</a></p>
+                  <p>Already have an account? <a href="/#">Login</a></p>
                 </div>
 
                 <div className="mt-3 text-center">

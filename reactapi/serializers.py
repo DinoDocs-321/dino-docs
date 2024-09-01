@@ -38,10 +38,11 @@ class RegisterSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(required=True, max_length=15)
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
     confirm_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    termsAccepted = serializers.BooleanField(write_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'email', 'phone_number', 'password', 'confirm_password')
+        fields = ('first_name', 'last_name', 'email', 'phone_number', 'password', 'confirm_password', 'termsAccepted')
 
     def validate_email(self, value):
         """Ensure email is unique."""
@@ -50,13 +51,16 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
-        """Ensure the passwords match."""
+        """Ensure passwords match and terms are accepted."""
         if data['password'] != data['confirm_password']:
             raise serializers.ValidationError("Passwords do not match.")
+        if not data.get('termsAccepted'):
+            raise serializers.ValidationError("You must accept the terms and privacy policies.")
         return data
 
     def create(self, validated_data):
         validated_data.pop('confirm_password')  # Remove confirm_password as it's not needed to create a user
+        validated_data.pop('termsAccepted')  # Remove termsAccepted as it's not a user model field
 
         user = CustomUser(
             email=validated_data['email'],

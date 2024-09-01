@@ -8,12 +8,13 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
     path('generate/', generate_documents_view, name='generate_documents'),
+
         # Custom token obtain view to use email for authentication
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
 
     # Default token refresh view
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('register/', register_user, name='register')
+    path('register/', register_user, name='register'),
 
     # Other endpoints
     # path('login/', views.login_view, name='login'),

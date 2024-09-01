@@ -19,16 +19,18 @@ import bson
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
+
 @api_view(['POST'])
 def register_user(request):
     """
     Register a new user.
     """
-    if request.method == 'POST':
-        serializer = RegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()  # Create the new user
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    serializer = RegisterSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()  # Create the new user
+        return Response({"message": "User created successfully!"}, status=status.HTTP_201_CREATED)
+    else:
+        # Log the errors or return them in the response
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # ----- .Login/Signup Views ------
