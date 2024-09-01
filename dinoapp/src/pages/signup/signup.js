@@ -181,7 +181,7 @@ const Signup = () => {
 
                 <div className="mt-3 text-center">
                   <p>
-                    Already have an account? <a href="/#">Login</a>
+                    Already have an account? <a href="/signin">Login</a>
                   </p>
                 </div>
 

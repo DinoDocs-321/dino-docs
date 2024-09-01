@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
 from openai import OpenAI
 
 # Django imports
@@ -23,6 +24,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
+
 
 # Local application imports
 from .serializers import UserSerializer
@@ -70,6 +72,22 @@ class LoginUser(APIView):
         except User.DoesNotExist:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            # Get the refresh token from the request data
+            refresh_token = request.data.get('refresh_token')
+            token = RefreshToken(refresh_token)
+            
+            # Blacklist the refresh token, effectively logging out the user
+            token.blacklist()
+
+            return Response({"message": "Logout successful."}, status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ForgotPasswordRequest(APIView):
     permission_classes = [AllowAny]
@@ -89,7 +107,7 @@ class ForgotPasswordRequest(APIView):
                 'uid': uid,
                 'token': token,
             })
-            send_mail(mail_subject, message, 'temp@sohamverma.com', [email])
+            send_mail(mail_subject, message, 'contact@sohamverma.com', [email])
 
             return Response({'message': 'Password reset email sent'}, status=status.HTTP_200_OK)
 

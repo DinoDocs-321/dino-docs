@@ -25,7 +25,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <Container className="my-5">
+    <Container className="m-2">
       <h3>Forgot Password</h3>
       {error && <Alert variant="danger">{error}</Alert>}
       {message && <Alert variant="success">{message}</Alert>}
@@ -40,7 +40,7 @@ const ForgotPassword = () => {
             required
           />
         </Form.Group>
-        <Button variant="primary" type="submit" className="mt-3">
+        <Button variant="primary" type="submit" className="mt-1">
           Submit
         </Button>
       </Form>
