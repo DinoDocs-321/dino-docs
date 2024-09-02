@@ -44,14 +44,15 @@ const Converter = () => {
 
   const handleConvert = async () => {
     try {
-      const response = await axios.post('/api/convert/', {
-        type: 'json_to_bson', 
-        data: textFieldValue
+      const response = await axios.post('http://localhost:8000/api/convert/', {
+        data: textFieldValue,
       });
-      setConversionResult(response.data.converted);
+  
+
+      setConversionResult(response.data.converted_data);
     } catch (error) {
-      console.error('Conversion error:', error);
-      setConversionResult('Error during conversion');
+      console.error('Error during conversion:', error);
+      alert('An error occurred during conversion. Please check the console for more details.');
     }
   };
 
