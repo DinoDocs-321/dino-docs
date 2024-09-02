@@ -1,69 +1,60 @@
 import json
 import logging
+import re
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import CustomTokenObtainPairSerializer, RegisterSerializer
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from django.contrib.auth import authenticate
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework_simplejwt.tokens import RefreshToken
-import json
-
 from openai import OpenAI
 import bson
 
-
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import UserSerializer
 
 # -------------------------------
 # ----- Login/Signup Views ------
 
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
 
 
-@api_view(['POST'])
-def register_user(request):
-    """
-    Register a new user.
-    """
-    serializer = RegisterSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()  # Create the new user
-        return Response({"message": "User created successfully!"}, status=status.HTTP_201_CREATED)
-    else:
-        # Log the errors or return them in the response
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-@api_view(['POST'])
-@permission_classes([AllowAny])  # Allow any user to access this view (including unauthenticated users)
-def signin_view(request):
-    try:
-        # Parse JSON body
-        data = request.data
-        email = data.get('email')
-        password = data.get('password')
-
-        # Authenticate user
-        user = authenticate(request, username=email, password=password)
-
-        if user is not None:
-            # Generate JWT tokens
+class RegisterUser(APIView):
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
             refresh = RefreshToken.for_user(user)
             return Response({
                 'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }, status=200)
-        else:
-            return Response({'error': 'Invalid email or password'}, status=401)
-    except Exception as e:
-        return Response({'error': str(e)}, status=500)
+                'token': str(refresh.access_token),
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LoginUser(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        
+        if email is None or password is None:
+            return Response({'error': 'Please provide both email and password'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = User.objects.get(email=email)
+            user = authenticate(username=user.username, password=password)
+            if user:
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        except User.DoesNotExist:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 # ----- .Login/Signup Views ------

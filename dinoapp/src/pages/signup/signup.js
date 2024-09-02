@@ -9,9 +9,9 @@ import Col from 'react-bootstrap/Col';
 import Alert from 'react-bootstrap/Alert';
 import { assets } from '../../assets/assets';  // Adjust the path as needed for your assets
 import './signup.css';
+import { FaGoogle } from 'react-icons/fa';
 
 const Signup = () => {
-  // State to handle form inputs
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -21,94 +21,83 @@ const Signup = () => {
     confirm_password: '',
     termsAccepted: false,
   });
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
-  const [errors, setErrors] = useState({});  // State to handle validation errors
-  const [message, setMessage] = useState('');  // State to handle general messages
+  const handleLoginClick = () => {
+    navigate('/signin');
+  };
 
-  const navigate = useNavigate();  // Hook to navigate to different routes
-
-  // Handle input changes
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value,
+      [e.target.name]: e.target.value,
     });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors({});  // Clear previous errors
 
-    const { password, confirm_password, termsAccepted } = formData;
-
-    // Client-side validation
-    if (password !== confirm_password) {
-      setErrors({ ...errors, confirm_password: "Passwords do not match!" });
-      return;
-    }
-
-    if (!termsAccepted) {
-      setErrors({ ...errors, termsAccepted: "You must accept the terms and privacy policies." });
+    if (formData.password !== formData.confirm_password) {
+      setErrors({ confirm_password: "Passwords don't match" });
       return;
     }
 
     try {
-      // Make the API request to the Django backend
-      const response = await axios.post('http://localhost:8000/api/register/', formData);
-
-      if (response.status === 201) {
-        setMessage("Registration successful! Redirecting to homepage...");
-
-        setTimeout(() => navigate('/generate'), 2000);  // Redirect to homepage after 2 seconds
+      const response = await axios.post('http://127.0.0.1:8000/api/signup/', formData);
+      if (response.data.token) {
+        // Save JWT token to localStorage or cookie
+        localStorage.setItem('token', response.data.token);
+        setMessage('Sign up successful!');
+        navigate('/homepage'); // Redirect to a protected route
       }
     } catch (error) {
-      console.error('There was an error registering the user!', error);
-      setMessage("An error occurred. Please try again.");
       if (error.response && error.response.data) {
-        setErrors(error.response.data);  // Set errors from server response
+        setErrors(error.response.data);
+      } else {
+        setErrors({ general: 'Something went wrong, please try again.' });
       }
     }
   };
 
-return (
+  return (
     <Container className="my-5">
-    <Row className="justify-content-center align-items-center">
+      <Row className="justify-content-center align-items-center">
         <Col md={5} className="d-none d-md-block">
           {/* Left Column for Image */}
-        <div className="signup-img-container">
+          <div className="signup-img-container">
             <img src={assets.Rectangle} alt="Sign Up" className="img-fluid" />
-        </div>
+          </div>
         </Col>
         <Col md={7}>
-        <div className="signup-form-container">
+          <div className="signup-form-container">
             <h3 className="signup-title text-left mb-4">Sign Up</h3>
             <div>
-            {Object.keys(errors).length > 0 && (
+              {Object.keys(errors).length > 0 && (
                 <Alert variant="danger" dismissible>
-                <ul className="mb-0">
+                  <ul className="mb-0">
                     {Object.entries(errors).map(([key, value]) => (
-                    <li key={key}>{value}</li>
+                      <li key={key}>{value}</li>
                     ))}
-                </ul>
+                  </ul>
                 </Alert>
-            )}
-            <Form onSubmit={handleSubmit} method="POST">
+              )}
+              <Form onSubmit={handleSubmit} method="POST">
                 <Row className="mb-3" style={{ gap: '1%' }}>
-                <Col>
+                  <Col>
                     <Form.Group controlId="formFirstName">
-                    <Form.Control
+                      <Form.Control
                         type="text"
                         name="first_name"
                         placeholder="First Name"
                         value={formData.first_name}
                         onChange={handleChange}
                         required
-                    />
+                      />
                     </Form.Group>
-                </Col>
-                <Col>
+                  </Col>
+                  <Col>
                     <Form.Group controlId="formLastName">
                       <Form.Control
                         type="text"
@@ -178,7 +167,7 @@ return (
                     id="terms"
                     label={
                       <>
-                        I agree to all the <a href="#">Terms and Privacy Policies</a>
+                        I agree to all the <a href="#" style={{ color: 'red' }}>Terms</a> and <a href="#" style={{ color: 'red' }}>Privacy Policies</a>
                       </>
                     }
                     checked={formData.termsAccepted}
@@ -188,18 +177,31 @@ return (
                 </Form.Group>
 
                 <div className="form-group mb-3">
-                  <Button type="submit" className="col-md-12 btn btn-dark">Create account</Button>
+                  <Button type="submit" className="col-md-12 btn btn-dark">
+                    Create account
+                  </Button>
                 </div>
 
                 {message && <p className="mt-3 text-center">{message}</p>}
 
                 <div className="mt-3 text-center">
-                  <p>Already have an account? <a href="/#">Login</a></p>
+                  <p>
+                    Already have an account? <a style={{ cursor: 'pointer', color: 'red' }} onClick={handleLoginClick}>Login</a>
+                  </p>
                 </div>
 
                 <div className="mt-3 text-center">
-                  <p>Or Sign up with</p>
-                  <Button variant="outline-dark"><i className="fab fa-google"></i> Google</Button>
+                <div className="divider-container">
+                  <hr className="divider-line" />
+                  <span className="divider-text">Or Sign up with</span>
+                  <hr className="divider-line" />
+                </div>
+                <div className="mt-3 text-center">
+                  <Button className="google-signup-button" variant="outline-primary">
+                    <FaGoogle className="google-icon" />
+                    Google
+                  </Button>
+                </div>
                 </div>
               </Form>
             </div>
