@@ -1,6 +1,10 @@
+# Standard library imports
 import json
 import logging
 import re
+import bson
+
+# Third-party imports
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -15,10 +19,25 @@ from rest_framework import status
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
+from openai import OpenAI
+
+# Django imports
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from rest_framework_simplejwt.tokens import RefreshToken
+from django.template.loader import render_to_string
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
+
+
+# Local application imports
 from .serializers import UserSerializer
+
+
 
 # -------------------------------
 # ----- Login/Signup Views ------
@@ -43,10 +62,10 @@ class LoginUser(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
-        
+
         if email is None or password is None:
             return Response({'error': 'Please provide both email and password'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         try:
             user = User.objects.get(email=email)
             user = authenticate(username=user.username, password=password)
@@ -60,6 +79,66 @@ class LoginUser(APIView):
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
         except User.DoesNotExist:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            # Get the refresh token from the request data
+            refresh_token = request.data.get('refresh_token')
+            token = RefreshToken(refresh_token)
+
+            # Blacklist the refresh token, effectively logging out the user
+            token.blacklist()
+
+            return Response({"message": "Logout successful."}, status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ForgotPasswordRequest(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        try:
+            user = User.objects.get(email=email)
+            token = PasswordResetTokenGenerator().make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            # You should configure your email settings in settings.py for this to work.
+            mail_subject = 'Password Reset Request'
+            message = render_to_string('password_reset_email.html', {
+                'user': user,
+                'domain': 'localhost:3000',  # Your frontend domain
+                'uid': uid,
+                'token': token,
+            })
+            send_mail(mail_subject, message, 'contact@sohamverma.com', [email])
+
+            return Response({'message': 'Password reset email sent'}, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            return Response({'error': 'Email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class ResetPasswordConfirm(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+            if PasswordResetTokenGenerator().check_token(user, token):
+                new_password = request.data.get('password')
+                user.set_password(new_password)
+                user.save()
+                return Response({'message': 'Password reset successful'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Token is invalid or expired'}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({'error': 'Invalid user'}, status=status.HTTP_404_NOT_FOUND)
 
 
 # ----- .Login/Signup Views ------

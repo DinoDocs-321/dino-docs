@@ -1,5 +1,3 @@
-// src/pages/signout/signout.js
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,7 +14,7 @@ const SignOut = () => {
   }, [navigate]);
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
+    <div style={{ textAlign: 'center', marginTop: '0' }}>
       <h2>Signing out...</h2>
     </div>
   );
