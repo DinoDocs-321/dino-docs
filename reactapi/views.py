@@ -155,13 +155,15 @@ class ConvertJsonToBson(APIView):
     def post(self, request):
         try:
             # Parsing JSON data from the request body
-            json_data = request.data.get('data')
+            request_data = json.loads(request.body.decode('utf-8'))
+            json_data = request_data.get('data')
+
 
             if not json_data:
                 return HttpResponseBadRequest("No data provided")
 
             # Convert JSON to BSON
-            bson_data = bson.BSON.encode(json_data)
+            bson_data = bson.BSON.encode({"data": json_data})
 
             # Convert BSON to hexadecimal string for easy representation
             bson_str = bson_data.hex()

@@ -19,5 +19,6 @@ urlpatterns = [
     path('reset-password/<uidb64>/<token>/', ResetPasswordConfirm.as_view(), name='reset_password_confirm'),
     path('convert/', ConvertJsonToBson.as_view(), name='convert-json-schema-to-bson'),
 
+
 ]
 
