@@ -9,12 +9,8 @@ const Converter = () => {
   const [conversionResult, setConversionResult] = useState('');
 
   useEffect(() => {
-    const fetchData = async () => {
-      const preLoadedData = 'This is pre-loaded data';
-      setTextFieldValue(preLoadedData);
-    };
-
-    fetchData();
+    const preLoadedData = '{"key": "value"}'; 
+    setTextFieldValue(preLoadedData);
   }, []);
 
   const handleInputChange = (event) => {
@@ -22,24 +18,30 @@ const Converter = () => {
   };
 
   const handleGenerateSave = () => {
-    const blob = new Blob([textFieldValue], { type: 'text/plain' });
+    const blob = new Blob([textFieldValue], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'content.txt';
+    link.download = 'content.json';
     link.click();
     URL.revokeObjectURL(url);
   };
 
   const handleGenerateBSONFile = () => {
-    const data = { content: textFieldValue };
-    const bsonData = BSON.serialize(data);
-    const blob = new Blob([bsonData], { type: 'application/bson' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = 'content.bson';
-    link.click();
-    URL.revokeObjectURL(url);
+    try {
+      const data = JSON.parse(textFieldValue);
+      const bsonData = BSON.serialize(data);
+      const blob = new Blob([bsonData.buffer], { type: 'application/bson' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'content.bson';
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating BSON:', error);
+      alert('Invalid JSON. Please check your input.');
+    }
   };
 
   const handleConvert = async () => {
@@ -47,7 +49,6 @@ const Converter = () => {
       const response = await axios.post('http://localhost:8000/api/convert/', {
         data: textFieldValue,
       });
-  
 
       setConversionResult(response.data.converted_data);
     } catch (error) {
@@ -59,21 +60,21 @@ const Converter = () => {
   return (
     <div className='container'>
       <Form.Group className="bsonTextField" controlId="exampleForm.ControlTextarea1">
-            <Form.Control
-              as="textarea" rows={10}
-              value={textFieldValue}
-              onChange={handleInputChange}
-              placeholder="Enter JSON or BSON data"
-            />
+        <Form.Control
+          as="textarea" rows={10}
+          value={textFieldValue}
+          onChange={handleInputChange}
+          placeholder="Enter JSON data"
+        />
       </Form.Group>
       <div className="bsonbtns">
-        <button onClick={handleGenerateSave}>Save Schema & Document</button>
+        <button onClick={handleGenerateSave}>Save JSON Document</button>
         <button onClick={handleGenerateBSONFile}>Generate BSON Document</button>
-        <button onClick={handleConvert}>Convert Data</button>
+        <button onClick={handleConvert}>Convert to BSON</button>
       </div>
       {conversionResult && (
         <div className="conversionResult">
-          <h3>Conversion Result:</h3>
+          <h3>Conversion Result (BSON as hex):</h3>
           <pre>{conversionResult}</pre>
         </div>
       )}

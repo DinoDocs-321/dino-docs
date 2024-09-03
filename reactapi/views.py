@@ -158,6 +158,7 @@ class ConvertJsonToBson(APIView):
             request_data = json.loads(request.body.decode('utf-8'))
             json_data = request_data.get('data')
 
+
             if not json_data:
                 return HttpResponseBadRequest("No data provided")
 
