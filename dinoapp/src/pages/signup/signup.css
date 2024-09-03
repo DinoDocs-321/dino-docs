@@ -1,0 +1,85 @@
+.signup-img-container {
+    width: 470px;
+    height: 724px;
+    display: flex; /* Enables Flexbox on the container */
+    align-items: center;
+
+    border-radius: 30px;
+  }
+
+  .signup-img-container img {
+    max-width: 70%;
+    max-height: 100%;
+    display: block;
+  }
+
+  .signup-title {
+    font-weight: bold;
+    text-align: left;
+    margin-bottom: 16px;
+  }
+
+  .signup-form-container {
+    padding: 0px; /* No shadow or padding for right container */
+    background-color: #ffffff;
+  }
+
+  .flexible-placeholder {
+    font-size: 16px; /* Adjust font size as needed */
+  }
+
+  .form-group {
+    margin-bottom: 10%; /* Ensure consistent spacing between form groups */
+  }
+
+  .btn-dark {
+    background-color: #395C6B; /* Custom color for the button */
+    border-color: #333;
+  }
+
+  .text-center p a {
+    color: #333;
+  }
+  .divider-container {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+  }
+
+  .divider-line {
+    flex-grow: 1;
+    border: none;
+    border-top: 1px solid #d3d3d3; /* Light gray color */
+    margin: 0 10px;
+  }
+
+  .divider-text {
+    color: #888; /* Gray color for text */
+    font-size: 14px; /* Adjust font size as needed */
+  }
+  .google-signup-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%; /* Full width of the container */
+    border: 2px solid red ; /* Google Blue color border */
+    border-radius: 4px; /* Rounded corners */
+    background-color: white; /* White background */
+    color: #575a5e; /* Google Blue color text */
+    padding: 10px; /* Padding inside the button */
+    font-size: 16px; /* Adjust font size as needed */
+    font-weight: bold; /* Bold font weight */
+    transition: background-color 0.3s ease; /* Smooth background color transition */
+  }
+
+  .google-signup-button:hover {
+    background-color: #f1f3f4; /* Light gray background on hover */
+    color: #4285F4; /* Google Blue color text on hover */
+  }
+
+  .google-icon {
+    margin-right: 8px; /* Space between icon and text */
+    font-size: 20px; /* Adjust icon size */
+  }
+

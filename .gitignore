@@ -13,3 +13,4 @@ generator/__pycache__
 generator/migrations/__pycache__
 supervisord.pid
 dinoapp/node_modules
+node_modules
