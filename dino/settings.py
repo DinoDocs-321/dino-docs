@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "corsheaders",
     'reactapi',
     'rest_framework',
-    'rest_framework_simplejwt.token_blacklist',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -60,16 +60,15 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-      'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -120,8 +119,6 @@ DATABASES = {
         'NAME': 'dinodocsDB01',
         'CLIENT': {
             'host': 'mongodb+srv://terenceyuan:tydino1@cluster0.hwtjmmu.mongodb.net/dinodocsDB01?retryWrites=true&w=majority',
-            'username': 'terenceyuan',  # Optional if included in the URI
-            'password': 'tydino1',      # Optional if included in the URI
             'authSource': 'admin',
             'authMechanism': 'SCRAM-SHA-1',
         },
@@ -179,3 +176,12 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'  # This is the SendGrid username
+EMAIL_HOST_PASSWORD = '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'  # Replace with your SendGrid API key
+DEFAULT_FROM_EMAIL = 'contact@sohamverma.com'
