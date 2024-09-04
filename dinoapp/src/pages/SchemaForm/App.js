@@ -10,7 +10,7 @@ const SchemaForm = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-          const result = await axios.post('http://127.0.0.1:8000/api/generate/', {
+            const result = await axios.post('http://127.0.0.1:8000/api/generate/', {
             schema,
             format,
             num_samples: numSamples,
