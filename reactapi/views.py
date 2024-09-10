@@ -5,6 +5,7 @@ import re
 import bson
 
 # Third-party imports
+import concurrent.futures
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -185,43 +186,51 @@ class ConvertJsonToBson(APIView):
 # ----- Schema form Views ------
 
 # Initialize OpenAI client
-client = OpenAI(api_key="#key")
+client = OpenAI(api_key="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")
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+def generate_single_document(schema):
+    prompt = f"""
+    Generate a unique sample JSON document based on the following schema: {json.dumps(schema)}.
+    Ensure that all fields, such as names, addresses, phone numbers, and dates, are randomly generated, diverse, and unique. Avoid common names such as 'John Doe' or 'Jane Smith'.
+    Use a variety of different names from different cultures.
+    """
+
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "You are a JSON document generator."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    document_content = response.choices[0].message.content
+
+    # Extract and parse JSON from the response
+    json_match = re.search(r'\{.*\}', document_content, re.DOTALL)
+    if json_match:
+        document = json.loads(json_match.group())
+        return document
+    else:
+        raise ValueError("No valid JSON found in the response.")
+
+# Function to generate multiple documents in parallel
 def generate_documents(schema: dict, num_docs: int = 1):
-    """Generates multiple unique documents by making separate API calls for each document."""
+    """Generates multiple unique documents by making parallel API calls."""
     generated_documents = []
 
     try:
-        for _ in range(num_docs):
-            prompt = f"Generate a unique sample JSON document based on the following schema: {json.dumps(schema)}"
-            response = client.chat.completions.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": "You are a JSON document generator."},
-                    {"role": "user", "content": prompt}
-                ]
-            )
-
-            # Access the content correctly using dot notation
-            document_content = response.choices[0].message.content
-
-            # Attempt to extract and parse JSON from the response
-            try:
-                # Look for the first occurrence of valid JSON in the content
-                json_match = re.search(r'\{.*\}', document_content, re.DOTALL)
-                if json_match:
-                    document = json.loads(json_match.group())
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = [executor.submit(generate_single_document, schema) for _ in range(num_docs)]
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    document = future.result()
                     generated_documents.append(document)
                     logging.info(f"Successfully generated document: {document}")
-                else:
-                    raise ValueError("No valid JSON found in the response.")
-
-            except (json.JSONDecodeError, ValueError) as decode_error:
-                logging.error(f"Failed to parse JSON: {decode_error}")
-                raise Exception("Failed to parse generated JSON document.")
+                except Exception as e:
+                    logging.error(f"Error generating document: {e}")
 
         return generated_documents
 
@@ -230,6 +239,7 @@ def generate_documents(schema: dict, num_docs: int = 1):
         logging.error(f"Error generating documents using OpenAI API: {error_message}")
         raise Exception(error_message)
 
+# Django view for handling document generation requests
 @csrf_exempt
 @require_POST
 def generate_documents_view(request):
@@ -262,7 +272,6 @@ def generate_documents_view(request):
     except Exception as e:
         logging.error(f"Failed to generate documents: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
-
 
 # ----- .Schema form Views ------
 # -------------------------------
