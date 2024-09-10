@@ -60,9 +60,9 @@ After setting up either with a virtual environment or Docker, you can access the
 ## File Structure
 
 - `dino/`: Django project directory
-- `dinoapp/`: Main Django application
-- `dinoreact/`: React frontend application
-- `requirements.txt`: Python dependencies
+- `dinoapp/`: React frontend application
+- `reactapi/`: Main Django application
+- `dino/requirements.txt`: Python dependencies
 - `docker-compose.yml`: Docker Compose configuration
 - `Dockerfile`: Docker configuration for the Django application
 
