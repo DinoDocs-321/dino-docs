@@ -185,8 +185,13 @@ class ConvertJsonToBson(APIView):
 # ------------------------------
 # ----- Schema form Views ------
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 # Initialize OpenAI client
-client = OpenAI(api_key="#key")
+client = OpenAI(api_key= os.getenv("OPENAI_API_KEY"))
+
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -198,46 +203,66 @@ def generate_single_document(schema):
     Use a variety of different names from different cultures.
     """
 
-    response = client.chat.completions.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "You are a JSON document generator."},
-            {"role": "user", "content": prompt}
-        ]
-    )
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a JSON document generator."},
+                {"role": "user", "content": prompt}
+            ]
+        )
 
-    document_content = response.choices[0].message.content
+        document_content = response.choices[0].message.content
 
-    # Extract and parse JSON from the response
-    json_match = re.search(r'\{.*\}', document_content, re.DOTALL)
-    if json_match:
-        document = json.loads(json_match.group())
-        return document
-    else:
-        raise ValueError("No valid JSON found in the response.")
+        # Attempt to extract and parse JSON from the response
+        try:
+            # Look for the first occurrence of valid JSON in the content
+            json_match = re.search(r'\{.*\}', document_content, re.DOTALL)
+            if json_match:
+                document = json.loads(json_match.group())
+                return document
+            else:
+                raise ValueError("No valid JSON found in the response.")
+        except (json.JSONDecodeError, ValueError) as decode_error:
+            logging.error(f"Failed to parse JSON: {decode_error}")
+            raise Exception("Failed to parse generated JSON document.")
+        
+    except Exception as e:
+        logging.error(f"Error generating document: {str(e)}")
+        raise Exception(f"Error generating document: {str(e)}")
 
 # Function to generate multiple documents in parallel
 def generate_documents(schema: dict, num_docs: int = 1):
-    """Generates multiple unique documents by making parallel API calls."""
+    """Generates multiple unique documents by making parallel API calls with retries."""
     generated_documents = []
+    retries = 3
 
-    try:
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            futures = [executor.submit(generate_single_document, schema) for _ in range(num_docs)]
-            for future in concurrent.futures.as_completed(futures):
-                try:
-                    document = future.result()
-                    generated_documents.append(document)
-                    logging.info(f"Successfully generated document: {document}")
-                except Exception as e:
-                    logging.error(f"Error generating document: {e}")
+    while len(generated_documents) < num_docs and retries > 0:
+        remaining_docs = num_docs - len(generated_documents)
 
-        return generated_documents
+        try:
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                futures = [executor.submit(generate_single_document, schema) for _ in range(remaining_docs)]
+                for future in concurrent.futures.as_completed(futures):
+                    try:
+                        document = future.result()
+                        generated_documents.append(document)
+                        logging.info(f"Successfully generated document: {document}")
+                    except Exception as e:
+                        logging.error(f"Error generating document: {e}")
+                        # Retry if document fails to generate
+                        retries -= 1
+                        if retries == 0:
+                            logging.error(f"Max retries reached. Could not generate document.")
+                        else:
+                            logging.info(f"Retrying... {retries} retries left.")
+                        continue
 
-    except Exception as e:
-        error_message = str(e).split(':')[-1].strip()
-        logging.error(f"Error generating documents using OpenAI API: {error_message}")
-        raise Exception(error_message)
+        except Exception as e:
+            logging.error(f"Error in batch generation: {e}")
+
+    return generated_documents
+
 
 # Django view for handling document generation requests
 @csrf_exempt
