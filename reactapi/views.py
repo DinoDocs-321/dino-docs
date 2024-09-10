@@ -186,7 +186,7 @@ class ConvertJsonToBson(APIView):
 # ----- Schema form Views ------
 
 # Initialize OpenAI client
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="#key")
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
