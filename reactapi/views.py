@@ -221,12 +221,14 @@ Ensure that:
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4-turbo",  # Switch to GPT-4-turbo for better performance and lower cost
             messages=[
                 {"role": "system", "content": "You are a JSON document generator."},
                 {"role": "user", "content": prompt}
             ]
         )
+
+
 
         document_content = response.choices[0].message.content
         logging.info(f"Raw response: {document_content}")  # Log the raw response for debugging
