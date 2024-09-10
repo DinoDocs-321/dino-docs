@@ -1,0 +1,2062 @@
+{
+  "documents": [
+    {
+      "bank": {
+        "bankId": 123,
+        "name": "GlobalBank",
+        "address": {
+          "street": "345 Bora Parkway",
+          "city": "New Delhi",
+          "state": "Delhi",
+          "postalCode": "110001"
+        },
+        "employees": [
+          {
+            "employeeId": 789,
+            "firstName": "Mei",
+            "lastName": "Li",
+            "position": "Manager",
+            "salary": 75000,
+            "hireDate": "2017-11-11",
+            "contactInfo": {
+              "email": "mei.li@example.com",
+              "phone": "+919999999999"
+            }
+          },
+          {
+            "employeeId": 790,
+            "firstName": "Carlos",
+            "lastName": "Gomez",
+            "position": "Cashier",
+            "salary": 45000,
+            "hireDate": "2015-06-07",
+            "contactInfo": {
+              "email": "carlos.gomez@example.com",
+              "phone": "+919999899999"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 321,
+          "firstName": "Emeka",
+          "lastName": "Johnson",
+          "dob": "1978-02-21",
+          "accounts": [
+            {
+              "accountId": 123,
+              "accountType": "Checking",
+              "balance": 15000,
+              "currency": "USD",
+              "createdDate": "2016-04-30",
+              "transactions": [
+                {
+                  "transactionId": 1,
+                  "date": "2017-03-10T14:30:00Z",
+                  "type": "Credit",
+                  "amount": 1000,
+                  "description": "Paycheck deposit"
+                },
+                {
+                  "transactionId": 2,
+                  "date": "2017-03-10T16:30:00Z",
+                  "type": "Debit",
+                  "amount": 200,
+                  "description": "Grocery shopping"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "emeka.johnson@example.com",
+            "phone": "+919999879999"
+          }
+        },
+        {
+          "customerId": 322,
+          "firstName": "Sophia",
+          "lastName": "Mueller",
+          "dob": "1989-07-14",
+          "accounts": [
+            {
+              "accountId": 124,
+              "accountType": "Savings",
+              "balance": 50000,
+              "currency": "EUR",
+              "createdDate": "2018-06-25",
+              "transactions": [
+                {
+                  "transactionId": 3,
+                  "date": "2019-05-11T09:00:00Z",
+                  "type": "Credit",
+                  "amount": 2000,
+                  "description": "Birthday gift"
+                },
+                {
+                  "transactionId": 4,
+                  "date": "2019-05-11T11:00:00Z",
+                  "type": "Debit",
+                  "amount": 800,
+                  "description": "Grocery shopping"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "sophia.mueller@example.com",
+            "phone": "+919999769999"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 101,
+        "name": "Global Unity Bank",
+        "address": {
+          "street": "127 Independence Street",
+          "city": "Perth",
+          "state": "West Australia",
+          "postalCode": "6000"
+        },
+        "employees": [
+          {
+            "employeeId": 2001,
+            "firstName": "Rashid",
+            "lastName": "Kumar",
+            "position": "Branch Manager",
+            "salary": 80000,
+            "hireDate": "2015-06-17",
+            "contactInfo": {
+              "email": "rashid.kumar@example.com",
+              "phone": "+611234567890"
+            }
+          },
+          {
+            "employeeId": 2002,
+            "firstName": "Li",
+            "lastName": "Mei",
+            "position": "Financial Advisor",
+            "salary": 55000,
+            "hireDate": "2018-01-12",
+            "contactInfo": {
+              "email": "li.mei@example.com",
+              "phone": "+611092345678"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 3001,
+          "firstName": "Mateo",
+          "lastName": "Rodriguez",
+          "dob": "1975-03-25",
+          "accounts": [
+            {
+              "accountId": 4001,
+              "accountType": "Checking",
+              "balance": 7000,
+              "currency": "AUD",
+              "createdDate": "2015-04-13",
+              "transactions": [
+                {
+                  "transactionId": 5001,
+                  "date": "2018-06-29T14:30:00Z",
+                  "type": "Debit",
+                  "amount": 100,
+                  "description": "Grocery shopping"
+                },
+                {
+                  "transactionId": 5002,
+                  "date": "2018-06-30T10:15:00Z",
+                  "type": "Credit",
+                  "amount": 2000,
+                  "description": "Salary"
+                }
+              ]
+            },
+            {
+              "accountId": 4002,
+              "accountType": "Savings",
+              "balance": 20000,
+              "currency": "AUD",
+              "createdDate": "2017-11-20",
+              "transactions": [
+                {
+                  "transactionId": 5003,
+                  "date": "2019-07-01T09:00:00Z",
+                  "type": "Debit",
+                  "amount": 500,
+                  "description": "Car loan"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "mateo.rodriguez@example.com",
+            "phone": "+611023456789"
+          }
+        },
+        {
+          "customerId": 3002,
+          "firstName": "Chimamanda",
+          "lastName": "Adichie",
+          "dob": "1985-04-10",
+          "accounts": [
+            {
+              "accountId": 4003,
+              "accountType": "Credit",
+              "balance": 5000,
+              "currency": "AUD",
+              "createdDate": "2016-11-23",
+              "transactions": [
+                {
+                  "transactionId": 5004,
+                  "date": "2019-07-05T12:45:00Z",
+                  "type": "Debit",
+                  "amount": 1000,
+                  "description": "Flight ticket"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "chimamanda.adichie@example.com",
+            "phone": "+611567890123"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 123456,
+        "name": "Global United Bank",
+        "address": {
+          "street": "1234 Elm Street",
+          "city": "Munich",
+          "state": "Bavaria",
+          "postalCode": "80331"
+        },
+        "employees": [
+          {
+            "employeeId": 112233,
+            "firstName": "Juan",
+            "lastName": "Rodriguez",
+            "position": "Branch Manager",
+            "salary": 65000,
+            "hireDate": "2012-05-05",
+            "contactInfo": {
+              "email": "juan.rodriguez@gub.com",
+              "phone": "+4915112233445"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 123123,
+          "firstName": "Chen",
+          "lastName": "Wei",
+          "dob": "1980-12-30",
+          "accounts": [
+            {
+              "accountId": 456456,
+              "accountType": "Savings",
+              "balance": 15000,
+              "currency": "USD",
+              "createdDate": "2015-10-10",
+              "transactions": [
+                {
+                  "transactionId": 789789,
+                  "date": "2021-11-25T15:30:00",
+                  "type": "Debit",
+                  "amount": 200,
+                  "description": "ATM withdrawal"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "chen.wei@example.com",
+            "phone": "+8613123456789"
+          }
+        },
+        {
+          "customerId": 456456,
+          "firstName": "Esther",
+          "lastName": "Adeniji",
+          "dob": "1975-01-20",
+          "accounts": [
+            {
+              "accountId": 123123,
+              "accountType": "Checking",
+              "balance": 3000,
+              "currency": "USD",
+              "createdDate": "2018-06-10",
+              "transactions": [
+                {
+                  "transactionId": 987987,
+                  "date": "2021-12-01T10:30:00",
+                  "type": "Credit",
+                  "amount": 500,
+                  "description": "Direct Deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "esther.adeniji@example.com",
+            "phone": "+2348012345678"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 125,
+        "name": "Global Trust Financial",
+        "address": {
+          "street": "Bezirksstraße 25",
+          "city": "Berlin",
+          "state": "Berlin",
+          "postalCode": "10115"
+        },
+        "employees": [
+          {
+            "employeeId": 632,
+            "firstName": "Lars",
+            "lastName": "Müller",
+            "position": "Branch Manager",
+            "salary": 72500,
+            "hireDate": "2015-06-01",
+            "contactInfo": {
+              "email": "lars.muller@globaltrust.com",
+              "phone": "+491620442524"
+            }
+          },
+          {
+            "employeeId": 147,
+            "firstName": "Anna",
+            "lastName": "Schmidt",
+            "position": "Financial Advisor",
+            "salary": 56500.5,
+            "hireDate": "2018-03-10",
+            "contactInfo": {
+              "email": "anna.schmidt@globaltrust.com",
+              "phone": "+491526933436"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 78,
+          "firstName": "Tariq",
+          "lastName": "Iqbal",
+          "dob": "1987-05-14",
+          "accounts": [
+            {
+              "accountId": 909,
+              "accountType": "Savings",
+              "balance": 24000,
+              "currency": "EUR",
+              "createdDate": "2010-02-14",
+              "transactions": [
+                {
+                  "transactionId": 1053,
+                  "date": "2020-11-30T11:38:32Z",
+                  "type": "Debit",
+                  "amount": 150.75,
+                  "description": "Wire transfer to GCash"
+                },
+                {
+                  "transactionId": 1072,
+                  "date": "2020-12-01T14:48:45Z",
+                  "type": "Credit",
+                  "amount": 300,
+                  "description": "ATM Deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "tariq.iqbal@gmail.com",
+            "phone": "+4917620562468"
+          }
+        },
+        {
+          "customerId": 52,
+          "firstName": "Maria",
+          "lastName": "Rodriguez",
+          "dob": "1972-10-22",
+          "accounts": [
+            {
+              "accountId": 602,
+              "accountType": "Checking",
+              "balance": 8200,
+              "currency": "EUR",
+              "createdDate": "2008-08-11",
+              "transactions": [
+                {
+                  "transactionId": 1158,
+                  "date": "2020-12-05T10:31:21Z",
+                  "type": "Debit",
+                  "amount": 75.2,
+                  "description": "Coffee shop payment"
+                },
+                {
+                  "transactionId": 1173,
+                  "date": "2020-12-05T18:00:00Z",
+                  "type": "Credit",
+                  "amount": 540.5,
+                  "description": "Salary deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "maria.rodriguez@hotmail.com",
+            "phone": "+491721110435"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 12345,
+        "name": "Platinum Trust Bank",
+        "address": {
+          "street": "456 Victoria Street",
+          "city": "London",
+          "state": "Greater London",
+          "postalCode": "SW1A 2QQ"
+        },
+        "employees": [
+          {
+            "employeeId": 4561,
+            "firstName": "Marco",
+            "lastName": "Rodriguez",
+            "position": "Loan Officer",
+            "salary": 50000,
+            "hireDate": "2015-05-16",
+            "contactInfo": {
+              "email": "marco.rodriguez@ptbank.co.uk",
+              "phone": "+442071238923"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 7891011,
+          "firstName": "Miyako",
+          "lastName": "Yamada",
+          "dob": "1980-11-19",
+          "accounts": [
+            {
+              "accountId": 11211,
+              "accountType": "Checking",
+              "balance": 60000,
+              "currency": "GBP",
+              "createdDate": "2019-06-01",
+              "transactions": [
+                {
+                  "transactionId": 991001,
+                  "date": "2021-09-10T14:30:00",
+                  "type": "Debit",
+                  "amount": 500,
+                  "description": "Grocery Shopping"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "myamada@personal.co.jp",
+            "phone": "+819012345678"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 1423,
+        "name": "Leumi International",
+        "address": {
+          "street": "57 Lexington Street",
+          "city": "New York",
+          "state": "NY",
+          "postalCode": "10010"
+        },
+        "employees": [
+          {
+            "employeeId": 52345,
+            "firstName": "Luis",
+            "lastName": "Garcia",
+            "position": "Bank Manager",
+            "salary": 120000,
+            "hireDate": "2015-06-22",
+            "contactInfo": {
+              "email": "luis.garcia@email.com",
+              "phone": "+18005555555"
+            }
+          },
+          {
+            "employeeId": 78242,
+            "firstName": "Sakura",
+            "lastName": "Tanaka",
+            "position": "Accountant",
+            "salary": 80000,
+            "hireDate": "2017-03-01",
+            "contactInfo": {
+              "email": "sakura.tanaka@email.com",
+              "phone": "+18005551234"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 23453,
+          "firstName": "Mohammed",
+          "lastName": "Ali",
+          "dob": "1980-02-22",
+          "accounts": [
+            {
+              "accountId": 1234,
+              "accountType": "Checking",
+              "balance": 20000,
+              "currency": "USD",
+              "createdDate": "2010-05-01",
+              "transactions": [
+                {
+                  "transactionId": 5678,
+                  "date": "2021-07-22T10:34:00",
+                  "type": "Debit",
+                  "amount": 5000,
+                  "description": "Payment for loan"
+                },
+                {
+                  "transactionId": 7890,
+                  "date": "2021-07-25T14:50:00",
+                  "type": "Credit",
+                  "amount": 7000,
+                  "description": "Salary deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "mohammed.ali@email.com",
+            "phone": "+18005558888"
+          }
+        },
+        {
+          "customerId": 98765,
+          "firstName": "Julie",
+          "lastName": "Bonnet",
+          "dob": "1985-03-18",
+          "accounts": [
+            {
+              "accountId": 4321,
+              "accountType": "Savings",
+              "balance": 50000,
+              "currency": "EUR",
+              "createdDate": "2010-05-01",
+              "transactions": [
+                {
+                  "transactionId": 5679,
+                  "date": "2021-07-20T10:20:00",
+                  "type": "Credit",
+                  "amount": 10000,
+                  "description": "Deposit from other account"
+                },
+                {
+                  "transactionId": 7891,
+                  "date": "2021-07-21T11:15:00",
+                  "type": "Debit",
+                  "amount": 2300,
+                  "description": "Payment to vendor"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "julie.bonnet@email.com",
+            "phone": "+18005553456"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 101,
+        "name": "Global Bank",
+        "address": {
+          "street": "4325 International Blvd",
+          "city": "Tokyo",
+          "state": "Japan",
+          "postalCode": "102-0082"
+        },
+        "employees": [
+          {
+            "employeeId": 1,
+            "firstName": "Aoi",
+            "lastName": "Tanaka",
+            "position": "Manager",
+            "salary": 80000,
+            "hireDate": "2020-05-12",
+            "contactInfo": {
+              "email": "aoi.tanaka@globalbank.com",
+              "phone": "+8131234567"
+            }
+          },
+          {
+            "employeeId": 2,
+            "firstName": "Liu",
+            "lastName": "Wei",
+            "position": "Teller",
+            "salary": 50000,
+            "hireDate": "2021-03-21",
+            "contactInfo": {
+              "email": "liu.wei@globalbank.com",
+              "phone": "+8132345678"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 50001,
+          "firstName": "Carlos",
+          "lastName": "Garcia",
+          "dob": "1986-09-19",
+          "accounts": [
+            {
+              "accountId": 999,
+              "accountType": "Checking",
+              "balance": 2000,
+              "currency": "USD",
+              "createdDate": "2015-09-19",
+              "transactions": [
+                {
+                  "transactionId": 1,
+                  "date": "2015-09-19T12:00:00Z",
+                  "type": "Credit",
+                  "amount": 2000,
+                  "description": "Initial Deposit"
+                },
+                {
+                  "transactionId": 2,
+                  "date": "2015-10-01T12:00:00Z",
+                  "type": "Debit",
+                  "amount": 200,
+                  "description": "Grocery Shopping"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "carlos.garcia@email.com",
+            "phone": "+5215555555555"
+          }
+        },
+        {
+          "customerId": 50002,
+          "firstName": "Sandra",
+          "lastName": "Osei",
+          "dob": "1975-02-25",
+          "accounts": [
+            {
+              "accountId": 1000,
+              "accountType": "Savings",
+              "balance": 50000,
+              "currency": "GHS",
+              "createdDate": "2016-02-25",
+              "transactions": [
+                {
+                  "transactionId": 3,
+                  "date": "2016-02-25T12:00:00Z",
+                  "type": "Credit",
+                  "amount": 50000,
+                  "description": "Initial Deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "sandra.osei@email.com",
+            "phone": "+233202020202"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 314123,
+        "name": "Global Unity Bank",
+        "address": {
+          "street": "2576 Rainer Street",
+          "city": "Seattle",
+          "state": "Washington",
+          "postalCode": "98101"
+        },
+        "employees": [
+          {
+            "employeeId": 54123,
+            "firstName": "Yuki",
+            "lastName": "Yamamoto",
+            "position": "Branch Manager",
+            "salary": 95000,
+            "hireDate": "2012-06-01",
+            "contactInfo": {
+              "email": "yuki.yamamoto@gubank.com",
+              "phone": "+12065551234"
+            }
+          },
+          {
+            "employeeId": 54124,
+            "firstName": "Miguel",
+            "lastName": "Ruíz",
+            "position": "Account Manager",
+            "salary": 65000,
+            "hireDate": "2016-02-15",
+            "contactInfo": {
+              "email": "miguel.ruiz@gubank.com",
+              "phone": "+12065554567"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 234312,
+          "firstName": "Nguyễn",
+          "lastName": "Thị Thu Trang",
+          "dob": "1987-09-15",
+          "accounts": [
+            {
+              "accountId": 23455,
+              "accountType": "Checking",
+              "balance": 54342.92,
+              "currency": "USD",
+              "createdDate": "2013-07-15",
+              "transactions": [
+                {
+                  "transactionId": 11231,
+                  "date": "2021-09-01T14:20:30Z",
+                  "type": "Debit",
+                  "amount": 150,
+                  "description": "Grocery Shopping"
+                },
+                {
+                  "transactionId": 11232,
+                  "date": "2021-09-10T10:00:00Z",
+                  "type": "Credit",
+                  "amount": 3000,
+                  "description": "Salary Deposit"
+                }
+              ]
+            },
+            {
+              "accountId": 23677,
+              "accountType": "Savings",
+              "balance": 125000,
+              "currency": "USD",
+              "createdDate": "2011-12-25",
+              "transactions": [
+                {
+                  "transactionId": 14235,
+                  "date": "2022-01-07T17:43:00Z",
+                  "type": "Credit",
+                  "amount": 1000,
+                  "description": "Monthly Savings Deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "thu.trang@gmail.com",
+            "phone": "+84912345678"
+          }
+        },
+        {
+          "customerId": 783423,
+          "firstName": "Ibrahim",
+          "lastName": "Al-Hakim",
+          "dob": "1992-10-21",
+          "accounts": [
+            {
+              "accountId": 78943,
+              "accountType": "Credit",
+              "balance": -2034.57,
+              "currency": "USD",
+              "createdDate": "2018-02-12",
+              "transactions": [
+                {
+                  "transactionId": 98321,
+                  "date": "2022-02-15T16:55:32Z",
+                  "type": "Debit",
+                  "amount": 540,
+                  "description": "Restaurant Payment"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "ibrahim.alhakim@yahoo.com",
+            "phone": "+12125551234"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 101,
+        "name": "GlobalTrust Bank",
+        "address": {
+          "street": "1122 Fleet St",
+          "city": "Baltimore",
+          "state": "Maryland",
+          "postalCode": "21202"
+        },
+        "employees": [
+          {
+            "employeeId": 90001,
+            "firstName": "Kamal",
+            "lastName": "Patel",
+            "position": "Bank Manager",
+            "salary": 75000,
+            "hireDate": "2015-06-22",
+            "contactInfo": {
+              "email": "kPatel@globaltrustbank.com",
+              "phone": "+14107892134"
+            }
+          },
+          {
+            "employeeId": 90002,
+            "firstName": "Maria",
+            "lastName": "Gutierrez",
+            "position": "Loan Officer",
+            "salary": 55000,
+            "hireDate": "2017-04-09",
+            "contactInfo": {
+              "email": "mGutierrez@globaltrustbank.com",
+              "phone": "+14107892135"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 80001,
+          "firstName": "Takashi",
+          "lastName": "Kimura",
+          "dob": "1980-11-19",
+          "accounts": [
+            {
+              "accountId": 70001,
+              "accountType": "Checking",
+              "balance": 3422.45,
+              "currency": "USD",
+              "createdDate": "2012-10-08",
+              "transactions": [
+                {
+                  "transactionId": 60001,
+                  "date": "2019-05-06T14:30:00",
+                  "type": "Credit",
+                  "amount": 2000,
+                  "description": "Paycheck deposit"
+                },
+                {
+                  "transactionId": 60002,
+                  "date": "2019-05-07T10:20:00",
+                  "type": "Debit",
+                  "amount": 150,
+                  "description": "Grocery shopping"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "t.kimura@mail.com",
+            "phone": "+14106591212"
+          }
+        },
+        {
+          "customerId": 80002,
+          "firstName": "Amina",
+          "lastName": "Kone",
+          "dob": "1992-07-01",
+          "accounts": [
+            {
+              "accountId": 70002,
+              "accountType": "Savings",
+              "balance": 10000,
+              "currency": "USD",
+              "createdDate": "2018-01-15",
+              "transactions": [
+                {
+                  "transactionId": 60003,
+                  "date": "2020-03-01T18:45:00",
+                  "type": "Credit",
+                  "amount": 5000,
+                  "description": "Tax refund"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "a.kone@mail.com",
+            "phone": "+14106591213"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 123456,
+        "name": "Bank of Americas",
+        "address": {
+          "street": "997 Autumn Leaf Street",
+          "city": "Los Angeles",
+          "state": "California",
+          "postalCode": "90001"
+        },
+        "employees": [
+          {
+            "employeeId": 1011,
+            "firstName": "Roberto",
+            "lastName": "Fernandez",
+            "position": "Bank Teller",
+            "salary": 50000,
+            "hireDate": "2011-04-23",
+            "contactInfo": {
+              "email": "roberto.fernandez@example.com",
+              "phone": "+13235554455"
+            }
+          },
+          {
+            "employeeId": 1022,
+            "firstName": "Anaya",
+            "lastName": "Sharma",
+            "position": "Account Manager",
+            "salary": 70000,
+            "hireDate": "2015-06-10",
+            "contactInfo": {
+              "email": "anaya.sharma@example.com",
+              "phone": "+13235553232"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 2001,
+          "firstName": "Kim",
+          "lastName": "Sun-Hi",
+          "dob": "1980-09-12",
+          "accounts": [
+            {
+              "accountId": 3001,
+              "accountType": "Checking",
+              "balance": 10000,
+              "currency": "USD",
+              "createdDate": "2018-01-22",
+              "transactions": [
+                {
+                  "transactionId": 11001,
+                  "date": "2019-04-10T10:00:00Z",
+                  "type": "Debit",
+                  "amount": 500,
+                  "description": "Online Purchase"
+                },
+                {
+                  "transactionId": 11002,
+                  "date": "2019-04-12T14:35:00Z",
+                  "type": "Credit",
+                  "amount": 1500,
+                  "description": "Payroll Deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "kim.sunhi@example.com",
+            "phone": "+13235552222"
+          }
+        },
+        {
+          "customerId": 2002,
+          "firstName": "Ndidi",
+          "lastName": "Eze",
+          "dob": "1985-12-30",
+          "accounts": [
+            {
+              "accountId": 3002,
+              "accountType": "Savings",
+              "balance": 20000,
+              "currency": "USD",
+              "createdDate": "2016-11-22",
+              "transactions": [
+                {
+                  "transactionId": 11003,
+                  "date": "2017-02-10T10:00:00Z",
+                  "type": "Credit",
+                  "amount": 5000,
+                  "description": "Year End Bonus"
+                },
+                {
+                  "transactionId": 11004,
+                  "date": "2019-12-10T16:00:00Z",
+                  "type": "Debit",
+                  "amount": 200,
+                  "description": "ATM Withdrawal"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "ndidi.eze@example.com",
+            "phone": "+13235556222"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 1204,
+        "name": "Global Trust Bank",
+        "address": {
+          "street": "2558 Walnut Street",
+          "city": "San Francisco",
+          "state": "CA",
+          "postalCode": "94123"
+        },
+        "employees": [
+          {
+            "employeeId": 122,
+            "firstName": "Emiko",
+            "lastName": "Tanaka",
+            "position": "Branch Manager",
+            "salary": 65000,
+            "hireDate": "2015-08-01",
+            "contactInfo": {
+              "email": "emiko.tanaka@globaltrust.com",
+              "phone": "+14155552671"
+            }
+          },
+          {
+            "employeeId": 123,
+            "firstName": "Ali",
+            "lastName": "Khan",
+            "position": "Financial Advisor",
+            "salary": 50000,
+            "hireDate": "2016-10-15",
+            "contactInfo": {
+              "email": "ali.khan@globaltrust.com",
+              "phone": "+14155552672"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 4567,
+          "firstName": "Carlos",
+          "lastName": "Hernandez",
+          "dob": "1985-12-30",
+          "accounts": [
+            {
+              "accountId": 8901,
+              "accountType": "Checking",
+              "balance": 20000,
+              "currency": "USD",
+              "createdDate": "2011-05-20",
+              "transactions": [
+                {
+                  "transactionId": 1,
+                  "date": "2019-07-01T13:14:30Z",
+                  "type": "Debit",
+                  "amount": 2000,
+                  "description": "Payment for car loan"
+                },
+                {
+                  "transactionId": 2,
+                  "date": "2019-08-01T13:35:20Z",
+                  "type": "Credit",
+                  "amount": 2500,
+                  "description": "Salary deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "carlos.h@gmail.com",
+            "phone": "+14152223344"
+          }
+        },
+        {
+          "customerId": 4568,
+          "firstName": "Minji",
+          "lastName": "Kim",
+          "dob": "1992-03-13",
+          "accounts": [
+            {
+              "accountId": 8902,
+              "accountType": "Savings",
+              "balance": 30000,
+              "currency": "USD",
+              "createdDate": "2012-02-15",
+              "transactions": [
+                {
+                  "transactionId": 3,
+                  "date": "2019-08-01T09:35:20Z",
+                  "type": "Credit",
+                  "amount": 1500,
+                  "description": "Interest deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "minji.kim@gmail.com",
+            "phone": "+14152223345"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 123,
+        "name": "Global Finance Inc",
+        "address": {
+          "street": "12, Daffodil Street",
+          "city": "Zurich",
+          "state": "Zurich",
+          "postalCode": "8001"
+        },
+        "employees": [
+          {
+            "employeeId": 234,
+            "firstName": "Stefan",
+            "lastName": "Muller",
+            "position": "Branch Manager",
+            "salary": 80000,
+            "hireDate": "2012-01-24",
+            "contactInfo": {
+              "email": "stefan.muller@example.com",
+              "phone": "+41431234567"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 345,
+          "firstName": "Kenzo",
+          "lastName": "Tanaka",
+          "dob": "1980-08-10",
+          "accounts": [
+            {
+              "accountId": 456,
+              "accountType": "Savings",
+              "balance": 30000,
+              "currency": "CHF",
+              "createdDate": "2017-04-13",
+              "transactions": [
+                {
+                  "transactionId": 567,
+                  "date": "2017-04-13T14:30:00.000Z",
+                  "type": "Credit",
+                  "amount": 30000,
+                  "description": "Opening balance"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "kenzo.tanaka@example.com",
+            "phone": "+81312345678"
+          }
+        },
+        {
+          "customerId": 789,
+          "firstName": "Amara",
+          "lastName": "Keita",
+          "dob": "1990-07-20",
+          "accounts": [
+            {
+              "accountId": 890,
+              "accountType": "Checking",
+              "balance": 50000,
+              "currency": "USD",
+              "createdDate": "2016-11-02",
+              "transactions": [
+                {
+                  "transactionId": 901,
+                  "date": "2016-11-02T10:15:00.000Z",
+                  "type": "Credit",
+                  "amount": 50000,
+                  "description": "Opening balance"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "amara.keita@example.com",
+            "phone": "+120212345678"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 1,
+        "name": "Worldwide Savings & Loan",
+        "address": {
+          "street": "8962 Broad Street",
+          "city": "Paris",
+          "state": "Paris",
+          "postalCode": "75001"
+        },
+        "employees": [
+          {
+            "employeeId": 1001,
+            "firstName": "Jacques",
+            "lastName": "Dupont",
+            "position": "Branch Manager",
+            "salary": 70000,
+            "hireDate": "2012-06-10",
+            "contactInfo": {
+              "email": "j.dupont@worldwide.com",
+              "phone": "+33123456789"
+            }
+          },
+          {
+            "employeeId": 1002,
+            "firstName": "Marie",
+            "lastName": "Lefevre",
+            "position": "Financial Advisor",
+            "salary": 50000,
+            "hireDate": "2015-07-15",
+            "contactInfo": {
+              "email": "m.lefevre@worldwide.com",
+              "phone": "+33101234567"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 2001,
+          "firstName": "Toshio",
+          "lastName": "Kojima",
+          "dob": "1985-04-22",
+          "accounts": [
+            {
+              "accountId": 3001,
+              "accountType": "Savings",
+              "balance": 10500,
+              "currency": "JPY",
+              "createdDate": "2012-10-05",
+              "transactions": [
+                {
+                  "transactionId": 4001,
+                  "date": "2012-10-05T14:30:00Z",
+                  "type": "Credit",
+                  "amount": 10500,
+                  "description": "Initial Deposit"
+                },
+                {
+                  "transactionId": 4002,
+                  "date": "2013-01-15T10:30:00Z",
+                  "type": "Debit",
+                  "amount": 500,
+                  "description": "ATM Withdrawal"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "kojima.t@example.com",
+            "phone": "+81312345678"
+          }
+        },
+        {
+          "customerId": 2002,
+          "firstName": "Lucia",
+          "lastName": "Rojas",
+          "dob": "1990-01-15",
+          "accounts": [
+            {
+              "accountId": 3002,
+              "accountType": "Checking",
+              "balance": 1500,
+              "currency": "USD",
+              "createdDate": "2018-11-10",
+              "transactions": [
+                {
+                  "transactionId": 4003,
+                  "date": "2018-11-10T09:00:00Z",
+                  "type": "Credit",
+                  "amount": 1500,
+                  "description": "Payroll Deposit"
+                },
+                {
+                  "transactionId": 4004,
+                  "date": "2018-11-15T12:00:00Z",
+                  "type": "Debit",
+                  "amount": 100,
+                  "description": "Online Purchase"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "l.rojas@example.com",
+            "phone": "+12025551234"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 1234,
+        "name": "Trustworthy United Bank",
+        "address": {
+          "street": "132 Talkactive Street",
+          "city": "Warsaw",
+          "state": "Mazovia",
+          "postalCode": "00-021"
+        },
+        "employees": [
+          {
+            "employeeId": 1,
+            "firstName": "Pablo",
+            "lastName": "Gómez",
+            "position": "Branch Manager",
+            "salary": 5000,
+            "hireDate": "2012-05-15",
+            "contactInfo": {
+              "email": "p.gomez@tub.com",
+              "phone": "+482281234567"
+            }
+          },
+          {
+            "employeeId": 2,
+            "firstName": "Maria",
+            "lastName": "Nowak",
+            "position": "Portfolio Manager",
+            "salary": 4400,
+            "hireDate": "2016-02-10",
+            "contactInfo": {
+              "email": "m.nowak@tub.com",
+              "phone": "+482281234568"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 801,
+          "firstName": "Yuki",
+          "lastName": "Tanaka",
+          "dob": "1986-08-14",
+          "accounts": [
+            {
+              "accountId": 7001,
+              "accountType": "Savings",
+              "balance": 6545.48,
+              "currency": "JPY",
+              "createdDate": "2014-10-15",
+              "transactions": [
+                {
+                  "transactionId": 901,
+                  "date": "2020-04-25T14:30:00Z",
+                  "type": "Debit",
+                  "amount": 2000,
+                  "description": "ATM Withdrawal"
+                },
+                {
+                  "transactionId": 902,
+                  "date": "2020-04-26T16:54:00Z",
+                  "type": "Credit",
+                  "amount": 1200,
+                  "description": "Online Transfer"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "yuki.tanaka@gmail.com",
+            "phone": "+81328901234"
+          }
+        },
+        {
+          "customerId": 802,
+          "firstName": "Leila",
+          "lastName": "Daher",
+          "dob": "1996-01-22",
+          "accounts": [
+            {
+              "accountId": 7002,
+              "accountType": "Checking",
+              "balance": 870.63,
+              "currency": "USD",
+              "createdDate": "2018-09-12",
+              "transactions": [
+                {
+                  "transactionId": 903,
+                  "date": "2020-07-05T09:20:30Z",
+                  "type": "Debit",
+                  "amount": 120,
+                  "description": "POS Payment"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "leila.daher@hotmail.com",
+            "phone": "+12025551234"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 12345,
+        "name": "Trust Finance",
+        "address": {
+          "street": "277 Lwiindi Street",
+          "city": "Lusaka",
+          "state": "Lusaka",
+          "postalCode": "10101"
+        },
+        "employees": [
+          {
+            "employeeId": 1,
+            "firstName": "Musa",
+            "lastName": "Omondi",
+            "position": "Manager",
+            "salary": 60000,
+            "hireDate": "2015-06-15",
+            "contactInfo": {
+              "email": "musa.omondi@example.com",
+              "phone": "+260971234567"
+            }
+          },
+          {
+            "employeeId": 2,
+            "firstName": "Chiyo",
+            "lastName": "Hayashi",
+            "position": "Accountant",
+            "salary": 45000,
+            "hireDate": "2018-04-01",
+            "contactInfo": {
+              "email": "chiyo.hayashi@example.com",
+              "phone": "+260972345678"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 1001,
+          "firstName": "Ricardo",
+          "lastName": "Lopez",
+          "dob": "1985-11-21",
+          "accounts": [
+            {
+              "accountId": 11001,
+              "accountType": "Checking",
+              "balance": 1500,
+              "currency": "USD",
+              "createdDate": "2016-05-18",
+              "transactions": [
+                {
+                  "transactionId": 20001,
+                  "date": "2021-05-18T09:00:00",
+                  "type": "Debit",
+                  "amount": 500,
+                  "description": "Electric bill payment"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "ricardo.lopez@example.com",
+            "phone": "+126012345678"
+          }
+        },
+        {
+          "customerId": 1002,
+          "firstName": "Divya",
+          "lastName": "Patel",
+          "dob": "1992-03-08",
+          "accounts": [
+            {
+              "accountId": 11002,
+              "accountType": "Savings",
+              "balance": 6000,
+              "currency": "USD",
+              "createdDate": "2017-10-30",
+              "transactions": [
+                {
+                  "transactionId": 20002,
+                  "date": "2021-05-20T15:00:00",
+                  "type": "Credit",
+                  "amount": 2000,
+                  "description": "Salary deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "divya.patel@example.com",
+            "phone": "+126098765432"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 12345,
+        "name": "Prosperia Bank",
+        "address": {
+          "street": "7832 Penrose Plaza",
+          "city": "Arlington",
+          "state": "Virginia",
+          "postalCode": "22204"
+        },
+        "employees": [
+          {
+            "employeeId": 4537,
+            "firstName": "Emeka",
+            "lastName": "Adibe",
+            "position": "Branch Manager",
+            "salary": 75000,
+            "hireDate": "2013-06-11",
+            "contactInfo": {
+              "email": "emeka.adibe@example.com",
+              "phone": "+17035551234"
+            }
+          },
+          {
+            "employeeId": 5728,
+            "firstName": "Xiu Ying",
+            "lastName": "Lim",
+            "position": "Financial Advisor",
+            "salary": 65000,
+            "hireDate": "2015-05-22",
+            "contactInfo": {
+              "email": "xiuying.lim@example.com",
+              "phone": "+17035557891"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 9283,
+          "firstName": "Eduardo",
+          "lastName": "Lopez",
+          "dob": "1985-08-14",
+          "accounts": [
+            {
+              "accountId": 773481,
+              "accountType": "Checking",
+              "balance": 15873.57,
+              "currency": "USD",
+              "createdDate": "2015-09-09",
+              "transactions": [
+                {
+                  "transactionId": 18273,
+                  "date": "2017-12-05T10:15:30Z",
+                  "type": "Debit",
+                  "amount": 140.75,
+                  "description": "Payment for utilities"
+                },
+                {
+                  "transactionId": 18274,
+                  "date": "2018-01-05T10:15:30Z",
+                  "type": "Credit",
+                  "amount": 2000,
+                  "description": "Payroll deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "eduardo.lopez@example.com",
+            "phone": "+17035551098"
+          }
+        },
+        {
+          "customerId": 6271,
+          "firstName": "Amadou",
+          "lastName": "Diop",
+          "dob": "1975-03-25",
+          "accounts": [
+            {
+              "accountId": 763211,
+              "accountType": "Savings",
+              "balance": 27839.35,
+              "currency": "USD",
+              "createdDate": "2011-02-19",
+              "transactions": [
+                {
+                  "transactionId": 28273,
+                  "date": "2017-12-05T13:20:30Z",
+                  "type": "Credit",
+                  "amount": 200,
+                  "description": "Interest received"
+                },
+                {
+                  "transactionId": 28274,
+                  "date": "2017-02-19T13:20:30Z",
+                  "type": "Credit",
+                  "amount": 8000,
+                  "description": "Inheritance deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "amadou.diop@example.com",
+            "phone": "+17035553237"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 12345,
+        "name": "Global Finance Bank",
+        "address": {
+          "street": "23 Kowloon Lane",
+          "city": "Hong Kong",
+          "state": "Hong Kong",
+          "postalCode": "999077"
+        },
+        "employees": [
+          {
+            "employeeId": 10001,
+            "firstName": "Li",
+            "lastName": "Wong",
+            "position": "Manager",
+            "salary": 75000,
+            "hireDate": "2016-08-13",
+            "contactInfo": {
+              "email": "liwong@globalbank.com",
+              "phone": "+85298765432"
+            }
+          },
+          {
+            "employeeId": 10002,
+            "firstName": "Ingrid",
+            "lastName": "Schmidt",
+            "position": "Teller",
+            "salary": 40000,
+            "hireDate": "2019-05-11",
+            "contactInfo": {
+              "email": "ingridschmidt@globalbank.com",
+              "phone": "+85212345678"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 20001,
+          "firstName": "Carlos",
+          "lastName": "Gomez",
+          "dob": "1990-07-20",
+          "accounts": [
+            {
+              "accountId": 30001,
+              "accountType": "Checking",
+              "balance": 12500.59,
+              "currency": "USD",
+              "createdDate": "2015-06-25",
+              "transactions": [
+                {
+                  "transactionId": 40001,
+                  "date": "2021-07-15T10:30:00Z",
+                  "type": "Debit",
+                  "amount": 250,
+                  "description": "ATM Withdrawal"
+                },
+                {
+                  "transactionId": 40002,
+                  "date": "2021-07-14T14:45:00Z",
+                  "type": "Credit",
+                  "amount": 5000,
+                  "description": "Salary Deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "carlosgomez@gmail.com",
+            "phone": "+15781234567"
+          }
+        },
+        {
+          "customerId": 20002,
+          "firstName": "Aneesh",
+          "lastName": "Patel",
+          "dob": "1985-10-11",
+          "accounts": [
+            {
+              "accountId": 30002,
+              "accountType": "Savings",
+              "balance": 22500.75,
+              "currency": "USD",
+              "createdDate": "2012-02-18",
+              "transactions": [
+                {
+                  "transactionId": 40003,
+                  "date": "2021-07-10T15:45:00Z",
+                  "type": "Debit",
+                  "amount": 700,
+                  "description": "Online Purchase"
+                },
+                {
+                  "transactionId": 40004,
+                  "date": "2021-07-01T09:00:00Z",
+                  "type": "Credit",
+                  "amount": 200,
+                  "description": "Interest"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "aneeshpatel@gmail.com",
+            "phone": "+12709876543"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 12345,
+        "name": "Global Finance Group",
+        "address": {
+          "street": "123 Liberty St",
+          "city": "New York",
+          "state": "NY",
+          "postalCode": "10006"
+        },
+        "employees": [
+          {
+            "employeeId": 101,
+            "firstName": "Abdul",
+            "lastName": "Khan",
+            "position": "Branch Manager",
+            "salary": 90000,
+            "hireDate": "2014-05-01",
+            "contactInfo": {
+              "email": "abdul.khan@globalfinancegroup.com",
+              "phone": "+12015551234"
+            }
+          },
+          {
+            "employeeId": 102,
+            "firstName": "Stefanie",
+            "lastName": "Martinez",
+            "position": "Financial Advisor",
+            "salary": 75000.75,
+            "hireDate": "2016-12-12",
+            "contactInfo": {
+              "email": "stefanie.martinez@globalfinancegroup.com",
+              "phone": "+12015556789"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 2001,
+          "firstName": "Hiroshi",
+          "lastName": "Suzuki",
+          "dob": "1995-03-11",
+          "accounts": [
+            {
+              "accountId": 201,
+              "accountType": "Checking",
+              "balance": 10840.3,
+              "currency": "USD",
+              "createdDate": "2017-01-01",
+              "transactions": [
+                {
+                  "transactionId": 2051,
+                  "date": "2021-01-15T04:32:10Z",
+                  "type": "Debit",
+                  "amount": 200,
+                  "description": "Online Purchase"
+                },
+                {
+                  "transactionId": 2052,
+                  "date": "2021-01-16T14:50:20Z",
+                  "type": "Credit",
+                  "amount": 1500,
+                  "description": "Salary Deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "hiroshi.suzuki@gmail.com",
+            "phone": "+819012345678"
+          }
+        },
+        {
+          "customerId": 2002,
+          "firstName": "Kemi",
+          "lastName": "Adesina",
+          "dob": "1989-07-19",
+          "accounts": [
+            {
+              "accountId": 202,
+              "accountType": "Savings",
+              "balance": 25300.8,
+              "currency": "USD",
+              "createdDate": "2019-06-15",
+              "transactions": [
+                {
+                  "transactionId": 2061,
+                  "date": "2021-01-05T21:45:30Z",
+                  "type": "Debit",
+                  "amount": 1800,
+                  "description": "Rent payment"
+                },
+                {
+                  "transactionId": 2062,
+                  "date": "2021-01-16T11:25:40Z",
+                  "type": "Credit",
+                  "amount": 2200,
+                  "description": "Salary Deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "kemi.adesina@yahoo.com",
+            "phone": "+2348012345678"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 102345,
+        "name": "Consolidated Int. Bank",
+        "address": {
+          "street": "1905 Rivera St",
+          "city": "Havana",
+          "state": "La Habana",
+          "postalCode": "12345"
+        },
+        "employees": [
+          {
+            "employeeId": 45325,
+            "firstName": "Alejandro",
+            "lastName": "Gomez",
+            "position": "Bank Manager",
+            "salary": 5000.45,
+            "hireDate": "2015-09-21",
+            "contactInfo": {
+              "email": "alejandro.gomez@consolidated.com",
+              "phone": "+5354378956"
+            }
+          },
+          {
+            "employeeId": 34563,
+            "firstName": "Liu",
+            "lastName": "Wang",
+            "position": "Accountant",
+            "salary": 3150.88,
+            "hireDate": "2018-07-13",
+            "contactInfo": {
+              "email": "liu.wang@consolidated.com",
+              "phone": "+5354895632"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 53091,
+          "firstName": "Emeka",
+          "lastName": "Okafor",
+          "dob": "1992-11-05",
+          "accounts": [
+            {
+              "accountId": 6781,
+              "accountType": "Checking",
+              "balance": 2190.34,
+              "currency": "USD",
+              "createdDate": "2020-01-18",
+              "transactions": [
+                {
+                  "transactionId": 1,
+                  "date": "2021-05-23T14:20:30Z",
+                  "type": "Debit",
+                  "amount": 200,
+                  "description": "Wire transfer"
+                },
+                {
+                  "transactionId": 2,
+                  "date": "2021-06-04T10:45:00Z",
+                  "type": "Credit",
+                  "amount": 500,
+                  "description": "Paycheck deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "emeka_okafor@example.com",
+            "phone": "+2348050678912"
+          }
+        },
+        {
+          "customerId": 62109,
+          "firstName": "Sophia",
+          "lastName": "Fernandez",
+          "dob": "1987-04-21",
+          "accounts": [
+            {
+              "accountId": 2341,
+              "accountType": "Savings",
+              "balance": 6978,
+              "currency": "USD",
+              "createdDate": "2019-03-16",
+              "transactions": [
+                {
+                  "transactionId": 3,
+                  "date": "2021-05-24T12:34:56Z",
+                  "type": "Credit",
+                  "amount": 320,
+                  "description": "Cash deposit"
+                },
+                {
+                  "transactionId": 4,
+                  "date": "2021-05-30T09:10:20Z",
+                  "type": "Debit",
+                  "amount": 150,
+                  "description": "ATM withdrawal"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "sophiafernandez@example.com",
+            "phone": "+5378956123"
+          }
+        }
+      ]
+    },
+    {
+      "bank": {
+        "bankId": 12345,
+        "name": "Global United Bank",
+        "address": {
+          "street": "1080 Paseo De Peralta",
+          "city": "Santa Fe",
+          "state": "NM",
+          "postalCode": "87501"
+        },
+        "employees": [
+          {
+            "employeeId": 78911,
+            "firstName": "Priyanka",
+            "lastName": "Patil",
+            "position": "Branch Manager",
+            "salary": 90000,
+            "hireDate": "2015-02-01",
+            "contactInfo": {
+              "email": "priyanka.patil@gub.com",
+              "phone": "+15058675309"
+            }
+          },
+          {
+            "employeeId": 78912,
+            "firstName": "Carlos",
+            "lastName": "Martinez",
+            "position": "Cashier",
+            "salary": 35000,
+            "hireDate": "2018-07-15",
+            "contactInfo": {
+              "email": "carlos.martinez@gub.com",
+              "phone": "+15058675310"
+            }
+          }
+        ]
+      },
+      "customers": [
+        {
+          "customerId": 45678,
+          "firstName": "Akiko",
+          "lastName": "Takahashi",
+          "dob": "1985-09-15",
+          "accounts": [
+            {
+              "accountId": 1122,
+              "accountType": "Checking",
+              "balance": 25000,
+              "currency": "USD",
+              "createdDate": "2019-05-20",
+              "transactions": [
+                {
+                  "transactionId": 890,
+                  "date": "2020-11-30T09:15:00",
+                  "type": "Debit",
+                  "amount": 150,
+                  "description": "Online Purchase"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "akiko.takahashi@gmail.com",
+            "phone": "+818012345678"
+          }
+        },
+        {
+          "customerId": 45679,
+          "firstName": "Moussa",
+          "lastName": "Diop",
+          "dob": "1978-03-11",
+          "accounts": [
+            {
+              "accountId": 1123,
+              "accountType": "Savings",
+              "balance": 35000,
+              "currency": "USD",
+              "createdDate": "2016-04-18",
+              "transactions": [
+                {
+                  "transactionId": 891,
+                  "date": "2020-09-30T11:45:00",
+                  "type": "Credit",
+                  "amount": 500,
+                  "description": "Payroll Deposit"
+                }
+              ]
+            }
+          ],
+          "contactInfo": {
+            "email": "moussa.diop@hotmail.com",
+            "phone": "+221776543210"
+          }
+        }
+      ]
+    }
+  ],
+  "success_count": 20,
+  "failure_count": 1
+}
