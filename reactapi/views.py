@@ -23,6 +23,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from openai import OpenAI
+from .models import JSONData
+from .serializers import JSONDataSerializer
 
 # Django imports
 from django.contrib.auth.models import User
@@ -144,7 +146,18 @@ class ResetPasswordConfirm(APIView):
 # ----- .Login/Signup Views ------
 # -------------------------------
 
+class SaveJSONView(APIView):
+    def post(self, request):
+        serializer = JSONDataSerializer(data=request.data)
+        if serializer.is_valid():
+            json_data_instance = serializer.save()
 
+            # Log and check the serialized data
+            response_data = serializer.data
+            print("Serialized data being returned:", response_data)
+
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # ----------------------------

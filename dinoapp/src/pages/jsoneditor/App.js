@@ -34,7 +34,7 @@ const JSONEditor = () => {
 
   const transformFormData = (data) => {
     const result = {};
-  
+
     data.forEach(row => {
       if (Array.isArray(row)) {
         row.forEach(field => {
@@ -64,7 +64,7 @@ const JSONEditor = () => {
         });
       }
     });
-  
+
     return result;
   };
 
@@ -86,7 +86,7 @@ const JSONEditor = () => {
 
   const convertJSONToFormData = (json) => {
     const formData = [];
-    
+
     const parseObject = (obj) => {
       const result = [];
       Object.entries(obj).forEach(([key, value]) => {
@@ -118,7 +118,7 @@ const JSONEditor = () => {
 
   const addField = (rowIndex, parentId) => {
     const newField = { id: Date.now(), label: '', value: '', type: 'Text' };
-    
+
     const addFieldToGroup = (group) => {
       if (group.id === parentId) {
         if (!group.inner) {
@@ -133,7 +133,7 @@ const JSONEditor = () => {
     const updatedRows = formData.map((row, index) => {
       if (index === rowIndex) {
         let fieldAdded = false;
-  
+
         // Check if the parentId exists in the current row
         const newRow = row.map(field => {
           if (field.id === parentId && field.type === 'Group') {
@@ -142,7 +142,7 @@ const JSONEditor = () => {
           }
           return field;
         });
-  
+
         if (!fieldAdded) {
           // Add the new field directly to the row and place it under the current parent
           const parentIndex = row.findIndex(field => field.id === parentId);
@@ -152,7 +152,7 @@ const JSONEditor = () => {
             newRow.push(newField); // If parentId is not found, add it to the end
           }
         }
-  
+
         return newRow;
       }
       return row;
@@ -169,7 +169,7 @@ const JSONEditor = () => {
         group.inner.forEach(deleteFromGroup);
       }
     };
-  
+
     const updatedRows = formData.map(row => {
       row.forEach(deleteFromGroup);
       return row.filter(field => {
@@ -180,7 +180,7 @@ const JSONEditor = () => {
         return field.id !== id;
       });
     }).filter(row => row.length > 0);
-  
+
     setFormData(updatedRows);
     setJSONCode(JSON.stringify(transformFormData(updatedRows), null, 2));
   };
@@ -218,13 +218,13 @@ const JSONEditor = () => {
   const deepCopy = (obj) => {
     return JSON.parse(JSON.stringify(obj));
   };
-  
+
   const addNewObject = () => {
     const newObjectTemplate = deepCopy(initialFormData);
     const newObject = newObjectTemplate.map(row => row.map(field => ({
       ...field,
       id: Date.now() + Math.random(),
-      value: field.value, 
+      value: field.value,
     })));
 
     const updatedFormData = [...formData, ...newObject];
@@ -235,7 +235,7 @@ const JSONEditor = () => {
   };
 
   const handleSubmit = () => {
-    axios.post('http://localhost:8000/api/save-json/', JSON.parse(jsonCode))
+    axios.post('http://127.0.0.1:8000/api/save-json/', { json_data: JSON.parse(jsonCode) })
       .then(response => {
         console.log(response.data);
       })
@@ -254,7 +254,7 @@ const JSONEditor = () => {
   };
 
   const handleDragOver = (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     e.dataTransfer.dropEffect = "move";
   };
 
@@ -303,13 +303,13 @@ const JSONEditor = () => {
     }
 
     return (
-        <div key={field.id} 
+        <div key={field.id}
           className='input-container'
           draggable
-          onDragStart={(e) => handleDragStart(e, rowIndex)} 
+          onDragStart={(e) => handleDragStart(e, rowIndex)}
           onDragEnd={handleDragEnd}
           onDragOver={handleDragOver}
-          onDrop={(e) => handleDrop(e, rowIndex)} 
+          onDrop={(e) => handleDrop(e, rowIndex)}
         >
             <div className='input-wrapper'>
               <label classname='label-field'>
@@ -317,11 +317,11 @@ const JSONEditor = () => {
                     value={field.label}
                     onChange={(e) => handleLabelChange(e, field.id)}
                     onClick={(e) => e.stopPropagation()}
-                    disabled={isIDField} 
+                    disabled={isIDField}
                     className={isIDField ? 'ID-input' : 'label-field'}
                 />
               </label>
-                    
+
               <input
                 className='value-input'
                 type='text'
@@ -331,13 +331,13 @@ const JSONEditor = () => {
                 <span className='status-icon drag-icon'><arrowsIcon/></span>
                 <span className='status-icon add-icon' onClick={() => addField(0)}><addIcon/></span>
                 <span className='status-icon delete-icon' onClick={() => deleteField(field.id)}><binIcon/></span>
-                
+
                 {isIDField && (
                     <button className='unique-button'>Unique</button>
                 )}
             </div>
         </div>
-    );  
+    );
   };
   return (
     <div className='json-editor-container'>
@@ -348,8 +348,8 @@ const JSONEditor = () => {
             <button className='add-button' onClick={addNewObject}>+</button>
           </div>
           {formData.map((row, rowIndex) => (
-            <div 
-                key={rowIndex} 
+            <div
+                key={rowIndex}
                 className='input-row'
                 draggable
                 onDragStart={(e) => handleDragStart(e, rowIndex)}
@@ -370,7 +370,7 @@ const JSONEditor = () => {
           />
         </div>
       </div>
-      
+
       <div className='buttons'>
         <button onClick={generateJSONData}>Generate JSON Data</button>
         <button onClick={handleSubmit}>Save JSON Document</button>

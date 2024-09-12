@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
+from reactapi.models import JSONData
+
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
@@ -18,3 +20,8 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+class JSONDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JSONData
+        fields = ['json_data']
