@@ -20,5 +20,9 @@ urlpatterns = [
     path('convert/', ConvertJsonToBson.as_view(), name='convert-json-schema-to-bson'),
 
 
+    #Generator paths
+    path('data-types/', DataTypeList.as_view(), name='data-types'),
+    #path('generate/', GenerateDataView.as_view(), name='generate-data'),
+
 ]
 

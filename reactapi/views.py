@@ -195,11 +195,9 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-import time
-
+# Rate limit error handler
 def handle_rate_limit_error(e):
     try:
-        # Extract the retry time from the error message
         retry_after = float(re.search(r'try again in (\d+\.?\d*)s', str(e)).group(1))
         logging.info(f"Rate limit reached. Retrying in {retry_after} seconds.")
         time.sleep(retry_after)
@@ -207,7 +205,7 @@ def handle_rate_limit_error(e):
         logging.error(f"Error parsing retry time: {parse_error}")
         time.sleep(5)  # Default wait time if parsing fails
 
-# Modify the document generation function to include rate limit handling
+
 def generate_single_document(schema):
     prompt = f"""
     Generate a valid, unique sample JSON document based on the following schema: {json.dumps(schema)}.
@@ -221,19 +219,16 @@ Ensure that:
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4-turbo",  # Switch to GPT-4-turbo for better performance and lower cost
+            model="gpt-4-turbo",
             messages=[
                 {"role": "system", "content": "You are a JSON document generator."},
                 {"role": "user", "content": prompt}
             ]
         )
 
-
-
         document_content = response.choices[0].message.content
         logging.info(f"Raw response: {document_content}")  # Log the raw response for debugging
 
-        # Attempt to extract and parse JSON from the response
         try:
             json_match = re.search(r'\{.*\}', document_content, re.DOTALL)
             if json_match:
@@ -254,8 +249,6 @@ Ensure that:
         raise Exception(f"Error generating document: {str(e)}")
 
 
-
-# Function to generate multiple documents in parallel and count successes and failures
 def generate_documents(schema: dict, num_docs: int = 1):
     """Generates multiple unique documents by making parallel API calls and counts successes and failures."""
     generated_documents = []
@@ -277,7 +270,6 @@ def generate_documents(schema: dict, num_docs: int = 1):
                         logging.info(f"Successfully generated document: {document}")
                     except Exception as e:
                         logging.error(f"Error generating document: {e}")
-                        # Increment failure count and retry if document fails to generate
                         failure_count += 1
                         retries -= 1
                         if retries == 0:
@@ -291,45 +283,169 @@ def generate_documents(schema: dict, num_docs: int = 1):
 
     return generated_documents, success_count, failure_count
 
-# Django view for handling document generation requests
-@csrf_exempt
-@require_POST
-def generate_documents_view(request):
-    """Handles POST requests to generate documents based on a JSON schema."""
-    try:
-        data = json.loads(request.body)
-        schema = data.get('schema')
-        output_format = data.get('format', 'json')
-        num_samples = int(data.get('num_samples', 1))  # Ensure num_samples is an integer
 
-        if not schema:
-            return HttpResponseBadRequest("Schema is required.")
+# Main View: Handles the initial request and internally calls the document generation logic
+class GenerateDocumentView(APIView):
+    """
+    This view handles POST requests to generate documents based on the JSON schema provided by the front-end.
+    """
 
-        # Convert schema string to dict if necessary
-        if isinstance(schema, str):
-            schema = json.loads(schema)
+    def post(self, request):
+        try:
+            # Extract data from the request
+            rows = request.data.get('rows')
+            num_samples = int(request.data.get('num_samples', 1))
+            format_type = request.data.get('format', 'json')
 
-        # Generate documents using the OpenAI API and count successes and failures
-        documents, success_count, failure_count = generate_documents(schema, num_samples)
+            # Step 1: Create a valid JSON schema from rows (assuming you have this logic)
+            schema = create_valid_json_schema(rows)
 
-        # Prepare the response data
-        if output_format.lower() == 'json':
-            response_data = {
-                'documents': documents,
-                'success_count': success_count,
-                'failure_count': failure_count
+            # Step 2: Internally call the document generation logic (no need for separate URL)
+            documents, success_count, failure_count = generate_documents(schema, num_samples)
+
+            # Step 3: Prepare the response
+            if format_type.lower() == 'json':
+                response_data = {
+                    'documents': documents,
+                    'success_count': success_count,
+                    'failure_count': failure_count
+                }
+            elif format_type.lower() == 'bson':
+                response_data = {
+                    'documents': bson.dumps(documents).hex(),
+                    'success_count': success_count,
+                    'failure_count': failure_count
+                }
+            else:
+                return JsonResponse({'error': 'Invalid format specified. Use "json" or "bson".'}, status=400)
+
+            return JsonResponse(response_data, status=200)
+
+        except Exception as e:
+            logging.error(f"Error processing document generation: {str(e)}")
+            return JsonResponse({'error': str(e)}, status=500)
+
+# ----- Schema form Views ------
+# ------------------------------
+
+
+
+# ------------------------------
+# -------Generate Views---------
+
+#
+DATA_TYPES = [
+    {"value": "names", "label": "Names", "type": "string"},
+    {"value": "phoneFax", "label": "Phone / Fax", "type": "string"},
+    {"value": "email", "label": "Email", "type": "string"},
+    {"value": "date", "label": "Date", "type": "string", "format": "date"},
+    {"value": "time", "label": "Time", "type": "string", "format": "time"},
+    {"value": "company", "label": "Company", "type": "string"},
+    {"value": "streetAddress", "label": "Street Address", "type": "string"},
+    {"value": "city", "label": "City", "type": "string"},
+    {"value": "postalZip", "label": "Postal / Zip", "type": "string"},
+    {"value": "region", "label": "Region", "type": "string"},
+    {"value": "country", "label": "Country", "type": "string"},
+    {"value": "latitudeLongitude", "label": "Latitude/Longitude", "type": "array", "items": {"type": "number"}},
+    {"value": "fixedNumberOfWords", "label": "Fixed Number of Words", "type": "integer"},
+    {"value": "randomNumber", "label": "Random Number", "type": "integer"},
+    {"value": "alphanumeric", "label": "Alphanumeric", "type": "string"},
+    {"value": "boolean", "label": "Boolean", "type": "boolean"},
+    {"value": "autoIncrement", "label": "Auto Increment", "type": "integer"},
+    {"value": "numberRange", "label": "Number Range", "type": "number"},
+    {"value": "normalDistribution", "label": "Normal Distribution", "type": "number"},
+    {"value": "guid", "label": "GUID", "type": "string"},
+    {"value": "constant", "label": "Constant", "type": "string"},
+    {"value": "computed", "label": "Computed", "type": "string"},
+    {"value": "list", "label": "List", "type": "array", "items": {"type": "string"}},
+    {"value": "weightedList", "label": "Weighted List", "type": "array", "items": {"type": "string"}},
+    {"value": "colour", "label": "Colour", "type": "string"},
+    {"value": "url", "label": "URL", "type": "string", "format": "url"},
+    {"value": "currency", "label": "Currency", "type": "string"},
+    {"value": "bankAccountNums", "label": "Bank Account Numbers", "type": "string"},
+    {"value": "cvv", "label": "CVV", "type": "integer"},
+    {"value": "pin", "label": "PIN", "type": "integer"}
+]
+
+# Function to map the value of dataType to the corresponding structure in DATA_TYPES
+def map_data_type(value):
+    for data_type in DATA_TYPES:
+        if data_type["value"] == value:
+            return data_type
+    return None  # Return None if no match is found
+
+# Function to create a valid JSON schema based on the rows received from the front-end
+def create_valid_json_schema(rows):
+    """
+    Create a valid JSON schema based on the rows of data from the front-end.
+    """
+
+    # Base structure of the JSON schema
+    json_schema = {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "title": "Generated Schema",
+        "description": "Schema generated based on user input",
+        "properties": {},
+        "required": []
+    }
+
+    # Iterate through each row to build the schema
+    for row in rows:
+        data_type_mapping = map_data_type(row.get("dataType"))
+
+        if data_type_mapping:
+            json_schema["properties"][row["keyTitle"]] = {
+                "type": data_type_mapping["type"],
+                "description": row.get("userPrompt", ""),
             }
-        elif output_format.lower() == 'bson':
-            response_data = {
-                'documents': bson.dumps(documents).hex(),
-                'success_count': success_count,
-                'failure_count': failure_count
-            }
-        else:
-            return HttpResponseBadRequest("Invalid output format specified. Use 'json' or 'bson'.")
 
-        return JsonResponse(response_data, safe=False)
+            # Add additional keys like 'format' if they exist in the data type
+            if "format" in data_type_mapping:
+                json_schema["properties"][row["keyTitle"]]["format"] = data_type_mapping["format"]
 
-    except Exception as e:
-        logging.error(f"Failed to generate documents: {str(e)}")
-        return JsonResponse({'error': str(e)}, status=500)
+            # Optionally, add examples
+            if row.get("example"):
+                json_schema["properties"][row["keyTitle"]]["example"] = row["example"]
+
+            # Mark the field as required if it has a keyTitle
+            json_schema["required"].append(row["keyTitle"])
+
+    return json_schema
+
+# Mock function to generate sample documents based on a schema
+def generate_documents(schema, num_samples, format_type):
+    """
+    Mock function to generate sample documents based on a schema.
+    Replace this with the actual AI or document generation logic.
+    """
+    documents = []
+    for _ in range(num_samples):
+        doc = {}
+        for key, value in schema["properties"].items():
+            # Generate simple mock data based on the type
+            if value["type"] == "string":
+                doc[key] = "Sample Text"
+            elif value["type"] == "integer":
+                doc[key] = 12345
+            elif value["type"] == "boolean":
+                doc[key] = True
+            # You can expand this to handle other types, formats, etc.
+        documents.append(doc)
+
+    # Return the documents in the requested format (for now we assume JSON)
+    return documents
+
+class DataTypeList(APIView):
+    """
+    Handle GET requests to return the available data types to the frontend.
+    """
+    
+    def get(self, request):
+        # Return the available data types in a JSON response
+        return Response(DATA_TYPES, status=status.HTTP_200_OK)
+
+# -------Generate Views---------
+# ------------------------------
+
+
