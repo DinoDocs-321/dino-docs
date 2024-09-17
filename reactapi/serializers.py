@@ -1,7 +1,11 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.conf import settings
+from rest_framework import serializers
+from django.contrib.auth.models import User
+from pymongo import MongoClient
 
-from reactapi.models import JSONData
+
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -21,7 +25,25 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-class JSONDataSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = JSONData
-        fields = ['json_data']
+
+# serializer
+class JSONSchemaSerializer(serializers.Serializer):
+    schema_name = serializers.CharField(max_length=255)
+    json_data = serializers.JSONField()  # Field to accept dynamic JSON data
+
+    def create(self, validated_data):
+        user = self.context['request'].user  # Get the authenticated user
+
+        # Connect to MongoDB using PyMongo
+        client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
+        db = client[settings.DATABASES['default']['NAME']]  # Connect to the database
+
+        # Insert the schema into the 'user_schemas' collection, using both user_id and email
+        db['user_schemas'].insert_one({
+            "user_id": str(user.id),  # Store the user ID as a string
+            "email": user.email,      # Store the user's email
+            "schema_name": validated_data['schema_name'],
+            "json_data": validated_data['json_data'],
+        })
+
+        return validated_data

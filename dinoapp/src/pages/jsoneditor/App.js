@@ -235,14 +235,21 @@ const JSONEditor = () => {
   };
 
   const handleSubmit = () => {
-    axios.post('http://127.0.0.1:8000/api/save-json/', { json_data: JSON.parse(jsonCode) })
-      .then(response => {
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.error('There was an error saving the JSON data!', error);
-      });
-  };
+    try {
+        // If jsonCode is a stringified JSON, use JSON.parse to convert it to an object
+        const jsonData = JSON.parse(jsonCode);
+
+        axios.post('http://localhost:8000/api/save-json/', jsonData)
+            .then(response => {
+                console.log(response.data);  // Handle successful response
+            })
+            .catch(error => {
+                console.error('There was an error saving the JSON data!', error);
+            });
+    } catch (e) {
+        console.error('Invalid JSON format!', e);  // Handle JSON parsing error
+    }
+};
 
   const handleDragStart = (e, rowIndex) => {
     e.dataTransfer.setData("rowIndex", rowIndex);
