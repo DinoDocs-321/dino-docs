@@ -20,6 +20,9 @@ RUN npm run build
 FROM nginx:alpine
 COPY --from=0 /usr/src/app/build /usr/share/nginx/html
 
+# Add custom Nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Expose port 80 to the host machine
 EXPOSE 80
 
