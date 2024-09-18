@@ -64,14 +64,15 @@ const Converter = () => {
     <Container>
       <Row>
     
-      <Form.Group className="bsonTextField" controlId="exampleForm.ControlTextarea1">
-        <Form.Control
-          as="textarea" rows={10}
-          value={textFieldValue}
-          onChange={handleInputChange}
-          placeholder="Enter JSON data"
-        />
-      </Form.Group>
+        <Form.Group className="bsonTextField" controlId="exampleForm.ControlTextarea1">
+          <Form.Control
+            as="textarea" rows={10}
+            value={textFieldValue}
+            onChange={handleInputChange}
+            placeholder="Enter JSON data"
+          />
+        </Form.Group>
+      
       </Row>
       <Row>
       <div className="bsonbtns">
