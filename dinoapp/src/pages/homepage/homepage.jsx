@@ -19,7 +19,7 @@ const Homepage = () => {
             </button>
           </Link>
           <br />
-          <Link to="/converter">
+          <Link to="/manualschema">
             <button className='PSbtn'>
               Provide Schema
             </button>
