@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
+import Button from 'react-bootstrap/Button';
 
 function DinoNavbar() {
   const [menu, setMenu] = useState("home");
@@ -25,21 +25,33 @@ function DinoNavbar() {
   const isAuthenticated = !!localStorage.getItem('accessToken');
 
   return (
-    <Navbar expand="lg" className=" dinonavbar">
-      <Container >
-        <Navbar.Brand href="/"><img src={assets.dinologo} alt="Logo" className="logo" /></Navbar.Brand>
+    <Navbar expand="lg" className=" dinonavbar navbar-dark">
+      <Container>
+        <Navbar.Brand href="/">
+          <img src={assets.dinologo} alt="Logo" className="logo" height="16" style={{ marginTop: "-1px" }} />
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto dinonavbar-menu">
-
             <Nav.Link href='/homepage' onClick={() => setMenu("home")} className={menu === "home" ? "active" : ""}>Home</Nav.Link>
             <Nav.Link href='/JSONEditor' onClick={() => setMenu("Generator")} className={menu === "Generator" ? "active" : ""}>Generator</Nav.Link>
             <Nav.Link href='/Schema-Form' onClick={() => setMenu("Schema")} className={menu === "Schema" ? "active" : ""}>Schema</Nav.Link>
             <Nav.Link href='/converter' onClick={() => setMenu("Converter")} className={menu === "Converter" ? "active" : ""}>Converter</Nav.Link>
             <Nav.Link href='/contact' onClick={() => setMenu("Contact")} className={menu === "Contact" ? "active" : ""}>Contact</Nav.Link>
             <Nav.Link href='/About' onClick={() => setMenu("About")} className={menu === "About" ? "active" : ""}>About</Nav.Link>
-
           </Nav>
+          <div className="d-flex align-items-center">
+            {isAuthenticated ? (
+              <>
+                <Button variant="link" className="me-2" onClick={handleSignOut}>Sign Out</Button>
+              </>
+            ) : (
+              <>
+                <Button variant="link" className="me-2" onClick={() => navigate('/signin')}>Login</Button>
+                <Button variant="primary" className="me-3" onClick={() => navigate('/signup')}>Sign up for free</Button>
+              </>
+            )}
+          </div>
         </Navbar.Collapse>
       </Container>
     </Navbar>
@@ -47,6 +59,7 @@ function DinoNavbar() {
 }
 
 export default DinoNavbar;
+
 /*
 const dinoNavbar = () => {
   const [menu, setMenu] = useState("home");
