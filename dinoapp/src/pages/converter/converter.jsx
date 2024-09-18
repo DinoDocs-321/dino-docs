@@ -3,6 +3,9 @@ import axios from 'axios';
 import { BSON } from 'bson';
 import Form from 'react-bootstrap/Form';
 import './converter.css';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 const Converter = () => {
   const [textFieldValue, setTextFieldValue] = useState('');
@@ -58,7 +61,9 @@ const Converter = () => {
   };
 
   return (
-    <div className='container'>
+    <Container>
+      <Row>
+    
       <Form.Group className="bsonTextField" controlId="exampleForm.ControlTextarea1">
         <Form.Control
           as="textarea" rows={10}
@@ -67,6 +72,8 @@ const Converter = () => {
           placeholder="Enter JSON data"
         />
       </Form.Group>
+      </Row>
+      <Row>
       <div className="bsonbtns">
         <button onClick={handleGenerateSave}>Save JSON Document</button>
         <button onClick={handleGenerateBSONFile}>Generate BSON Document</button>
@@ -78,7 +85,9 @@ const Converter = () => {
           <pre>{conversionResult}</pre>
         </div>
       )}
-    </div>
+      </Row>
+    
+    </Container>
   );
 };
 
