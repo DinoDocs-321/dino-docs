@@ -70,7 +70,6 @@ const Converter = () => {
       <div className="bsonbtns">
         <button onClick={handleGenerateSave}>Save JSON Document</button>
         <button onClick={handleGenerateBSONFile}>Generate BSON Document</button>
-        <button onClick={handleConvert}>Convert to BSON</button>
       </div>
       {conversionResult && (
         <div className="conversionResult">
