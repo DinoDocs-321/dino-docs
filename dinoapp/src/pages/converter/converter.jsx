@@ -58,7 +58,7 @@ const Converter = () => {
   };
 
   return (
-    <div className='container'>
+    <div className='converContainer'>
       <Form.Group className="bsonTextField" controlId="exampleForm.ControlTextarea1">
         <Form.Control
           as="textarea" rows={10}
