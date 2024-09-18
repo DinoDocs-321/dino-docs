@@ -26,7 +26,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from openai import OpenAI
 from pymongo import MongoClient
-from .serializers import  JSONSchemaSerializer
+from .serializers import  UserSchemaSerializer
 
 # Django imports
 from django.contrib.auth.models import User
@@ -151,27 +151,33 @@ class ResetPasswordConfirm(APIView):
 
 # views
 class UserSchemaView(APIView):
-    permission_classes = [IsAuthenticated]  # Ensure only logged-in users can access this view
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        serializer = JSONSchemaSerializer(data=request.data, context={'request': request})
+        serializer = UserSchemaSerializer(data=request.data)
 
         if serializer.is_valid():
-            user = request.user  # Get the authenticated user
+            schema_name = serializer.validated_data.get('schema_name', 'Unnamed Schema')  # Provide a default if no name
+            json_data = serializer.validated_data['json_data']
+            user = request.user  # The authenticated user
 
             # Connect to MongoDB using PyMongo
             client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
-            db = client[settings.DATABASES['default']['NAME']]  # Connect to the database
+            db = client[settings.DATABASES['default']['NAME']]
 
-            # Insert the new schema into the 'user_schemas' collection
-            db['user_schemas'].insert_one({
-                "user_id": str(user.id),  # Store the user ID as a string
-                "email": user.email,      # Store the user's email
-                "schema_name": serializer.validated_data['schema_name'],
-                "json_data": serializer.validated_data['json_data'],
-            })
-
-            return Response({"message": "Schema saved successfully!"}, status=status.HTTP_201_CREATED)
+            # Append the new schema to the user's document in MongoDB  (CHANGE THIS COLLECTION TO STORE )
+            db['reactapi_customuser'].update_one(
+                {'_id': user.id},
+                {
+                    '$push': {
+                        'schemas': {
+                            'schema_name': schema_name,
+                            'json_data': json_data
+                        }
+                    }
+                }
+            )
+            return Response({"message": "Schema added successfully!"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
