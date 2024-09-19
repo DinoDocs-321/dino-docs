@@ -32,6 +32,7 @@ from django.template.loader import render_to_string
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
+from django.utils.decorators import method_decorator
 from django.core.mail import send_mail
 
 
@@ -448,27 +449,67 @@ class DataTypeList(APIView):
 # -------Generate Views---------
 # ------------------------------
 
+
+
+
+# @method_decorator(csrf_exempt, name='dispatch')
+# class ManualGenerate(View):
+#     def post(self, request, *args, **kwargs):
+#         logging.debug(f"POST request received: {request}")
+#         file = request.FILES.get('file')
+#         if file:
+#             logging.debug(f"File received: {file.name}")
+#             try:
+#                 json_data = json.load(file)
+#                 logging.info(f"File '{file.name}' successfully uploaded and parsed.")
+#                 return JsonResponse({'status': 'success', 'filename': file.name})
+#             except json.JSONDecodeError:
+#                 logging.error(f"File '{file.name}' could not be parsed. Invalid JSON.")
+#                 return JsonResponse({'status': 'error', 'message': 'Invalid JSON file.'}, status=400)
+#         return JsonResponse({'status': 'error', 'message': 'No file uploaded'}, status=400)
+
+#     def get(self, request, *args, **kwargs):
+#         return JsonResponse({'status': 'success', 'message': 'GET request received'})
+
+
+import json
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 
-class ManualGenerate(View):
-    def post(self, request, *args, **kwargs):
-        logging.debug(f"POST request received: {request}")
-        file = request.FILES.get('file')
-        if file:
-            logging.debug(f"File received: {file.name}")
-            try:
-                json_data = json.load(file)
-                logging.info(f"File '{file.name}' successfully uploaded and parsed.")
-                return JsonResponse({'status': 'success', 'filename': file.name})
-        
-            except json.JSONDecodeError:
-                logging.error(f"File '{file.name}' could not be parsed. Invalid JSON.")
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON file.'}, status=400)
-        
-        return JsonResponse({'status': 'error', 'message': 'No file uploaded'}, status=400)
+# View to handle file upload and validate JSON
+@csrf_exempt
+def validate_json_file(request):
+    if request.method == 'POST':
+        json_file = request.FILES.get('file')  # Retrieve the uploaded file
+        if not json_file:
+            return JsonResponse({'status': 'error', 'message': 'No file uploaded'}, status=400)
 
+        try:
+            file_content = json_file.read().decode('utf-8')  # Read and decode the file content
+            json.loads(file_content)  # Attempt to parse it as JSON
+            return JsonResponse({'status': 'success', 'message': 'Valid JSON file'}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON file'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'Error processing file: {str(e)}'}, status=500)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
-    def get(self, request, *args, **kwargs):
-        return JsonResponse({'status': 'success', 'message': 'GET request received'})
+# View to handle pasted JSON validation
+@csrf_exempt
+def validate_json_text(request):
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)  # Parse the request body as JSON
+            json_text = body.get('jsonText')  # Get the JSON text from the request
+            if not json_text:
+                return JsonResponse({'status': 'error', 'message': 'No JSON text provided'}, status=400)
+
+            json.loads(json_text)  # Attempt to parse it as JSON
+            return JsonResponse({'status': 'success', 'message': 'Valid JSON text'}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON text'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'Error processing request: {str(e)}'}, status=500)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
 
