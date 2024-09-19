@@ -453,10 +453,21 @@ from django.utils.decorators import method_decorator
 
 class ManualGenerate(View):
     def post(self, request, *args, **kwargs):
+        logging.debug(f"POST request received: {request}")
         file = request.FILES.get('file')
         if file:
-            return JsonResponse({'status': 'success', 'filename': file.name})
+            logging.debug(f"File received: {file.name}")
+            try:
+                json_data = json.load(file)
+                logging.info(f"File '{file.name}' successfully uploaded and parsed.")
+                return JsonResponse({'status': 'success', 'filename': file.name})
+        
+            except json.JSONDecodeError:
+                logging.error(f"File '{file.name}' could not be parsed. Invalid JSON.")
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON file.'}, status=400)
+        
         return JsonResponse({'status': 'error', 'message': 'No file uploaded'}, status=400)
+
 
     def get(self, request, *args, **kwargs):
         return JsonResponse({'status': 'success', 'message': 'GET request received'})

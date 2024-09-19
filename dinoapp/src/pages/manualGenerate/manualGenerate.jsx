@@ -22,31 +22,60 @@ function ManualGenerate() {
 
     const formData = new FormData();
     formData.append('file', file);
-
-    fetch('/api/manual-generate/', {
-      method: 'POST',
-      body: formData,
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return response.text().then(text => {
-            throw new Error(`Upload failed: ${text}`);
-          });
-        }
-        return response.json();
+    try {
+      fetch('http://localhost:8000/api/manual-generate/', {
+        method: 'POST',
+        body: formData,
       })
-      .then((data) => {
-        if (data.status === 'success') {
-          setFileUrl(`/media/${data.filename}`); // Adjust the URL if needed
-          setMessage(`File uploaded successfully: ${data.filename}`);
-        } else {
-          setMessage(`Upload failed: ${data.message}`);
-        }
-      })
-      .catch((error) => {
-        setMessage(`Upload error: ${error.message}`);
-      });
+        .then((response) => {
+          if (!response.ok) {
+            return response.text().then(text => {
+              throw new Error(`Upload failed: ${text}`);
+            });
+          }
+          return response.json();
+        })
+        .then((data) => {
+          if (data.status === 'success') {
+            setFileUrl(`${data.filename}`); 
+            setMessage(`File uploaded successfully: ${data.filename}`);
+          } else {
+            setMessage(`Upload failed: ${data.message}`);
+          }
+        })
+        .catch((error) => {
+          console.error('Upload error:', error.message);
+          setMessage(`Upload error: ${error.message}`);
+        });
+    } catch (error) {
+      console.error('Error in fetch request:', error);
+    }
   };
+
+
+  //   fetch('/api/manual-generate/', {
+  //     method: 'POST',
+  //     body: formData,
+  //   })
+  //     .then(async (response) => {
+  //       if (!response.ok) {
+  //         const text = await response.text();
+  //         throw new Error(`Upload failed: ${text}`);
+  //       }
+  //       return response.json();
+  //     })
+  //     .then((data) => {
+  //       if (data.status === 'success') {
+  //         setFileUrl(`/media/${data.filename}`);
+  //         setMessage(`File uploaded successfully: ${data.filename}`);
+  //       } else {
+  //         setMessage(`Upload failed: ${data.message}`);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       setMessage(`Upload error: ${error.message}`);
+  //     });
+  // };
 
   const handleValidate = () => {
     try {
