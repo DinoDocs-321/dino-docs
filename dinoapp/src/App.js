@@ -35,7 +35,7 @@ function App() {
         <Route path='/contact' element={<Contact />} />
         <Route path='/JSONEditor' element={<JSONEditor />} />
         <Route path='/schema-form' element={<SchemaForm />} />
-        <Route path='/manualschema' element={<ManualSchema />} />
+        <Route path='/manual-generate' element={<ManualSchema />} />
         <Route path='/signin' element={<SignIn />} />
         <Route path='/signup' element={<SignUp />} />
         <Route path='/signout' element={<SignOut />} />
