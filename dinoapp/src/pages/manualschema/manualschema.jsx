@@ -12,21 +12,20 @@ const ManualSchema = () => {
     setTextFieldValue(preLoadedData);
   }, []);
 
-  // Handle input change for manual typing in textarea
   const handleInputChange = (event) => {
     setTextFieldValue(event.target.value);
   };
 
-  // Handle file upload and read file content
+  
   const handleFileUpload = (event) => {
-    const file = event.target.files[0]; // Get the first file from the input
+    const file = event.target.files[0]; 
     if (file) {
-      const reader = new FileReader(); // Create a new FileReader
+      const reader = new FileReader(); 
       reader.onload = function(e) {
-        const fileContent = e.target.result; // Get the file content
-        setTextFieldValue(fileContent); // Set file content to text field
+        const fileContent = e.target.result; 
+        setTextFieldValue(fileContent); 
       };
-      reader.readAsText(file); // Read the file content as text
+      reader.readAsText(file); 
     }
   };
 

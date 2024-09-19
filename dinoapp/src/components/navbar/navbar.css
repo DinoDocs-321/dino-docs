@@ -80,5 +80,5 @@
 .dinonavbar button:hover {
   background-color: #45879b; 
   color: #ddd;
-  transition: 1s ease-in-out; 
+  transition: 250ms ease-in-out; 
 }
