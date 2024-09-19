@@ -4,7 +4,7 @@ from .views import *
 
 
 urlpatterns = [
-    path('generate/', generate_documents_view, name='generate_documents'),
+    path('generate/', GenerateDocumentView.as_view(), name='generate_documents'),
 
     # JWT Authentication paths
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -23,6 +23,8 @@ urlpatterns = [
     #Generator paths
     path('data-types/', DataTypeList.as_view(), name='data-types'),
     #path('generate/', GenerateDataView.as_view(), name='generate-data'),
+    path('manual-generate/', ManualGenerate.as_view(), name='manual-generate'),
+
 
 ]
 

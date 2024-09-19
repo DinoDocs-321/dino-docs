@@ -448,4 +448,16 @@ class DataTypeList(APIView):
 # -------Generate Views---------
 # ------------------------------
 
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+
+class ManualGenerate(View):
+    def post(self, request, *args, **kwargs):
+        file = request.FILES.get('file')
+        if file:
+            return JsonResponse({'status': 'success', 'filename': file.name})
+        return JsonResponse({'status': 'error', 'message': 'No file uploaded'}, status=400)
+
+    def get(self, request, *args, **kwargs):
+        return JsonResponse({'status': 'success', 'message': 'GET request received'})
 
