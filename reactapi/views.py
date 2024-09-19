@@ -176,8 +176,28 @@ class ConvertJsonToBson(APIView):
 
 # ----- .JSON/BSON Views ------
 # ----------------------------
+class ConvertBsonToJson(APIView):
+    def post(self, reuqest):
+        try:
+            #Parsing BSON data from the request body 
+            request_data = bson.loads(request.body.decode('utf-8'))
+            bson_str = request_data.get('bson_data')
+
+            if not bson_str:
+                return HttpResponseBadRequest("No BSON data provided")
 
 
+            bson_data = bytes.fromhex(bson_str)
+            json_data = bson.BSON.decode(bson_data)
+
+            return JsonResponse({'converted_data': json_data})
+
+        except bson.errors.InvalidBSON:
+            return HttpResponseBadRequest("Invalid BSON data")    
+        except json.JSONDecodeError:
+            return HttpResponseBadRequest("Invalid request format")
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))
 
 
 

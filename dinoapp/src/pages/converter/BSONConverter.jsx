@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BSON } from 'bson';
 import Form from 'react-bootstrap/Form';
-import './converter.css';
+import './BSONConverter.css';
 
-const Converter = () => {
+const BSONConverter = () => {
   const [textFieldValue, setTextFieldValue] = useState('');
   const [conversionResult, setConversionResult] = useState('');
 
@@ -82,4 +82,4 @@ const Converter = () => {
   );
 };
 
-export default Converter;
+export default BSONConverter;
