@@ -364,7 +364,9 @@ DATA_TYPES = [
     {"value": "currency", "label": "Currency", "type": "string"},
     {"value": "bankAccountNums", "label": "Bank Account Numbers", "type": "string"},
     {"value": "cvv", "label": "CVV", "type": "integer"},
-    {"value": "pin", "label": "PIN", "type": "integer"}
+    {"value": "pin", "label": "PIN", "type": "integer"},
+    {"value": "object", "label": "Object", "type": "object"}
+
 ]
 
 # Function to map the value of dataType to the corresponding structure in DATA_TYPES
@@ -373,6 +375,26 @@ def map_data_type(value):
         if data_type["value"] == value:
             return data_type
     return None  # Return None if no match is found
+
+class GenerateData(APIView):
+    """
+    Handle POST requests to receive the schema and forward it to the AI generator.
+    """
+
+    def post(self, request):
+        schema = request.data.get('schema', {})
+        num_samples = int(request.data.get('num_samples', 10))
+        format_type = request.data.get('format', 'json')
+
+        # Here you would send 'schema' to your AI generator
+        # For now, we'll just return the schema for confirmation
+
+        # Example:
+        # ai_generated_data = call_ai_generator(schema, num_samples, format_type)
+
+        # For demonstration, we'll just return the schema
+        return Response({'message': 'Schema received', 'schema': schema}, status=status.HTTP_200_OK)
+    
 
 # Function to create a valid JSON schema based on the rows received from the front-end
 def create_valid_json_schema(rows):

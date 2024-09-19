@@ -1,76 +1,115 @@
+/* Container for the entire form */
 .container {
+    width: 100%;
+}
+
+/* Header row */
+.header {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 2fr 1fr; /* Adjust as necessary */
     gap: 10px;
-    width: 100%;
-  }
-  
-  .header, .row {
-    display: contents;
-  }
-  
-  .header span {
+    align-items: center;
+}
+
+.header span {
     font-weight: bold;
     padding: 10px 0;
-  }
-  
-  .row {
+}
+
+/* Field row */
+.field {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 2fr 1fr; /* Match grid layout */
     gap: 10px;
     align-items: center;
-  }
-  
-  .row select,
-  .row input {
+}
+
+/* Indent nested fields */
+.nested-field {
+    margin-left: 20px; /* Indent nested fields */
+}
+
+.nested-field .nested-field {
+    margin-left: 20px;
+}
+
+.nested-field .nested-field .nested-field {
+    margin-left: 20px;
+}
+
+/* Inputs and selects */
+.field select,
+.field input {
     width: 100%;
     padding: 5px;
     box-sizing: border-box;
-  }
-  
-  .tag-input {
+}
+
+/* Buttons */
+.field button {
+    padding: 5px 10px;
+    margin-left: 5px;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Input text overflow handling */
+.field input {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Tag input styles, if applicable */
+.tag-input {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-  }
-  
-  .tags {
+}
+
+.tags {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
-  }
-  
-  .tag {
+}
+
+.tag {
     display: inline-flex;
     align-items: center;
     background-color: #e0e0e0;
     border-radius: 5px;
     padding: 2px 8px;
     margin-right: 5px;
-  }
-  
-  .tag button {
+}
+
+.tag button {
     background: none;
     border: none;
     margin-left: 5px;
     cursor: pointer;
-  }
-  
-  button {
-    padding: 5px 10px;
-    margin-left: 5px;
-  }
-  
-  .row button {
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .row input {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
+}
+
+/* Additional styling for the schema info section */
+.schema-info {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.schema-info input {
+    flex: 1;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+/* Styling for the buttons at the bottom */
+.buttons-container {
+    margin-top: 20px;
+}
+
+.buttons-container button {
+    padding: 10px 15px;
+    margin-right: 10px;
+}
