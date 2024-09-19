@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import './domainGenerate.css';
+
 
 const JsonValidator = () => {
   const [jsonText, setJsonText] = useState('');
@@ -30,7 +32,7 @@ const JsonValidator = () => {
       });
       setMessage('File validated successfully');
       // Assuming you want to preview the uploaded file (adjust this based on your use case)
-      setFileUrl(URL.createObjectURL(file));
+      // setFileUrl(URL.createObjectURL(file));
     } catch (error) {
       setMessage('There was an error validating the file');
     }
