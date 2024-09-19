@@ -23,7 +23,11 @@ urlpatterns = [
     #Generator paths
     path('data-types/', DataTypeList.as_view(), name='data-types'),
     #path('generate/', GenerateDataView.as_view(), name='generate-data'),
-    path('manual-generate/', ManualGenerate.as_view(), name='manual-generate'),
+    # path('manual-generate/', ManualGenerate.as_view(), name='manual-generate'),
+    
+    path('validate-json-file/', validate_json_file, name='validate_json_file'),
+    path('validate-json-text/', validate_json_text, name='validate_json_text'),
+
 
 
 ]

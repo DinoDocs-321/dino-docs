@@ -1,22 +1,25 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './manualGenerate.css'; // Import the CSS file
+import './domainGenerate.css';
 
-function ManualGenerate() {
-  const [file, setFile] = useState(null);
+
+const JsonValidator = () => {
   const [jsonText, setJsonText] = useState('');
-  const [jsonPreview, setJsonPreview] = useState('');
-  const [message, setMessage] = useState('');
-  const [fileUrl, setFileUrl] = useState('');
+  const [file, setFile] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [jsonPreview, setJsonPreview] = useState(null);
+  const [fileUrl, setFileUrl] = useState(null);
 
+  // Handle file input change
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
+  // Handle file upload and validation
   const handleFileUpload = async (e) => {
     e.preventDefault();
     if (!file) {
-      setMessage('Please upload a file.');
+      setMessage('Please select a file to upload');
       return;
     }
 
@@ -24,31 +27,25 @@ function ManualGenerate() {
     formData.append('file', file);
 
     try {
-      const result = await axios.post('http://localhost:8000/api/manual-generate/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data', // Set headers for file upload
-        },
+      const result = await axios.post('http://127.0.0.1:8000/api/validate-json-file/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-      // If the response is successful
-      if (result.data.status === 'success') {
-        setFileUrl(result.data.filename); // Assuming the response returns the filename
-        setMessage(`File uploaded successfully: ${result.data.filename}`);
-      } else {
-        setMessage(`Upload failed: ${result.data.message}`);
-      }
+      setMessage('File validated successfully');
+      // Assuming you want to preview the uploaded file (adjust this based on your use case)
+      // setFileUrl(URL.createObjectURL(file));
     } catch (error) {
-      // Handle errors here
-      setMessage(`Upload error: ${error.response ? error.response.data : error.message}`);
+      setMessage('There was an error validating the file');
     }
   };
 
-  const handleValidate = () => {
+  // Handle JSON text validation
+  const handleValidate = async () => {
     try {
-      JSON.parse(jsonText);
-      setJsonPreview(JSON.stringify(JSON.parse(jsonText), null, 2));
-      setMessage('JSON is valid.');
+      const result = await axios.post('http://127.0.0.1:8000/api/validate-json-text/', { jsonText });
+      setJsonPreview(JSON.stringify(result.data, null, 2));
+      setMessage('JSON validated successfully');
     } catch (error) {
-      setMessage('Invalid JSON format.');
+      setMessage('There was an error validating the JSON');
     }
   };
 
@@ -98,6 +95,6 @@ function ManualGenerate() {
       </div>
     </div>
   );
-}
+};
 
-export default ManualGenerate;
+export default JsonValidator;
