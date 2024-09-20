@@ -4,6 +4,10 @@ from django.conf import settings
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from pymongo import MongoClient
+from django.utils import timezone
+from rest_framework import serializers
+from bson import ObjectId
+from django.db import connections
 
 
 
@@ -26,7 +30,16 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-# serializer
-class UserSchemaSerializer(serializers.Serializer):
-    schema_name = serializers.CharField(max_length=255, required=False, allow_blank=True)  # Optional schema name
-    json_data = serializers.JSONField()  # Required JSON data
+# from rest_framework import serializers
+# from .models import UserSchema
+
+# class UserSchemaSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = UserSchema
+#         fields = ['schema_name', 'json_data', 'created_at', 'updated_at']
+
+#     def create(self, validated_data):
+#         # Automatically assign the logged-in user to the schema
+#         user = self.context['request'].user
+#         schema = UserSchema.objects.create(user=user, **validated_data)
+#         return schema

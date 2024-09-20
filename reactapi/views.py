@@ -26,7 +26,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from openai import OpenAI
 from pymongo import MongoClient
-from .serializers import  UserSchemaSerializer
+
+
 
 # Django imports
 from django.contrib.auth.models import User
@@ -36,7 +37,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
-
+from django.db import connections
 
 # Local application imports
 from .serializers import UserSerializer
@@ -149,40 +150,43 @@ class ResetPasswordConfirm(APIView):
 # ----- .Login/Signup Views ------
 # -------------------------------
 
-# views
-class UserSchemaView(APIView):
-    permission_classes = [IsAuthenticated]
+# ------- save-json views ---------
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .mongodb_utils import get_collection
+from django.utils import timezone
 
-    def post(self, request):
-        serializer = UserSchemaSerializer(data=request.data)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def save_user_schema(request):
+    collection = get_collection()
 
-        if serializer.is_valid():
-            schema_name = serializer.validated_data.get('schema_name', 'Unnamed Schema')  # Provide a default if no name
-            json_data = serializer.validated_data['json_data']
-            user = request.user  # The authenticated user
+    schema_name = request.data.get('schema_name')
+    json_data = request.data.get('json_data')
 
-            # Connect to MongoDB using PyMongo
-            client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
-            db = client[settings.DATABASES['default']['NAME']]
+    if not schema_name or not json_data:
+        return Response({'error': 'Both schema_name and json_data are required'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Append the new schema to the user's document in MongoDB  (CHANGE THIS COLLECTION TO STORE )
-            db['reactapi_customuser'].update_one(
-                {'_id': user.id},
-                {
-                    '$push': {
-                        'schemas': {
-                            'schema_name': schema_name,
-                            'json_data': json_data
-                        }
-                    }
-                }
-            )
-            return Response({"message": "Schema added successfully!"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    new_schema = {
+        'user_id': str(request.user.id),
+        'schema_name': schema_name,
+        'json_data': json_data,
+        'created_at': timezone.now()
+    }
 
+    result = collection.insert_one(new_schema)
+
+    if result.inserted_id:
+        new_schema['_id'] = str(result.inserted_id)
+        return Response(new_schema, status=status.HTTP_201_CREATED)
+    else:
+        return Response({'error': 'Failed to save schema'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # ----------------------------
 # ----- JSON/BSON Views ------
+
 
 # create your views here
 class ConvertJsonToBson(APIView):
