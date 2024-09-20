@@ -1,7 +1,7 @@
 .homepage{
     display: flex;
     justify-content: space-between;
-    align-items: center;
+
 }
 
 .selectoption{
@@ -11,7 +11,6 @@
 }
 
 .homepageimg {
-    max-width: 100%; 
     height: auto; 
 }
 
