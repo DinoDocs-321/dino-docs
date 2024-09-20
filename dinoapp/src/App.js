@@ -14,6 +14,7 @@ import SignOut from './pages/signout/signout';
 import NotFound from './pages/notfound/notfound'
 import ForgotPassword from './pages/forgetpwd/forgetpwd';
 import ResetPassword from './pages/resetpwd/resetpwd';
+import ManualSchema from './pages/manualschema/manualschema';
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
         <Route path='/contact' element={<Contact />} />
         <Route path='/JSONEditor' element={<JSONEditor />} />
         <Route path='/schema-form' element={<SchemaForm />} />
+        <Route path='/manual-generate' element={<ManualSchema />} />
         <Route path='/signin' element={<SignIn />} />
         <Route path='/signup' element={<SignUp />} />
         <Route path='/signout' element={<SignOut />} />

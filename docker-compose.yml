@@ -11,14 +11,17 @@ services:
     environment:
       - DEBUG=1
       - SECRET_KEY="h_qq3+(%*4v)7r_@hzphjdef+2gmzzs@6o6qszai=zgsm10i4"
+    depends_on:
+      - react  # Ensure the React app is built before starting Django
 
   react:
     build:
       context: ./dinoapp  # Path to the React Dockerfile
+      dockerfile: Dockerfile  # Ensure the React Dockerfile is used for build
     container_name: react_app
     volumes:
-      - ./dinoapp:/usr/src/app
+      - ./dinoapp:/usr/src/app  # Sync local files with the container
     ports:
-      - "3000:3000"
+      - "3000:80"  # React is served via Nginx on port 80 internally
     stdin_open: true
     tty: true

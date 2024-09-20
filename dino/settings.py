@@ -78,7 +78,10 @@ ROOT_URLCONF = "dino.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'dinoreact/build')],
+        "DIRS": [
+            os.path.join(BASE_DIR, 'dinoapp/build'),  # React build folder
+            os.path.join(BASE_DIR, 'dino/templates')         # Django templates folder
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
