@@ -107,7 +107,24 @@ class LogoutView(APIView):
 
 # forgot password functionality veiw
 
-User = get_user_model()
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.conf import settings
+from pymongo import MongoClient, DESCENDING
+import random
+import string
+from datetime import datetime, timedelta
+
+# MongoDB setup
+client = MongoClient(settings.MONGODB_URI)
+db = client[settings.MONGODB_NAME]
+reset_codes_collection = db['password_reset_codes']
+
+# Create an index for better query performance
+reset_codes_collection.create_index([("email", 1), ("created_at", -1)])
 
 class ForgotPasswordView(APIView):
     def post(self, request):
@@ -123,22 +140,28 @@ class ForgotPasswordView(APIView):
         # Generate a random 6-digit code
         code = ''.join(random.choices(string.digits, k=6))
 
-        # Save the code in the user's profile or a separate model
-        user.profile.reset_code = code
-        user.profile.save()
+        # Store the code in MongoDB
+        reset_codes_collection.insert_one({
+            'user_id': str(user.id),
+            'email': email,
+            'code': code,
+            'created_at': datetime.utcnow()
+        })
 
-        # Send email with the code
-        send_mail(
-            'Password Reset Code',
-            f'Your password reset code is: {code}',
-            'from@example.com',
-            [email],
-            fail_silently=False,
-        )
+        # Send email with the reset code
+        subject = 'Password Reset Code'
+        message = f'Your password reset code is: {code}'
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [email]
 
-        return Response({'message': 'Reset code sent to email'}, status=status.HTTP_200_OK)
+        try:
+            send_mail(subject, message, from_email, recipient_list)
+            return Response({'message': 'Reset code sent to email'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"Error sending email: {str(e)}")
+            return Response({'error': 'Unable to send reset code. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class VerifyCodeView(APIView):
+class VerifyResetCodeView(APIView):
     def post(self, request):
         email = request.data.get('email')
         code = request.data.get('code')
@@ -146,16 +169,18 @@ class VerifyCodeView(APIView):
         if not email or not code:
             return Response({'error': 'Email and code are required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response({'error': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        # Find the most recent reset code for this email
+        reset_code = reset_codes_collection.find_one({
+            'email': email,
+            'code': code,
+            'created_at': {'$gte': datetime.utcnow() - timedelta(minutes=10)}
+        }, sort=[('created_at', DESCENDING)])
 
-        if user.profile.reset_code != code:
-            return Response({'error': 'Invalid code'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Code is valid, allow password reset
-        return Response({'message': 'Code verified successfully'}, status=status.HTTP_200_OK)
+        if reset_code:
+            # Code is valid
+            return Response({'message': 'Code verified successfully'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid or expired code'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # ----------------------------------------------------------------------------------------------------------------
