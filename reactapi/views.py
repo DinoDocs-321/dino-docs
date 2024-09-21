@@ -159,7 +159,7 @@ class ForgotPasswordView(APIView):
             return Response({'message': 'Reset code sent to email'}, status=status.HTTP_200_OK)
         except Exception as e:
             print(f"Error sending email: {str(e)}")
-            return Response({'error': 'Unable to send reset code. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': 'Unable to send reset code. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class VerifyCodeView(APIView):
     def post(self, request):
@@ -182,6 +182,34 @@ class VerifyCodeView(APIView):
         else:
             return Response({'error': 'Invalid or expired code'}, status=status.HTTP_400_BAD_REQUEST)
 
+from rest_framework_simplejwt.tokens import RefreshToken
+
+class ResetPasswordView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        new_password = request.data.get('new_password')
+
+        if not email or not new_password:
+            return Response({'error': 'Email and new password are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Find the user and update their password
+            user = User.objects.get(email=email)
+            user.set_password(new_password)
+            user.save()
+
+            # Generate new JWT tokens (access and refresh) after password reset
+            refresh = RefreshToken.for_user(user)
+
+            # Send new tokens to the frontend
+            return Response({
+                'message': 'Password reset successfully',
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
+            }, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 # ----------------------------------------------------------------------------------------------------------------
 

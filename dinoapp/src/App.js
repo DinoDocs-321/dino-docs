@@ -41,6 +41,7 @@ function App() {
         <Route path='/signout' element={<SignOut />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/verify-code' element={<VerifyCode />} />
+        <Route path='/reset-password' element={<ResetPassword />} />
 
         <Route path='*' element={<NotFound />} />
       </Routes>
