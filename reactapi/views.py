@@ -120,7 +120,7 @@ from datetime import datetime, timedelta
 
 # MongoDB setup
 client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
-db = client[settings.MONGODB_NAME]
+db = client[settings.DATABASES['default']['NAME']]
 reset_codes_collection = db['password_reset_codes']
 
 # Create an index for better query performance
@@ -161,7 +161,7 @@ class ForgotPasswordView(APIView):
             print(f"Error sending email: {str(e)}")
             return Response({'error': 'Unable to send reset code. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class VerifyResetCodeView(APIView):
+class VerifyCodeView(APIView):
     def post(self, request):
         email = request.data.get('email')
         code = request.data.get('code')

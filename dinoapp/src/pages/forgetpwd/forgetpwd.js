@@ -89,7 +89,6 @@ const ForgotPassword = () => {
       </Row>
     </Container>
 
-
   );
 };
 

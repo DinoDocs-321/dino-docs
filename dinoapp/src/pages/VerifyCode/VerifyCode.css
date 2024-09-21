@@ -1,64 +1,115 @@
+/* Container for the entire layout */
 .verify-code-container {
-    margin-top: 50px;
-    max-width: 900px;
-}
-.left-column, .right-column {
-    padding: 30px;
-}
-.back-to-login {
-    display: inline-block;
-    margin-bottom: 20px;
-    cursor: pointer;
-    color: #333;
-}
-h2 {
-    font-weight: 600;
-    margin-bottom: 10px;
-    font-size: 24px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent; /* Remove any background shade */
 }
 
-p {
-    margin-bottom: 30px;
-    color: #666;
-    font-size: 16px;
-}
-.form-control {
-    margin-bottom: 20px;
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
+/* Left-side image container for verify code */
+.verify-img-container {
+    width: 400px; /* Reduced width */
+    height: 600px; /* Reduced height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 30px; /* Optional: Keep border-radius if desired */
+    background-color: transparent; /* Ensure no background color */
+  }
+
+  /* Adjust the image inside the container */
+  .verify-img-container img {
+    max-width: 70%; /* Ensure image scales nicely */
+    max-height: 100%;
+    display: block;
+  }
+
+
+/* Right-side form container */
+.verify-form-container {
+    max-width: 380px;
     width: 100%;
-    box-sizing: border-box;
+    padding: 40px 20px;
+    margin: 0 auto;
+    background-color: transparent; /* Ensure no background color */
+    text-align: left;
+    box-shadow: none; /* Ensure no shadow */
+    border: none; /* No border to avoid divider effect */
 }
-.submit-btn {
-    width: 100%;
-    background-color: #395C6B;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 8px;
-    margin-top: 10px;
+
+/* Back to login link */
+.back-link {
+    color: #333;
+    text-decoration: none;
+    font-weight: 600;
     cursor: pointer;
+    display: block; /* Force it to be on its own line */
+    margin-bottom: 20px; /* Space between back link and the next element */
 }
-.submit-btn:hover {
-    background-color: #051623;
+
+/* Title */
+h3.verify-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 10px; /* Space after title */
+    display: block;
 }
-.illustration-img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 10px;
+
+/* Paragraph */
+p {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 20px; /* Space after paragraph */
 }
-.resend-link {
-    text-align: center;
+
+/* Form styling */
+.form-group {
+    display: block;
+    margin-bottom: 20px; /* Space between form fields */
+}
+
+.form-control {
+    display: block;
+    padding: 0.75rem 1rem;
+    width: 100%; /* Ensure full width */
+    margin-bottom: 20px;
+}
+
+button.btn-primary {
+    width: 100%;
+    display: block;
     margin-top: 20px;
+    padding: 0.75rem 1rem;
+    background-color: #395C6B;
+    border-color: #395C6B;
 }
-.resend-link a {
-    color: #395C6B;
+
+button.btn-primary:hover {
+    background-color: #2c4855;
+    border-color: #2c4855;
+}
+
+/* Resend link styling */
+.resend-link {
+    color: red;
+    cursor: pointer;
     text-decoration: none;
 }
 
-.resend-link a:hover {
+.resend-link:hover {
     text-decoration: underline;
+}
+
+/* Text center styling for the resend link */
+.text-center {
+    text-align: center;
+}
+
+/* Ensure row and column containers have no background or border */
+.row,
+.col {
+    background-color: transparent !important; /* Remove any background color */
+    box-shadow: none; /* Ensure no shadow effect */
+    border: none; /* Ensure no borders */
 }

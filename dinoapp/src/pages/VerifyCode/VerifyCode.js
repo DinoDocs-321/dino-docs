@@ -33,49 +33,43 @@ const handleSubmit = async (e) => {
     }
 };
 
-    return (
-    <Container className="verify-code-container">
-        <Row className="justify-content-center align-items-center">
-        {/* Left Column: Image */}
-        <Col md={6} className="left-column">
-            <img src={assets.ForgotPWD} alt="Illustration" className="illustration-img" />
-        </Col>
 
-        {/* Right Column: Form and Text */}
-        <Col md={6} className="right-column">
-            <span
-                style={{ fontWeight: 600 }}
-                onClick={handleLoginClick}
-                className="back-to-login"
-                >
-                {'< Back to login'}
-            </span>
-            <h2 style={{ fontWeight: 600 }}>Verify code</h2>
-            <p>An authentication code has been sent to your email.</p>
-            {error && <Alert variant="danger">{error}</Alert>}
-            {message && <Alert variant="success">{message}</Alert>}
-            <Form onSubmit={handleSubmit}>
-            <Form.Group controlId="formCode">
-                <Form.Label>Enter Code</Form.Label>
-                    <Form.Control
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="Enter the 6-digit code"
-                required
-                className="form-control"
-                    />
-            </Form.Group>
-            <Button type="submit" className="submit-btn">
-                Verify
-            </Button>
-            <p className="resend-link">
-                Didn't receive a code? <a href="#">Resend</a>
-            </p>
+    return (
+        <Container fluid className="verify-code-container">
+  <Row className="h-100">
+    <Col md={6} className="d-none d-md-flex align-items-center justify-content-center bg-light">
+      <img src={assets.ForgotPWD} alt="Illustration" className="img-fluid" />
+    </Col>
+    <Col md={6} className="d-flex align-items-center justify-content-center">
+      <div className="verify-form-container">
+        <span onClick={handleLoginClick} className="back-link">
+          ← Back to login
+        </span>
+        <h3 className="verify-title">Verify code</h3>
+        <p>An authentication code has been sent to your email.</p>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group controlId="formCode">
+            <Form.Label>Enter Code</Form.Label>
+            <Form.Control
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Enter the 6-digit code"
+              required
+            />
+          </Form.Group>
+          <Button type="submit" className="btn-primary">
+            Verify
+          </Button>
         </Form>
-        </Col>
-    </Row>
-    </Container>
+        <div className="text-center mt-3">
+          <p>Didn't receive a code? <span className="resend-link">Resend</span></p>
+        </div>
+      </div>
+    </Col>
+  </Row>
+</Container>
+
 );
 };
 
