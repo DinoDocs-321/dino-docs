@@ -119,7 +119,7 @@ import string
 from datetime import datetime, timedelta
 
 # MongoDB setup
-client = MongoClient(settings.MONGODB_URI)
+client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
 db = client[settings.MONGODB_NAME]
 reset_codes_collection = db['password_reset_codes']
 
