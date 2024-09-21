@@ -17,16 +17,23 @@ const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setMessage('');
-
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/forgot-password/', { email });
-      setMessage('Password reset email has been sent.');
+      const response = await axios.post('http://127.0.0.1:8000/api/forgot-password/',
+        { email: email },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log('Password reset email sent successfully');
+      navigate('/verify-code', { state: { email: email } });
     } catch (err) {
       if (err.response && err.response.data) {
-        setError(err.response.data.error);
+        setError(err.response.data.error || 'An error occurred. Please try again.');
       } else {
-        setError('Something went wrong. Please try again.');
+        setError('An error occurred. Please try again.');
       }
     }
   };

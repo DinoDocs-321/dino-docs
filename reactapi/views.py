@@ -38,6 +38,14 @@ from django.core.mail import send_mail
 # Local application imports
 from .serializers import UserSerializer
 
+from django.contrib.auth import get_user_model
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.core.mail import send_mail
+import random
+import string
+
 
 
 # -------------------------------
@@ -97,49 +105,60 @@ class LogoutView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+# forgot password functionality veiw
 
-class ForgotPasswordRequest(APIView):
-    permission_classes = [AllowAny]
+User = get_user_model()
 
+class ForgotPasswordView(APIView):
     def post(self, request):
         email = request.data.get('email')
+        if not email:
+            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             user = User.objects.get(email=email)
-            token = PasswordResetTokenGenerator().make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-
-            # You should configure your email settings in settings.py for this to work.
-            mail_subject = 'Password Reset Request'
-            message = render_to_string('password_reset_email.html', {
-                'user': user,
-                'domain': 'localhost:3000',  # Your frontend domain
-                'uid': uid,
-                'token': token,
-            })
-            send_mail(mail_subject, message, 'contact@sohamverma.com', [email])
-
-            return Response({'message': 'Password reset email sent'}, status=status.HTTP_200_OK)
-
         except User.DoesNotExist:
-            return Response({'error': 'Email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
+        # Generate a random 6-digit code
+        code = ''.join(random.choices(string.digits, k=6))
 
-class ResetPasswordConfirm(APIView):
-    permission_classes = [AllowAny]
+        # Save the code in the user's profile or a separate model
+        user.profile.reset_code = code
+        user.profile.save()
 
-    def post(self, request, uidb64, token):
+        # Send email with the code
+        send_mail(
+            'Password Reset Code',
+            f'Your password reset code is: {code}',
+            'from@example.com',
+            [email],
+            fail_silently=False,
+        )
+
+        return Response({'message': 'Reset code sent to email'}, status=status.HTTP_200_OK)
+
+class VerifyCodeView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        code = request.data.get('code')
+
+        if not email or not code:
+            return Response({'error': 'Email and code are required'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            uid = force_str(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(pk=uid)
-            if PasswordResetTokenGenerator().check_token(user, token):
-                new_password = request.data.get('password')
-                user.set_password(new_password)
-                user.save()
-                return Response({'message': 'Password reset successful'}, status=status.HTTP_200_OK)
-            else:
-                return Response({'error': 'Token is invalid or expired'}, status=status.HTTP_400_BAD_REQUEST)
+            user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response({'error': 'Invalid user'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+        if user.profile.reset_code != code:
+            return Response({'error': 'Invalid code'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Code is valid, allow password reset
+        return Response({'message': 'Code verified successfully'}, status=status.HTTP_200_OK)
+
+
+# ----------------------------------------------------------------------------------------------------------------
 
 
 # ----- .Login/Signup Views ------

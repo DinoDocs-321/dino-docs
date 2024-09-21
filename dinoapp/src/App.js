@@ -13,8 +13,8 @@ import SignUp from './pages/signup/signup'
 import SignOut from './pages/signout/signout';
 import NotFound from './pages/notfound/notfound'
 import ForgotPassword from './pages/forgetpwd/forgetpwd';
-import ResetPassword from './pages/resetpwd/resetpwd';
 import ManualSchema from './pages/manualschema/manualschema';
+import VerifyCode from './pages/VerifyCode/VerifyCode';
 
 
 function App() {
@@ -40,7 +40,7 @@ function App() {
         <Route path='/signup' element={<SignUp />} />
         <Route path='/signout' element={<SignOut />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
-        <Route path='/reset-password/:uidb64/:token' element={<ResetPassword />} />
+        <Route path='/verify-code' element={<VerifyCode />} />
 
         <Route path='*' element={<NotFound />} />
       </Routes>
