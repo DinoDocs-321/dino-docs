@@ -14,6 +14,29 @@ const ForgotPassword = () => {
     navigate('/signin');
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setError('');
+  //   try {
+  //     const response = await axios.post('http://127.0.0.1:8000/api/forgot-password/',
+  //       { email: email },
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json'
+  //         }
+  //       }
+  //     );
+
+  //     console.log('Password reset email sent successfully');
+  //     navigate('/verify-code', { state: { email: email, user_id: response.data.user_id } });
+  //   } catch (err) {
+  //     if (err.response && err.response.data) {
+  //       setError(err.response.data.error || 'An error occurred. Please try again.');
+  //     } else {
+  //       setError('An error occurred. Please try again.');
+  //     }
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -27,8 +50,13 @@ const ForgotPassword = () => {
         }
       );
 
-      console.log('Password reset email sent successfully');
-      navigate('/verify-code', { state: { email: email } });
+      // Ensure we receive user_id and navigate to the next step
+      const { user_id } = response.data;
+      if (user_id) {
+        navigate('/verify-code', { state: { email: email, user_id: user_id } });
+      } else {
+        setError('Failed to retrieve user ID.');
+      }
     } catch (err) {
       if (err.response && err.response.data) {
         setError(err.response.data.error || 'An error occurred. Please try again.');

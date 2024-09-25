@@ -33,6 +33,8 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 
 # Local application imports
@@ -133,22 +135,27 @@ class ForgotPasswordView(APIView):
             return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            # Check if the user exists with this email
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             return Response({'error': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Generate a random 6-digit code
+        # Generate a random 6-digit reset code
         code = ''.join(random.choices(string.digits, k=6))
 
-        # Store the code in MongoDB
-        reset_codes_collection.insert_one({
-            'user_id': str(user.id),
-            'email': email,
-            'code': code,
-            'created_at': datetime.utcnow()
-        })
+        # Store the reset code in MongoDB
+        try:
+            reset_codes_collection.insert_one({
+                'user_id': str(user.id),
+                'email': email,
+                'code': code,
+                'created_at': datetime.utcnow(),
+                'expires_at': datetime.utcnow() + timedelta(minutes=15)
+            })
+        except Exception as e:
+            return Response({'error': f'Error saving reset code: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # Send email with the reset code
+        # Send an email with the reset code
         subject = 'Password Reset Code'
         message = f'Your password reset code is: {code}'
         from_email = settings.DEFAULT_FROM_EMAIL
@@ -156,25 +163,34 @@ class ForgotPasswordView(APIView):
 
         try:
             send_mail(subject, message, from_email, recipient_list)
-            return Response({'message': 'Reset code sent to email'}, status=status.HTTP_200_OK)
+            #return Response({'message': 'Reset code sent to email'}, status=status.HTTP_200_OK)
+            return Response({
+            'message': 'Reset code sent to email',
+            'user_id': str(user.id)  # Include user_id in the response
+        }, status=status.HTTP_200_OK)
         except Exception as e:
+            # Print or log the exact error
             print(f"Error sending email: {str(e)}")
-        return Response({'error': 'Unable to send reset code. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            return Response({'error': f'Unable to send reset code. Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 class VerifyCodeView(APIView):
     def post(self, request):
-        email = request.data.get('email')
+        # email = request.data.get('email')
         code = request.data.get('code')
 
-        if not email or not code:
-            return Response({'error': 'Email and code are required'}, status=status.HTTP_400_BAD_REQUEST)
+        if  not code:
+            return Response({'error': 'code are required'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Find the most recent reset code for this email
         reset_code = reset_codes_collection.find_one({
-            'email': email,
             'code': code,
-            'created_at': {'$gte': datetime.utcnow() - timedelta(minutes=10)}
-        }, sort=[('created_at', DESCENDING)])
+            'expires_at': {'$gt': datetime.utcnow()}
+        })
+
+        if not reset_code:
+            # For debugging, let's check what's in the database
+            # all_codes = list(reset_codes_collection.find({'email': email}))
+            # print(f"All codes for {email}: {all_codes}")
+            return Response({'error': 'Invalid or expired code'}, status=status.HTTP_400_BAD_REQUEST)
 
         if reset_code:
             # Code is valid
@@ -186,22 +202,42 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 class ResetPasswordView(APIView):
     def post(self, request):
-        email = request.data.get('email')
+        user_id = request.data.get('user_id')
         new_password = request.data.get('new_password')
+        code = request.data.get('code')
 
-        if not email or not new_password:
-            return Response({'error': 'Email and new password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not all([user_id, new_password, code]):
+            return Response({'error': 'User ID, new password, and verification code are required'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Find the user and update their password
-            user = User.objects.get(email=email)
+            # Verify the reset code
+            reset_code = reset_codes_collection.find_one({
+                'user_id': str(user_id),
+                'code': code,
+                'expires_at': {'$gt': datetime.utcnow()}
+            })
+
+            if not reset_code:
+                return Response({'error': 'Invalid or expired verification code'}, status=status.HTTP_400_BAD_REQUEST)
+
+            user = User.objects.get(id=user_id)
+
+            # Validate the new password
+            try:
+                validate_password(new_password, user=user)
+            except ValidationError as e:
+                return Response({'error': list(e.messages)}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Set the new password
             user.set_password(new_password)
             user.save()
 
-            # Generate new JWT tokens (access and refresh) after password reset
+            # Delete the used reset code
+            reset_codes_collection.delete_one({'_id': reset_code['_id']})
+
+            # Generate new JWT tokens
             refresh = RefreshToken.for_user(user)
 
-            # Send new tokens to the frontend
             return Response({
                 'message': 'Password reset successfully',
                 'access_token': str(refresh.access_token),
@@ -210,7 +246,6 @@ class ResetPasswordView(APIView):
 
         except User.DoesNotExist:
             return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
-
 # ----------------------------------------------------------------------------------------------------------------
 
 

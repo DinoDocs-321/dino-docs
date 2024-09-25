@@ -181,10 +181,12 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'apikey'  # This is the SendGrid username
-EMAIL_HOST_PASSWORD = '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'  # Replace with your SendGrid API key
-DEFAULT_FROM_EMAIL = 'contact@sohamverma.com'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp-relay.brevo.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = Trueß
+# EMAIL_HOST_USER = '7c8ae7001@smtp-brevo.com'  # Replace with actual user
+# EMAIL_HOST_PASSWORD = 'WH1b2gp6LfzNF4D7'  # Replace with the actual key from Brevo
+# DEFAULT_FROM_EMAIL = 'dinodocs@mail.com'
+
+BREVO_API_KEY = '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'

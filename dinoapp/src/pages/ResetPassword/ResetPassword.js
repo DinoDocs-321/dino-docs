@@ -4,40 +4,40 @@ import { Form, Button, Container } from 'react-bootstrap';
 import axios from 'axios';
 
 const ResetPassword = () => {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const location = useLocation();  // Access state passed from previous route
-  const navigate = useNavigate();
+const [password, setPassword] = useState('');
+const [confirmPassword, setConfirmPassword] = useState('');
+const [error, setError] = useState('');
+const location = useLocation();
+const navigate = useNavigate();
 
-  const email = location.state?.email;  // Get the email from the state
+const { user_id, code } = location.state || {};
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Check if passwords match
     if (password !== confirmPassword) {
-      setError('Passwords do not match!');
-      return;
+        setError('Passwords do not match!');
+        return;
     }
 
     try {
-      // Make the API request to reset the password
-      const response = await axios.post('http://127.0.0.1:8000/api/reset-password/', {
-        email: email,  // Send the email with the new password
+      // Ensure user_id and code are correctly passed
+        console.log('Sending reset request with:', { user_id, code, new_password: password });
+        const response = await axios.post('http://127.0.0.1:8000/api/reset-password/', {
+        user_id: user_id,
         new_password: password,
-      });
+        code: code
+        });
 
-      // If successful, navigate to the sign-in page
-      if (response.status === 200) {
+        if (response.status === 200) {
         navigate('/signin');
-      }
+        }
     } catch (err) {
-      setError('Failed to reset password. Please try again.');
-      console.error('Error resetting password:', err);
+        setError('Failed to reset password. Please try again.');
+        console.error('Error resetting password:', err.response ? err.response.data : err.message);
     }
-  };
+};
 
   return (
     <Container className="my-5">

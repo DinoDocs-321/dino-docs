@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { assets } from '../../assets/assets';
 import './VerifyCode.css';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 
 const VerifyCode = () => {
   const [code, setCode] = useState('');
+
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user_id, email } = location.state || {};
 
   const handleLoginClick = () => {
     navigate('/signin');
@@ -19,12 +22,18 @@ const VerifyCode = () => {
     e.preventDefault();
     setError('');
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/verify-code/', { code });
+      const response = await axios.post('http://127.0.0.1:8000/api/verify-code/', { code, user_id });
 
       // If verification is successful, navigate to the reset password page
       if (response.status === 200) {
         // Pass the email (or user ID) to the reset password page for context
-        navigate('/reset-password', { state: { email: 'user@example.com' } });  // Adjust as per your logic
+        navigate('/reset-password', {
+          state: {
+            code: code,
+            user_id: user_id,
+            email: email
+          }
+        });  // pass user.id for later
       }
     } catch (err) {
       setError('Invalid or expired code. Please try again.');

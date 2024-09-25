@@ -15,6 +15,7 @@ import NotFound from './pages/notfound/notfound'
 import ForgotPassword from './pages/forgetpwd/forgetpwd';
 import ManualSchema from './pages/manualschema/manualschema';
 import VerifyCode from './pages/VerifyCode/VerifyCode';
+import ResetPassword from './pages/ResetPassword/ResetPassword';
 
 
 function App() {
@@ -42,7 +43,6 @@ function App() {
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/verify-code' element={<VerifyCode />} />
         <Route path='/reset-password' element={<ResetPassword />} />
-
         <Route path='*' element={<NotFound />} />
       </Routes>
     </div>
