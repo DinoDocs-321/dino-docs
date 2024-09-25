@@ -253,7 +253,7 @@ const JSONEditor = () => {
       return row.filter(field => {
         if (field.id === id && field.label === 'ID') {
           alert('The ID field cannot be deleted.');
-          return true; 
+          return true; // Prevent deletion of ID fields
         }
         return field.id !== id;
       });
@@ -295,6 +295,7 @@ const JSONEditor = () => {
 
   
   const addNewObject = () => {
+    // Define the structure of a new group with a 'group-label' field
     const newGroup = {
       id: Date.now() + Math.random(),
       type: 'Group',
@@ -305,13 +306,15 @@ const JSONEditor = () => {
           value: '',
           type: 'Text',
         },
+        // Add more fields inside the group if necessary
       ],
     };
   
-    
+    // Append the new group to the existing formData
     const updatedFormData = [...formData, newGroup];
     setFormData(updatedFormData);
   
+    // Update the JSON view
     const updatedJSON = JSON.stringify(updatedFormData.map(transformFormData), null, 2);
     setJSONCode(updatedJSON);
   };
@@ -411,9 +414,7 @@ const JSONEditor = () => {
                 <span className='status-icon add-icon' onClick={() => addField(0)}><addIcon/></span>
                 <span className='status-icon delete-icon' onClick={() => deleteField(field.id)}><binIcon/></span>
                 
-                {isIDField && (
-                    <button className='unique-button'>Unique</button>
-                )}
+                
             </div>
         </div>
     );
