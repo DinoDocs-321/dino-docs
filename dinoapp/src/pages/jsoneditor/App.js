@@ -422,6 +422,7 @@ const JSONEditor = () => {
   return (
     <div className='json-editor-container'>
       <div className='editor'>
+
         <div className='visual-editor'>
           <div className="visual-editor-header">
             <h3>Visual Editor</h3>
@@ -440,6 +441,7 @@ const JSONEditor = () => {
             </div>
           ))}
         </div>
+
         <div className='code-editor'>
           <h3>Code Editor</h3>
           <textarea
@@ -449,6 +451,7 @@ const JSONEditor = () => {
             style={{ width: '100%', height: '100%'}}
           />
         </div>
+        
       </div>
 
       <div className='buttons'>
