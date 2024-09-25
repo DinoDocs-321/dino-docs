@@ -7,29 +7,125 @@ import addIcon from '../../assets/add.png';
 
 const JSONEditor = () => {
   const initialFormData = [
-    [{ id: Date.now(), label: 'ID', value: 'SML', type: 'Text' }],
-    [{ id: Date.now() + 1, label: 'SortAs', value: 'SGML', type: 'Text' }],
-    [{ id: Date.now() + 2, label: 'GlossTerm', value: 'Standard Generalized Markup Language', type: 'Text' }],
-    [{ id: Date.now() + 3, label: 'Acronym', value: 'SGML', type: 'Text' }],
-    [{ id: Date.now() + 4, label: 'Abbrev', value: 'ISO 8879:198', type: 'Text' }],
     [{
-      id: Date.now() + 5,
-      label: 'GlossDef',
+      id: Date.now(),
+      label: 'id',
       type: 'Group',
       inner: [
-        { id: Date.now() + 6, label: 'para', value: 'A meta-markup', type: 'Text' },
+        { id: Date.now() + 1, label: 'type', value: 'integer', type: 'Text' },
+        { id: Date.now() + 2, label: 'description', value: 'The unique identifier for a user.', type: 'Text' }
+      ]
+    }],
+   
+    [{
+      id: Date.now() + 3,
+      label: 'username',
+      type: 'Group',
+      inner: [
+        { id: Date.now() + 4, label: 'type', value: 'string', type: 'Text' },
+        { id: Date.now() + 5, label: 'description', value: 'The username for the user.', type: 'Text' },
+        { id: Date.now() + 6, label: 'minLength', value: 3, type: 'Text' },
+        { id: Date.now() + 7, label: 'maxLength', value: 20, type: 'Text' }
+      ]
+    }],
+
+    [{
+      id: Date.now() + 8,
+      label: 'email',
+      type: 'Group',
+      inner: [
+        { id: Date.now() + 9, label: 'type', value: 'string', type: 'Text' },
+        { id: Date.now() + 10, label: 'format', value: 'email', type: 'Text' },
+        { id: Date.now() + 11, label: 'description', value: "The user's email address.", type: 'Text' }
+      ]
+    }],
+    [{
+      id: Date.now() + 12,
+      label: 'password',
+      type: 'Group',
+      inner: [
+        { id: Date.now() + 13, label: 'type', value: 'string', type: 'Text' },
+        { id: Date.now() + 14, label: 'description', value: "The user's password.", type: 'Text' },
+        { id: Date.now() + 15, label: 'minLength', value: 8, type: 'Text' }
+      ]
+    }],
+    
+    [{
+      id: Date.now() + 16,
+      label: 'profile',
+      type: 'Group',
+      inner: [
+        { id: Date.now() + 17, label: 'type', value: 'object', type: 'Text' },
+        { id: Date.now() + 18, label: 'description', value: "The user's profile information.", type: 'Text' },
         {
-          id: Date.now() + 7,
-          label: 'GlossSeeAlso',
+          id: Date.now() + 19,
+          label: 'properties',
           type: 'Group',
           inner: [
-            { id: Date.now() + 8, label: '1', value: 'GML', type: 'Text' },
-            { id: Date.now() + 9, label: '2', value: 'XML', type: 'Text' },
+            { id: Date.now() + 20, label: 'firstName', type: 'Group', inner: [
+                { id: Date.now() + 21, label: 'type', value: 'string', type: 'Text' },
+                { id: Date.now() + 22, label: 'description', value: "The user's first name.", type: 'Text' }
+              ]
+            },
+            { id: Date.now() + 23, label: 'lastName', type: 'Group', inner: [
+                { id: Date.now() + 24, label: 'type', value: 'string', type: 'Text' },
+                { id: Date.now() + 25, label: 'description', value: "The user's last name.", type: 'Text' }
+              ]
+            },
+            { id: Date.now() + 26, label: 'age', type: 'Group', inner: [
+                { id: Date.now() + 27, label: 'type', value: 'integer', type: 'Text' },
+                { id: Date.now() + 28, label: 'description', value: "The user's age.", type: 'Text' },
+                { id: Date.now() + 29, label: 'minimum', value: 0, type: 'Text' }
+              ]
+            },
+            { id: Date.now() + 30, label: 'address', type: 'Group', inner: [
+                { id: Date.now() + 31, label: 'type', value: 'object', type: 'Text' },
+                { id: Date.now() + 32, label: 'description', value: "The user's address.", type: 'Text' },
+                {
+                  id: Date.now() + 33,
+                  label: 'properties',
+                  type: 'Group',
+                  inner: [
+                    { id: Date.now() + 34, label: 'street', type: 'Group', inner: [
+                        { id: Date.now() + 35, label: 'type', value: 'string', type: 'Text' },
+                        { id: Date.now() + 36, label: 'description', value: "The street part of the user's address.", type: 'Text' }
+                      ]
+                    },
+                    { id: Date.now() + 37, label: 'city', type: 'Group', inner: [
+                        { id: Date.now() + 38, label: 'type', value: 'string', type: 'Text' },
+                        { id: Date.now() + 39, label: 'description', value: "The city part of the user's address.", type: 'Text' }
+                      ]
+                    },
+                    { id: Date.now() + 40, label: 'state', type: 'Group', inner: [
+                        { id: Date.now() + 41, label: 'type', value: 'string', type: 'Text' },
+                        { id: Date.now() + 42, label: 'description', value: "The state part of the user's address.", type: 'Text' }
+                      ]
+                    },
+                    { id: Date.now() + 43, label: 'postalCode', type: 'Group', inner: [
+                        { id: Date.now() + 44, label: 'type', value: 'string', type: 'Text' },
+                        { id: Date.now() + 45, label: 'description', value: "The postal code part of the user's address.", type: 'Text' },
+                        { id: Date.now() + 46, label: 'pattern', value: '^[0-9]{5}(-[0-9]{4})?$', type: 'Text' }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
           ]
         }
       ]
     }],
-    [{ id: Date.now() + 10, label: 'GlossSee', value: 'markup', type: 'Text' }]
+    
+    [{
+      id: Date.now() + 47,
+      label: 'createdAt',
+      type: 'Group',
+      inner: [
+        { id: Date.now() + 48, label: 'type', value: 'string', type: 'Text' },
+        { id: Date.now() + 49, label: 'description', value: "The date and time when the user was created.", type: 'Text' },
+        { id: Date.now() + 50, label: 'format', value: 'date-time', type: 'Text' }
+      ]
+    }]
   ];
 
   const transformFormData = (data) => {
@@ -120,10 +216,7 @@ const JSONEditor = () => {
     const newField = { id: Date.now(), label: '', value: '', type: 'Text' };
 
     const addFieldToGroup = (group) => {
-      if (group.id === parentId) {
-        if (!group.inner) {
-          group.inner = [];
-        }
+      if (group.id === parentId && group.type === 'Group') {
         group.inner.push(newField);
       } else if (group.inner) {
         group.inner.forEach(addFieldToGroup);
@@ -132,28 +225,13 @@ const JSONEditor = () => {
 
     const updatedRows = formData.map((row, index) => {
       if (index === rowIndex) {
-        let fieldAdded = false;
-
-        // Check if the parentId exists in the current row
-        const newRow = row.map(field => {
+        return row.map((field) => {
           if (field.id === parentId && field.type === 'Group') {
+            // If the parent is found, add the new field to its inner array
             addFieldToGroup(field);
-            fieldAdded = true;
           }
           return field;
         });
-
-        if (!fieldAdded) {
-          // Add the new field directly to the row and place it under the current parent
-          const parentIndex = row.findIndex(field => field.id === parentId);
-          if (parentIndex !== -1) {
-            newRow.splice(parentIndex + 1, 0, newField); // Insert the new field right after the parent
-          } else {
-            newRow.push(newField); // If parentId is not found, add it to the end
-          }
-        }
-
-        return newRow;
       }
       return row;
     });
@@ -215,52 +293,41 @@ const JSONEditor = () => {
     URL.revokeObjectURL(url);
   };
 
-  const deepCopy = (obj) => {
-    return JSON.parse(JSON.stringify(obj));
-  };
-
+  
   const addNewObject = () => {
-    const newObjectTemplate = deepCopy(initialFormData);
-    const newObject = newObjectTemplate.map(row => row.map(field => ({
-      ...field,
+    // Define the structure of a new group with a 'group-label' field
+    const newGroup = {
       id: Date.now() + Math.random(),
-      value: field.value,
-    })));
-
-    const updatedFormData = [...formData, ...newObject];
+      type: 'Group',
+      inner: [
+        {
+          id: Date.now() + Math.random() + 1,
+          label: 'group-label',
+          value: '',
+          type: 'Text',
+        },
+        // Add more fields inside the group if necessary
+      ],
+    };
+  
+    // Append the new group to the existing formData
+    const updatedFormData = [...formData, newGroup];
     setFormData(updatedFormData);
-
+  
+    // Update the JSON view
     const updatedJSON = JSON.stringify(updatedFormData.map(transformFormData), null, 2);
     setJSONCode(updatedJSON);
   };
 
-  const handleSubmit = async () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-        console.error('No access token found. Please log in.');
-        return;
-    }
-    const config = {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    };
-
-    const schema_name = prompt("Enter the schema name:", "GeneratedSchema");
-
-    const bodyParameters = {
-        schema_name: schema_name,
-        json_data: JSON.parse(jsonCode)  // Parse the JSON string to an object
-    };
-
-    try {
-        const response = await axios.post('http://localhost:8000/api/save-schema/', bodyParameters, config);
-        console.log('Schema saved successfully:', response.data);
-    } catch (error) {
-        console.error('There was an error saving the schema:', error.response ? error.response.data : error.message);
-    }
-};
-
+  const handleSubmit = () => {
+    axios.post('http://localhost:8000/api/save-json/', JSON.parse(jsonCode))
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.error('There was an error saving the JSON data!', error);
+      });
+  };
 
   const handleDragStart = (e, rowIndex) => {
     e.dataTransfer.setData("rowIndex", rowIndex);
@@ -292,8 +359,6 @@ const JSONEditor = () => {
   };
 
   const renderField = (field, rowIndex, parentFieldId = null) => {
-    const isIDField = field.label === 'ID';
-
     if (field.type === 'Group') {
       return (
         <div key={field.id} className='input-container group-container'>
@@ -334,9 +399,8 @@ const JSONEditor = () => {
                 <input
                     value={field.label}
                     onChange={(e) => handleLabelChange(e, field.id)}
-                    onClick={(e) => e.stopPropagation()}
-                    disabled={isIDField}
-                    className={isIDField ? 'ID-input' : 'label-field'}
+                    onClick={(e) => e.stopPropagation()} 
+                    className='label-field'
                 />
               </label>
 
@@ -349,10 +413,8 @@ const JSONEditor = () => {
                 <span className='status-icon drag-icon'><arrowsIcon/></span>
                 <span className='status-icon add-icon' onClick={() => addField(0)}><addIcon/></span>
                 <span className='status-icon delete-icon' onClick={() => deleteField(field.id)}><binIcon/></span>
-
-                {isIDField && (
-                    <button className='unique-button'>Unique</button>
-                )}
+                
+                
             </div>
         </div>
     );
@@ -360,6 +422,7 @@ const JSONEditor = () => {
   return (
     <div className='json-editor-container'>
       <div className='editor'>
+
         <div className='visual-editor'>
           <div className="visual-editor-header">
             <h3>Visual Editor</h3>
@@ -378,6 +441,7 @@ const JSONEditor = () => {
             </div>
           ))}
         </div>
+
         <div className='code-editor'>
           <h3>Code Editor</h3>
           <textarea
@@ -387,6 +451,7 @@ const JSONEditor = () => {
             style={{ width: '100%', height: '100%'}}
           />
         </div>
+        
       </div>
 
       <div className='buttons'>
