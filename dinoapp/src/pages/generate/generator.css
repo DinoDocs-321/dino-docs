@@ -1,115 +1,44 @@
-/* Container for the entire form */
-.container {
-    width: 100%;
-}
-
-/* Header row */
+/* Adjust header grid layout */
 .header {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 2fr 1fr; /* Adjust as necessary */
+    grid-template-columns: 1fr 1fr 1fr 2fr 1fr; /* Adjust to match the number of columns */
     gap: 10px;
     align-items: center;
-}
-
-.header span {
+    margin-bottom: 10px;
     font-weight: bold;
-    padding: 10px 0;
 }
 
-/* Field row */
+/* Update field grid to match */
 .field {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 2fr 1fr; /* Match grid layout */
+    grid-template-columns: 1fr 1fr 1fr 2fr 1fr; /* Update grid columns for each field */
     gap: 10px;
     align-items: center;
+    margin-bottom: 10px;
 }
 
-/* Indent nested fields */
-.nested-field {
-    margin-left: 20px; /* Indent nested fields */
-}
-
-.nested-field .nested-field {
-    margin-left: 20px;
-}
-
-.nested-field .nested-field .nested-field {
-    margin-left: 20px;
-}
-
-/* Inputs and selects */
+/* Styling the input and select fields */
 .field select,
 .field input {
-    width: 100%;
     padding: 5px;
+    width: 100%;
     box-sizing: border-box;
 }
 
-/* Buttons */
-.field button {
+/* Styling buttons for uniformity */
+.field button,
+.prompt-container button {
     padding: 5px 10px;
-    margin-left: 5px;
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-/* Input text overflow handling */
-.field input {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Tag input styles, if applicable */
-.tag-input {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-}
-
-.tag {
-    display: inline-flex;
-    align-items: center;
-    background-color: #e0e0e0;
-    border-radius: 5px;
-    padding: 2px 8px;
-    margin-right: 5px;
-}
-
-.tag button {
-    background: none;
-    border: none;
-    margin-left: 5px;
-    cursor: pointer;
-}
-
-/* Additional styling for the schema info section */
-.schema-info {
+/* Prompt container for prompt and button */
+.prompt-container {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
-}
-
-.schema-info input {
-    flex: 1;
-    padding: 5px;
-    box-sizing: border-box;
-}
-
-/* Styling for the buttons at the bottom */
-.buttons-container {
     margin-top: 20px;
 }
 
-.buttons-container button {
-    padding: 10px 15px;
-    margin-right: 10px;
+.prompt-container input {
+    flex: 1;
+    padding: 5px;
 }

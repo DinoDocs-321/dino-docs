@@ -250,81 +250,81 @@ Ensure that:
         raise Exception(f"Error generating document: {str(e)}")
 
 
-def generate_documents(schema: dict, num_docs: int = 1):
-    """Generates multiple unique documents by making parallel API calls and counts successes and failures."""
-    generated_documents = []
-    retries = 3
-    success_count = 0
-    failure_count = 0
+# def generate_documents(schema: dict, num_docs: int = 1):
+#     """Generates multiple unique documents by making parallel API calls and counts successes and failures."""
+#     generated_documents = []
+#     retries = 3
+#     success_count = 0
+#     failure_count = 0
 
-    while len(generated_documents) < num_docs and retries > 0:
-        remaining_docs = num_docs - len(generated_documents)
+#     while len(generated_documents) < num_docs and retries > 0:
+#         remaining_docs = num_docs - len(generated_documents)
 
-        try:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-                futures = [executor.submit(generate_single_document, schema) for _ in range(remaining_docs)]
-                for future in concurrent.futures.as_completed(futures):
-                    try:
-                        document = future.result()
-                        generated_documents.append(document)
-                        success_count += 1
-                        logging.info(f"Successfully generated document: {document}")
-                    except Exception as e:
-                        logging.error(f"Error generating document: {e}")
-                        failure_count += 1
-                        retries -= 1
-                        if retries == 0:
-                            logging.error(f"Max retries reached. Could not generate document.")
-                        else:
-                            logging.info(f"Retrying... {retries} retries left.")
-                        continue
+#         try:
+#             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+#                 futures = [executor.submit(generate_single_document, schema) for _ in range(remaining_docs)]
+#                 for future in concurrent.futures.as_completed(futures):
+#                     try:
+#                         document = future.result()
+#                         generated_documents.append(document)
+#                         success_count += 1
+#                         logging.info(f"Successfully generated document: {document}")
+#                     except Exception as e:
+#                         logging.error(f"Error generating document: {e}")
+#                         failure_count += 1
+#                         retries -= 1
+#                         if retries == 0:
+#                             logging.error(f"Max retries reached. Could not generate document.")
+#                         else:
+#                             logging.info(f"Retrying... {retries} retries left.")
+#                         continue
 
-        except Exception as e:
-            logging.error(f"Error in batch generation: {e}")
+#         except Exception as e:
+#             logging.error(f"Error in batch generation: {e}")
 
-    return generated_documents, success_count, failure_count
+#     return generated_documents, success_count, failure_count
 
 
 # Main View: Handles the initial request and internally calls the document generation logic
-class GenerateDocumentView(APIView):
-    """
-    This view handles POST requests to generate documents based on the JSON schema provided by the front-end.
-    """
+# class GenerateDocumentView(APIView):
+#     """
+#     This view handles POST requests to generate documents based on the JSON schema provided by the front-end.
+#     """
 
-    def post(self, request):
-        try:
-            # Extract data from the request
-            rows = request.data.get('rows')
-            num_samples = int(request.data.get('num_samples', 1))
-            format_type = request.data.get('format', 'json')
+#     def post(self, request):
+#         try:
+#             # Extract data from the request
+#             rows = request.data.get('rows')
+#             num_samples = int(request.data.get('num_samples', 1))
+#             format_type = request.data.get('format', 'json')
 
-            # Step 1: Create a valid JSON schema from rows (assuming you have this logic)
-            schema = create_valid_json_schema(rows)
+#             # Step 1: Create a valid JSON schema from rows (assuming you have this logic)
+#             schema = create_valid_json_schema(rows)
 
-            # Step 2: Internally call the document generation logic (no need for separate URL)
-            documents, success_count, failure_count = generate_documents(schema, num_samples)
+#             # Step 2: Internally call the document generation logic (no need for separate URL)
+#             documents, success_count, failure_count = generate_documents(schema, num_samples)
 
-            # Step 3: Prepare the response
-            if format_type.lower() == 'json':
-                response_data = {
-                    'documents': documents,
-                    'success_count': success_count,
-                    'failure_count': failure_count
-                }
-            elif format_type.lower() == 'bson':
-                response_data = {
-                    'documents': bson.dumps(documents).hex(),
-                    'success_count': success_count,
-                    'failure_count': failure_count
-                }
-            else:
-                return JsonResponse({'error': 'Invalid format specified. Use "json" or "bson".'}, status=400)
+#             # Step 3: Prepare the response
+#             if format_type.lower() == 'json':
+#                 response_data = {
+#                     'documents': documents,
+#                     'success_count': success_count,
+#                     'failure_count': failure_count
+#                 }
+#             elif format_type.lower() == 'bson':
+#                 response_data = {
+#                     'documents': bson.dumps(documents).hex(),
+#                     'success_count': success_count,
+#                     'failure_count': failure_count
+#                 }
+#             else:
+#                 return JsonResponse({'error': 'Invalid format specified. Use "json" or "bson".'}, status=400)
 
-            return JsonResponse(response_data, status=200)
+#             return JsonResponse(response_data, status=200)
 
-        except Exception as e:
-            logging.error(f"Error processing document generation: {str(e)}")
-            return JsonResponse({'error': str(e)}, status=500)
+#         except Exception as e:
+#             logging.error(f"Error processing document generation: {str(e)}")
+#             return JsonResponse({'error': str(e)}, status=500)
 
 # ----- Schema form Views ------
 # ------------------------------
@@ -370,12 +370,16 @@ DATA_TYPES = [
 
 ]
 
-# Function to map the value of dataType to the corresponding structure in DATA_TYPES
+#map values of data_types
 def map_data_type(value):
     for data_type in DATA_TYPES:
         if data_type["value"] == value:
             return data_type
-    return None  # Return None if no match is found
+    return None  #return none if nothing is matched
+
+class DataTypeList(APIView):
+    def get(self, request):
+        return Response(DATA_TYPES, status=status.HTTP_200_OK)
 
 class GenerateData(APIView):
     """
@@ -443,21 +447,27 @@ def generate_documents(schema, num_samples, format_type):
     Replace this with the actual AI or document generation logic.
     """
     documents = []
+    success_count = 0
+    failure_count = 0
     for _ in range(num_samples):
-        doc = {}
-        for key, value in schema["properties"].items():
-            # Generate simple mock data based on the type
-            if value["type"] == "string":
-                doc[key] = "Sample Text"
-            elif value["type"] == "integer":
-                doc[key] = 12345
-            elif value["type"] == "boolean":
-                doc[key] = True
-            # You can expand this to handle other types, formats, etc.
-        documents.append(doc)
-
-    # Return the documents in the requested format (for now we assume JSON)
-    return documents
+        try:
+            doc = {}
+            for key, value in schema["properties"].items():
+                # Generate simple mock data based on the type
+                if value["type"] == "string":
+                    doc[key] = "Sample Text"
+                elif value["type"] == "integer":
+                    doc[key] = 12345
+                elif value["type"] == "boolean":
+                    doc[key] = True
+                # Handle other types as needed
+            documents.append(doc)
+            success_count += 1
+        except Exception as e:
+            failure_count += 1
+            logging.error(f"Error generating document: {e}")
+    # Return the documents along with success and failure counts
+    return documents, success_count, failure_count
 
 class DataTypeList(APIView):
     """
@@ -467,6 +477,50 @@ class DataTypeList(APIView):
     def get(self, request):
         # Return the available data types in a JSON response
         return Response(DATA_TYPES, status=status.HTTP_200_OK)
+    
+# Main View: Handles the initial request and internally calls the document generation logic
+class GenerateDocumentView(APIView):
+    """
+    This view handles POST requests to generate documents based on the JSON schema provided by the front-end.
+    """
+
+    def post(self, request):
+        try:
+            # Extract data from the request
+            schema = request.data.get('schema')
+            num_samples = int(request.data.get('num_samples', 1))
+            #format_type = request.data.get('format', 'json')
+            format_type = 'json'
+
+            if not schema:
+                return Response({'error': 'Schema is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Optional: Validate the schema here if necessary
+            # You can use jsonschema library to validate the schema format
+
+            # Step 2: Internally call the document generation logic
+            documents, success_count, failure_count = generate_documents(schema, num_samples, format_type)
+
+            # Step 3: Prepare the response
+            if format_type.lower() == 'json':
+                response_data = {
+                    'documents': documents,
+                    'success_count': success_count,
+                    'failure_count': failure_count
+                }
+                return Response(response_data, status=status.HTTP_200_OK)
+            elif format_type.lower() == 'bson':
+                # Convert documents to BSON
+                bson_data = bson.dumps({'documents': documents})
+                response = HttpResponse(bson_data, content_type='application/bson')
+                response['Content-Disposition'] = 'attachment; filename="documents.bson"'
+                return response
+            else:
+                return Response({'error': 'Invalid format specified. Use "json" or "bson".'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            logging.error(f"Error processing document generation: {str(e)}")
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # -------Generate Views---------
 # ------------------------------
