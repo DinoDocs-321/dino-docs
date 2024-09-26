@@ -15,7 +15,7 @@ function Generator() {
     const [schemaTitle, setSchemaTitle] = useState('');
     const [schemaDescription, setSchemaDescription] = useState('');
     const [format, setFormat] = useState('json');
-    const [numSamples, setNumSamples] = useState(10);
+    const [numSamples, setNumSamples] = useState(10); // Default number of samples is 10
     const [response, setResponse] = useState(null);
 
     // State variable for data types
@@ -112,7 +112,7 @@ function Generator() {
         console.log('Generated Schema Data:', JSON.stringify(schemaData, null, 2));
 
         const dataToSend = {
-            schema: schemaData,
+            schema: schemaData, // This should be the complete schema object
             format: format,
             num_samples: numSamples,
         };
@@ -125,7 +125,7 @@ function Generator() {
                     'Content-Type': 'application/json',
                 },
             });
-
+    
             console.log('Response from server:', result.data);
             setResponse(result.data);
         } catch (error) {
@@ -231,6 +231,28 @@ function Generator() {
                     }}
                 />
             </div>
+
+            {/* Input for Number of Samples */}
+            <div className="sample-count">
+                <label>Number of Samples:</label>
+                <input
+                    type="number"
+                    value={numSamples}
+                    onChange={e => setNumSamples(parseInt(e.target.value) || 1)}
+                    min="1"
+                    step="1"
+                />
+            </div>
+
+            {/* Output Format Selection */}
+            <div className="output-format">
+                <label>Output Format:</label>
+                <select value={format} onChange={e => setFormat(e.target.value)}>
+                    <option value="json">JSON</option>
+                    <option value="bson">BSON</option>
+                </select>
+            </div>
+
             {errors.length > 0 && (
                 <div className="errors">
                     <h3>Form Errors:</h3>

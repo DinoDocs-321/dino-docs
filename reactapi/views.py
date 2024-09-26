@@ -1,28 +1,23 @@
+# views.py
+
 # Standard library imports
 import json
 import logging
 import re
+import time
 import bson
 
 # Third-party imports
 import concurrent.futures
 from django.http import JsonResponse, HttpResponseBadRequest
-from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from openai import OpenAI
-import bson
-from reactapi.models import JSONData
+import openai
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated
 from openai import OpenAI
 
 # Django imports
@@ -32,21 +27,24 @@ from django.template.loader import render_to_string
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from django.utils.decorators import method_decorator
 from django.core.mail import send_mail
-
 
 # Local application imports
 from .serializers import UserSerializer
 
+# Load environment variables
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
+# Set OpenAI API key
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# Initialize logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # -------------------------------
 # ----- Login/Signup Views ------
-
-
-
-
 class RegisterUser(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
@@ -58,7 +56,6 @@ class RegisterUser(APIView):
                 'token': str(refresh.access_token),
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class LoginUser(APIView):
     def post(self, request):
@@ -98,7 +95,6 @@ class LogoutView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
 class ForgotPasswordRequest(APIView):
     permission_classes = [AllowAny]
 
@@ -124,7 +120,6 @@ class ForgotPasswordRequest(APIView):
         except User.DoesNotExist:
             return Response({'error': 'Email does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-
 class ResetPasswordConfirm(APIView):
     permission_classes = [AllowAny]
 
@@ -142,24 +137,17 @@ class ResetPasswordConfirm(APIView):
         except User.DoesNotExist:
             return Response({'error': 'Invalid user'}, status=status.HTTP_404_NOT_FOUND)
 
-
 # ----- .Login/Signup Views ------
 # -------------------------------
 
-
-
-
 # ----------------------------
 # ----- JSON/BSON Views ------
-
-# create your views here
 class ConvertJsonToBson(APIView):
     def post(self, request):
         try:
             # Parsing JSON data from the request body
             request_data = json.loads(request.body.decode('utf-8'))
             json_data = request_data.get('data')
-
 
             if not json_data:
                 return HttpResponseBadRequest("No data provided")
@@ -179,24 +167,14 @@ class ConvertJsonToBson(APIView):
 # ----- .JSON/BSON Views ------
 # ----------------------------
 
-
-
-
-
 # ------------------------------
-# ----- Schema form Views ------
-
-import os
-from dotenv import load_dotenv
-load_dotenv()
-
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# ----- Schema Form Views ------
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Rate limit error handler
+import time
+
 def handle_rate_limit_error(e):
     try:
         retry_after = float(re.search(r'try again in (\d+\.?\d*)s', str(e)).group(1))
@@ -205,7 +183,6 @@ def handle_rate_limit_error(e):
     except Exception as parse_error:
         logging.error(f"Error parsing retry time: {parse_error}")
         time.sleep(5)  # Default wait time if parsing fails
-
 
 def generate_single_document(schema):
     prompt = f"""
@@ -220,7 +197,7 @@ Ensure that:
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4-turbo",
+            model="gpt-4-turbo",  # Switch to GPT-4-turbo for better performance and lower cost
             messages=[
                 {"role": "system", "content": "You are a JSON document generator."},
                 {"role": "user", "content": prompt}
@@ -230,111 +207,68 @@ Ensure that:
         document_content = response.choices[0].message.content
         logging.info(f"Raw response: {document_content}")  # Log the raw response for debugging
 
+        # Attempt to parse JSON from the response
         try:
-            json_match = re.search(r'\{.*\}', document_content, re.DOTALL)
-            if json_match:
-                document = json.loads(json_match.group())
+            document_content = document_content.strip()
+            json_start = document_content.find('{')
+            json_end = document_content.rfind('}') + 1
+            if json_start != -1 and json_end != -1:
+                json_str = document_content[json_start:json_end]
+                document = json.loads(json_str)
                 return document
             else:
-                raise ValueError("No valid JSON found in the response.")
+                raise ValueError("No valid JSON object found in the response.")
         except (json.JSONDecodeError, ValueError) as decode_error:
             logging.error(f"Failed to parse JSON: {decode_error}")
             raise Exception("Failed to parse generated JSON document.")
 
-    except OpenAI.RateLimitError as e:
-        logging.error(f"Error generating document: {e}")
-        handle_rate_limit_error(e)
-        raise Exception(f"Rate limit hit. Retrying after pause.")
+    # except openai.error.RateLimitError as e:
+    #     logging.error(f"Error generating document: {e}")
+    #     handle_rate_limit_error(e)
+    #     raise Exception(f"Rate limit hit. Retrying after pause.")
     except Exception as e:
         logging.error(f"Error generating document: {str(e)}")
         raise Exception(f"Error generating document: {str(e)}")
 
+def generate_documents(schema: dict, num_docs: int = 1):
+    """Generates multiple unique documents by making parallel API calls and counts successes and failures."""
+    generated_documents = []
+    retries = 3
+    success_count = 0
+    failure_count = 0
 
-# def generate_documents(schema: dict, num_docs: int = 1):
-#     """Generates multiple unique documents by making parallel API calls and counts successes and failures."""
-#     generated_documents = []
-#     retries = 3
-#     success_count = 0
-#     failure_count = 0
+    while len(generated_documents) < num_docs and retries > 0:
+        remaining_docs = num_docs - len(generated_documents)
 
-#     while len(generated_documents) < num_docs and retries > 0:
-#         remaining_docs = num_docs - len(generated_documents)
+        try:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+                futures = [executor.submit(generate_single_document, schema) for _ in range(remaining_docs)]
+                for future in concurrent.futures.as_completed(futures):
+                    try:
+                        document = future.result()
+                        generated_documents.append(document)
+                        success_count += 1
+                        logging.info(f"Successfully generated document: {document}")
+                    except Exception as e:
+                        logging.error(f"Error generating document: {e}")
+                        failure_count += 1
+                        retries -= 1
+                        if retries == 0:
+                            logging.error(f"Max retries reached. Could not generate document.")
+                        else:
+                            logging.info(f"Retrying... {retries} retries left.")
+                        continue
 
-#         try:
-#             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-#                 futures = [executor.submit(generate_single_document, schema) for _ in range(remaining_docs)]
-#                 for future in concurrent.futures.as_completed(futures):
-#                     try:
-#                         document = future.result()
-#                         generated_documents.append(document)
-#                         success_count += 1
-#                         logging.info(f"Successfully generated document: {document}")
-#                     except Exception as e:
-#                         logging.error(f"Error generating document: {e}")
-#                         failure_count += 1
-#                         retries -= 1
-#                         if retries == 0:
-#                             logging.error(f"Max retries reached. Could not generate document.")
-#                         else:
-#                             logging.info(f"Retrying... {retries} retries left.")
-#                         continue
+        except Exception as e:
+            logging.error(f"Error in batch generation: {e}")
 
-#         except Exception as e:
-#             logging.error(f"Error in batch generation: {e}")
+    return generated_documents, success_count, failure_count
 
-#     return generated_documents, success_count, failure_count
-
-
-# Main View: Handles the initial request and internally calls the document generation logic
-# class GenerateDocumentView(APIView):
-#     """
-#     This view handles POST requests to generate documents based on the JSON schema provided by the front-end.
-#     """
-
-#     def post(self, request):
-#         try:
-#             # Extract data from the request
-#             rows = request.data.get('rows')
-#             num_samples = int(request.data.get('num_samples', 1))
-#             format_type = request.data.get('format', 'json')
-
-#             # Step 1: Create a valid JSON schema from rows (assuming you have this logic)
-#             schema = create_valid_json_schema(rows)
-
-#             # Step 2: Internally call the document generation logic (no need for separate URL)
-#             documents, success_count, failure_count = generate_documents(schema, num_samples)
-
-#             # Step 3: Prepare the response
-#             if format_type.lower() == 'json':
-#                 response_data = {
-#                     'documents': documents,
-#                     'success_count': success_count,
-#                     'failure_count': failure_count
-#                 }
-#             elif format_type.lower() == 'bson':
-#                 response_data = {
-#                     'documents': bson.dumps(documents).hex(),
-#                     'success_count': success_count,
-#                     'failure_count': failure_count
-#                 }
-#             else:
-#                 return JsonResponse({'error': 'Invalid format specified. Use "json" or "bson".'}, status=400)
-
-#             return JsonResponse(response_data, status=200)
-
-#         except Exception as e:
-#             logging.error(f"Error processing document generation: {str(e)}")
-#             return JsonResponse({'error': str(e)}, status=500)
-
-# ----- Schema form Views ------
+# ----- .Schema Form Views ------
 # ------------------------------
 
-
-
 # ------------------------------
-# -------Generate Views---------
-
-#
+# ------- Generate Views --------
 DATA_TYPES = [
     {"value": "names", "label": "Names", "type": "string"},
     {"value": "phoneFax", "label": "Phone / Fax", "type": "string"},
@@ -366,119 +300,24 @@ DATA_TYPES = [
     {"value": "bankAccountNums", "label": "Bank Account Numbers", "type": "string"},
     {"value": "cvv", "label": "CVV", "type": "integer"},
     {"value": "pin", "label": "PIN", "type": "integer"},
-    {"value": "object", "label": "Object", "type": "object"}
-
+    {"value": "object", "label": "Object", "type": "object"},
+    {"value": "array", "label": "Array", "type": "array"}
 ]
 
-#map values of data_types
 def map_data_type(value):
     for data_type in DATA_TYPES:
         if data_type["value"] == value:
             return data_type
-    return None  #return none if nothing is matched
-
-class DataTypeList(APIView):
-    def get(self, request):
-        return Response(DATA_TYPES, status=status.HTTP_200_OK)
-
-class GenerateData(APIView):
-    """
-    Handle POST requests to receive the schema and forward it to the AI generator.
-    """
-
-    def post(self, request):
-        schema = request.data.get('schema', {})
-        num_samples = int(request.data.get('num_samples', 10))
-        format_type = request.data.get('format', 'json')
-
-        # Here you would send 'schema' to your AI generator
-        # For now, we'll just return the schema for confirmation
-
-        # Example:
-        # ai_generated_data = call_ai_generator(schema, num_samples, format_type)
-
-        # For demonstration, we'll just return the schema
-        return Response({'message': 'Schema received', 'schema': schema}, status=status.HTTP_200_OK)
-    
-
-# Function to create a valid JSON schema based on the rows received from the front-end
-def create_valid_json_schema(rows):
-    """
-    Create a valid JSON schema based on the rows of data from the front-end.
-    """
-
-    # Base structure of the JSON schema
-    json_schema = {
-        "$schema": "http://json-schema.org/draft-07/schema#",
-        "type": "object",
-        "title": "Generated Schema",
-        "description": "Schema generated based on user input",
-        "properties": {},
-        "required": []
-    }
-
-    # Iterate through each row to build the schema
-    for row in rows:
-        data_type_mapping = map_data_type(row.get("dataType"))
-
-        if data_type_mapping:
-            json_schema["properties"][row["keyTitle"]] = {
-                "type": data_type_mapping["type"],
-                "description": row.get("userPrompt", ""),
-            }
-
-            # Add additional keys like 'format' if they exist in the data type
-            if "format" in data_type_mapping:
-                json_schema["properties"][row["keyTitle"]]["format"] = data_type_mapping["format"]
-
-            # Optionally, add examples
-            if row.get("example"):
-                json_schema["properties"][row["keyTitle"]]["example"] = row["example"]
-
-            # Mark the field as required if it has a keyTitle
-            json_schema["required"].append(row["keyTitle"])
-
-    return json_schema
-
-# Mock function to generate sample documents based on a schema
-def generate_documents(schema, num_samples, format_type):
-    """
-    Mock function to generate sample documents based on a schema.
-    Replace this with the actual AI or document generation logic.
-    """
-    documents = []
-    success_count = 0
-    failure_count = 0
-    for _ in range(num_samples):
-        try:
-            doc = {}
-            for key, value in schema["properties"].items():
-                # Generate simple mock data based on the type
-                if value["type"] == "string":
-                    doc[key] = "Sample Text"
-                elif value["type"] == "integer":
-                    doc[key] = 12345
-                elif value["type"] == "boolean":
-                    doc[key] = True
-                # Handle other types as needed
-            documents.append(doc)
-            success_count += 1
-        except Exception as e:
-            failure_count += 1
-            logging.error(f"Error generating document: {e}")
-    # Return the documents along with success and failure counts
-    return documents, success_count, failure_count
+    return None  # Return None if nothing is matched
 
 class DataTypeList(APIView):
     """
     Handle GET requests to return the available data types to the frontend.
     """
-    
+
     def get(self, request):
-        # Return the available data types in a JSON response
         return Response(DATA_TYPES, status=status.HTTP_200_OK)
-    
-# Main View: Handles the initial request and internally calls the document generation logic
+
 class GenerateDocumentView(APIView):
     """
     This view handles POST requests to generate documents based on the JSON schema provided by the front-end.
@@ -489,70 +328,42 @@ class GenerateDocumentView(APIView):
             # Extract data from the request
             schema = request.data.get('schema')
             num_samples = int(request.data.get('num_samples', 1))
-            #format_type = request.data.get('format', 'json')
-            format_type = 'json'
+            format_type = request.data.get('format', 'json')
 
             if not schema:
                 return Response({'error': 'Schema is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Optional: Validate the schema here if necessary
-            # You can use jsonschema library to validate the schema format
+            # Convert schema string to dict if necessary
+            if isinstance(schema, str):
+                schema = json.loads(schema)
 
-            # Step 2: Internally call the document generation logic
-            documents, success_count, failure_count = generate_documents(schema, num_samples, format_type)
+            # Generate documents using the OpenAI API
+            documents, success_count, failure_count = generate_documents(schema, num_samples)
 
-            # Step 3: Prepare the response
-            if format_type.lower() == 'json':
-                response_data = {
-                    'documents': documents,
-                    'success_count': success_count,
-                    'failure_count': failure_count
-                }
-                return Response(response_data, status=status.HTTP_200_OK)
-            elif format_type.lower() == 'bson':
-                # Convert documents to BSON
-                bson_data = bson.dumps({'documents': documents})
-                response = HttpResponse(bson_data, content_type='application/bson')
-                response['Content-Disposition'] = 'attachment; filename="documents.bson"'
-                return response
-            else:
-                return Response({'error': 'Invalid format specified. Use "json" or "bson".'}, status=status.HTTP_400_BAD_REQUEST)
+            # Prepare the response
+            response_data = {
+                'documents': documents,
+                'success_count': success_count,
+                'failure_count': failure_count
+            }
+
+            if format_type.lower() == 'bson':
+                # Convert documents to BSON and encode as hex string
+                response_data['documents'] = bson.BSON.encode({'documents': documents}).hex()
+
+            return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as e:
             logging.error(f"Error processing document generation: {str(e)}")
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# -------Generate Views---------
+# ------- .Generate Views -------
 # ------------------------------
 
-
-
-
-# @method_decorator(csrf_exempt, name='dispatch')
-# class ManualGenerate(View):
-#     def post(self, request, *args, **kwargs):
-#         logging.debug(f"POST request received: {request}")
-#         file = request.FILES.get('file')
-#         if file:
-#             logging.debug(f"File received: {file.name}")
-#             try:
-#                 json_data = json.load(file)
-#                 logging.info(f"File '{file.name}' successfully uploaded and parsed.")
-#                 return JsonResponse({'status': 'success', 'filename': file.name})
-#             except json.JSONDecodeError:
-#                 logging.error(f"File '{file.name}' could not be parsed. Invalid JSON.")
-#                 return JsonResponse({'status': 'error', 'message': 'Invalid JSON file.'}, status=400)
-#         return JsonResponse({'status': 'error', 'message': 'No file uploaded'}, status=400)
-
-#     def get(self, request, *args, **kwargs):
-#         return JsonResponse({'status': 'success', 'message': 'GET request received'})
-
-
-import json
-from django.http import JsonResponse
+# ------------------------------
+# ----- JSON Validation Views --
 from django.views.decorators.csrf import csrf_exempt
 
-# View to handle file upload and validate JSON
 @csrf_exempt
 def validate_json_file(request):
     if request.method == 'POST':
@@ -570,7 +381,6 @@ def validate_json_file(request):
             return JsonResponse({'status': 'error', 'message': f'Error processing file: {str(e)}'}, status=500)
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
-# View to handle pasted JSON validation
 @csrf_exempt
 def validate_json_text(request):
     if request.method == 'POST':
@@ -588,4 +398,5 @@ def validate_json_text(request):
             return JsonResponse({'status': 'error', 'message': f'Error processing request: {str(e)}'}, status=500)
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
-
+# ----- .JSON Validation Views --
+# ------------------------------
