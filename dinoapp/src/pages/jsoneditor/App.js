@@ -16,7 +16,7 @@ const JSONEditor = () => {
         { id: Date.now() + 2, label: 'description', value: 'The unique identifier for a user.', type: 'Text' }
       ]
     }],
-   
+
     [{
       id: Date.now() + 3,
       label: 'username',
@@ -49,7 +49,7 @@ const JSONEditor = () => {
         { id: Date.now() + 15, label: 'minLength', value: 8, type: 'Text' }
       ]
     }],
-    
+
     [{
       id: Date.now() + 16,
       label: 'profile',
@@ -115,7 +115,7 @@ const JSONEditor = () => {
         }
       ]
     }],
-    
+
     [{
       id: Date.now() + 47,
       label: 'createdAt',
@@ -293,7 +293,7 @@ const JSONEditor = () => {
     URL.revokeObjectURL(url);
   };
 
-  
+
   const addNewObject = () => {
     // Define the structure of a new group with a 'group-label' field
     const newGroup = {
@@ -309,25 +309,51 @@ const JSONEditor = () => {
         // Add more fields inside the group if necessary
       ],
     };
-  
+
     // Append the new group to the existing formData
     const updatedFormData = [...formData, newGroup];
     setFormData(updatedFormData);
-  
+
     // Update the JSON view
     const updatedJSON = JSON.stringify(updatedFormData.map(transformFormData), null, 2);
     setJSONCode(updatedJSON);
   };
 
-  const handleSubmit = () => {
-    axios.post('http://localhost:8000/api/save-json/', JSON.parse(jsonCode))
-      .then(response => {
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.error('There was an error saving the JSON data!', error);
-      });
-  };
+  // const handleSubmit = () => {
+  //   axios.post('http://localhost:8000/api/save-schema/', JSON.parse(jsonCode))
+  //     .then(response => {
+  //       console.log(response.data);
+  //     })
+  //     .catch(error => {
+  //       console.error('There was an error saving the JSON data!', error);
+  //     });
+  // };
+  const handleSubmit = async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+        console.error('No access token found. Please log in.');
+        return;
+    }
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    };
+
+    const schema_name = prompt("Enter the schema name:", "GeneratedSchema");
+
+    const bodyParameters = {
+        schema_name: schema_name,
+        json_data: JSON.parse(jsonCode)  // Parse the JSON string to an object
+    };
+
+    try {
+        const response = await axios.post('http://localhost:8000/api/save-schema/', bodyParameters, config);
+        console.log('Schema saved successfully:', response.data);
+    } catch (error) {
+        console.error('There was an error saving the schema:', error.response ? error.response.data : error.message);
+    }
+};
 
   const handleDragStart = (e, rowIndex) => {
     e.dataTransfer.setData("rowIndex", rowIndex);
@@ -399,7 +425,7 @@ const JSONEditor = () => {
                 <input
                     value={field.label}
                     onChange={(e) => handleLabelChange(e, field.id)}
-                    onClick={(e) => e.stopPropagation()} 
+                    onClick={(e) => e.stopPropagation()}
                     className='label-field'
                 />
               </label>
@@ -413,8 +439,8 @@ const JSONEditor = () => {
                 <span className='status-icon drag-icon'><arrowsIcon/></span>
                 <span className='status-icon add-icon' onClick={() => addField(0)}><addIcon/></span>
                 <span className='status-icon delete-icon' onClick={() => deleteField(field.id)}><binIcon/></span>
-                
-                
+
+
             </div>
         </div>
     );
@@ -451,7 +477,7 @@ const JSONEditor = () => {
             style={{ width: '100%', height: '100%'}}
           />
         </div>
-        
+
       </div>
 
       <div className='buttons'>
