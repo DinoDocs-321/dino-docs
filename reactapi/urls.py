@@ -17,7 +17,7 @@ urlpatterns = [
 
     path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
     path('verify-code/', VerifyCodeView.as_view(), name = "verify_code"),
-    path('reset-password/', ResetPasswordView.as_view(), name = "reset-password"),
+    path('reset-password/', ResetPasswordView, name = "reset-password"),
     path('convert/', ConvertJsonToBson.as_view(), name='convert-json-schema-to-bson'),
 
 

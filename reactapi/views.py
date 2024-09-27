@@ -118,7 +118,7 @@ from django.conf import settings
 from pymongo import MongoClient, DESCENDING
 import random
 import string
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 # MongoDB setup
 client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
@@ -149,8 +149,8 @@ class ForgotPasswordView(APIView):
                 'user_id': str(user.id),
                 'email': email,
                 'code': code,
-                'created_at': datetime.utcnow(),
-                'expires_at': datetime.utcnow() + timedelta(minutes=15)
+                'created_at': datetime.now(timezone.utc),
+                'expires_at': datetime.now(timezone.utc) + timedelta(minutes=15)
             })
         except Exception as e:
             return Response({'error': f'Error saving reset code: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -172,80 +172,121 @@ class ForgotPasswordView(APIView):
             # Print or log the exact error
             print(f"Error sending email: {str(e)}")
             return Response({'error': f'Unable to send reset code. Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+import logging
+
 class VerifyCodeView(APIView):
     def post(self, request):
-        # email = request.data.get('email')
         code = request.data.get('code')
 
-        if  not code:
-            return Response({'error': 'code are required'}, status=status.HTTP_400_BAD_REQUEST)
+        logging.info(f"Received verification code: {code}")
 
-        # Find the most recent reset code for this email
+        if not code:
+            return Response({'error': 'Verification code is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Find the reset code document without requiring the email
         reset_code = reset_codes_collection.find_one({
             'code': code,
             'expires_at': {'$gt': datetime.utcnow()}
         })
 
-        if not reset_code:
-            # For debugging, let's check what's in the database
-            # all_codes = list(reset_codes_collection.find({'email': email}))
-            # print(f"All codes for {email}: {all_codes}")
-            return Response({'error': 'Invalid or expired code'}, status=status.HTTP_400_BAD_REQUEST)
-
         if reset_code:
-            # Code is valid
-            return Response({'message': 'Code verified successfully'}, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'Invalid or expired code'}, status=status.HTTP_400_BAD_REQUEST)
+            # If found, return the associated email
+            return Response({
+                'message': 'Code verified successfully',
+                'email': reset_code['email']
+            }, status=status.HTTP_200_OK)
+
+        return Response({'error': 'Invalid or expired code'}, status=status.HTTP_400_BAD_REQUEST)
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
+# from django.contrib.auth import get_user_model
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status
+# from datetime import datetime
+
+# User = get_user_model()
+
+# class ResetPasswordView(APIView):
+#     def post(self, request):
+#         email = request.headers.get('X-Reset-Email')
+#         code = request.headers.get('X-Reset-Code')
+#         new_password = request.data.get('new_password')
+
+
+#         if not new_password:
+#             return Response({'error': 'New password is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         # Verify the code again for security
+#         reset_code = reset_codes_collection.find_one({
+#             'email': email,
+#             'code': code,
+#             'expires_at': {'$gt': datetime.utcnow()}
+#         })
+
+
+
+#         try:
+#             user = User.objects.get(email=email)
+#             user.set_password(new_password)
+#             user.save()
+
+#             # Delete the used reset code
+#             reset_codes_collection.delete_one({'_id': reset_code['_id']})
+
+#             return Response({'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
+#         except User.DoesNotExist:
+#             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+import logging
+from bson.objectid import ObjectId
+from django.contrib.auth import get_user_model
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from datetime import datetime
+
+User = get_user_model()
+logger = logging.getLogger(__name__)
+@require_POST
 class ResetPasswordView(APIView):
     def post(self, request):
-        user_id = request.data.get('user_id')
+        email = request.headers.get('X-Reset-Email')
+        code = request.headers.get('X-Reset-Code')
         new_password = request.data.get('new_password')
-        code = request.data.get('code')
 
-        if not all([user_id, new_password, code]):
-            return Response({'error': 'User ID, new password, and verification code are required'}, status=status.HTTP_400_BAD_REQUEST)
+        logger.info(f"Attempting password reset for email: {email}")
+
+
+
+        reset_code = reset_codes_collection.find_one({
+            'email': email,
+            'code': code,
+            'expires_at': {'$gt': datetime.utcnow()}
+        })
+
+        if not reset_code:
+            logger.warning(f"Invalid or expired code for email: {email}")
+            # Log all codes for this email to help debugging
+            all_codes = list(reset_codes_collection.find({'email': email}))
+            logger.info(f"All codes for {email}: {all_codes}")
+            return Response({'error': 'Invalid or expired code'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Verify the reset code
-            reset_code = reset_codes_collection.find_one({
-                'user_id': str(user_id),
-                'code': code,
-                'expires_at': {'$gt': datetime.utcnow()}
-            })
-
-            if not reset_code:
-                return Response({'error': 'Invalid or expired verification code'}, status=status.HTTP_400_BAD_REQUEST)
-
-            user = User.objects.get(id=user_id)
-
-            # Validate the new password
-            try:
-                validate_password(new_password, user=user)
-            except ValidationError as e:
-                return Response({'error': list(e.messages)}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Set the new password
+            user = User.objects.get(email=email)
             user.set_password(new_password)
             user.save()
 
             # Delete the used reset code
             reset_codes_collection.delete_one({'_id': reset_code['_id']})
 
-            # Generate new JWT tokens
-            refresh = RefreshToken.for_user(user)
-
-            return Response({
-                'message': 'Password reset successfully',
-                'access_token': str(refresh.access_token),
-                'refresh_token': str(refresh),
-            }, status=status.HTTP_200_OK)
-
+            logger.info(f"Password reset successful for email: {email}")
+            return Response({'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+            logger.error(f"User not found for email: {email}")
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 # ----------------------------------------------------------------------------------------------------------------
 
 

@@ -8,36 +8,37 @@ const [password, setPassword] = useState('');
 const [confirmPassword, setConfirmPassword] = useState('');
 const [error, setError] = useState('');
 const location = useLocation();
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
-const { user_id, code } = location.state || {};
+  const { email, code } = location.state || {};
 
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     if (password !== confirmPassword) {
-        setError('Passwords do not match!');
-        return;
+      setError('Passwords do not match!');
+      return;
     }
 
     try {
-      // Ensure user_id and code are correctly passed
-        console.log('Sending reset request with:', { user_id, code, new_password: password });
-        const response = await axios.post('http://127.0.0.1:8000/api/reset-password/', {
-        user_id: user_id,
-        new_password: password,
-        code: code
-        });
-
-        if (response.status === 200) {
-        navigate('/signin');
+      const response = await axios.post('http://127.0.0.1:8000/api/reset-password/',
+        { new_password: password },  // POST request, not GET
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Reset-Email': email,
+            'X-Reset-Code': code  // Ensure you're passing the reset code
+          }
         }
+      );
+      navigate('/signin');
     } catch (err) {
-        setError('Failed to reset password. Please try again.');
-        console.error('Error resetting password:', err.response ? err.response.data : err.message);
+      setError('Failed to reset password. Please try again.');
+      console.error('Error resetting password:', err.response ? err.response.data : err.message);
     }
-};
+  };
+
 
   return (
     <Container className="my-5">

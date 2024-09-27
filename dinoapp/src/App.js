@@ -11,7 +11,7 @@ import SchemaForm from './pages/SchemaForm/App';
 import SignIn from './pages/signin/signin';
 import SignUp from './pages/signup/signup'
 import SignOut from './pages/signout/signout';
-import NotFound from './pages/notfound/notfound'
+import NotFound from './pages/notfound/notfound';
 import ForgotPassword from './pages/forgetpwd/forgetpwd';
 import ManualSchema from './pages/manualschema/manualschema';
 import VerifyCode from './pages/VerifyCode/VerifyCode';
