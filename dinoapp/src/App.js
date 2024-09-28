@@ -16,6 +16,7 @@ import ForgotPassword from './pages/forgetpwd/forgetpwd';
 import ResetPassword from './pages/resetpwd/resetpwd';
 import Generator from './pages/generate/generator';
 import DomainGenerate from './pages/domainGenerate/domainGenerate';
+import ManualSchema from './pages/manualschema/manualschema';
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
         <Route path='/contact' element={<Contact />} />
         <Route path='/JSONEditor' element={<JSONEditor />} />
         <Route path='/schema-form' element={<SchemaForm />} />
+        <Route path='/manual-generate' element={<ManualSchema />} />
         <Route path='/signin' element={<SignIn />} />
         <Route path='/signup' element={<SignUp />} />
         <Route path='/signout' element={<SignOut />} />

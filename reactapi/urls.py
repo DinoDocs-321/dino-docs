@@ -14,10 +14,12 @@ urlpatterns = [
     path('signup/', RegisterUser.as_view(), name='register_user'),
     path('signin/', LoginUser.as_view(), name='signin'),
     path('logout/', LogoutView.as_view(), name='logout'),
-    
+
     path('forgot-password/', ForgotPasswordRequest.as_view(), name='forgot_password'),
     path('reset-password/<uidb64>/<token>/', ResetPasswordConfirm.as_view(), name='reset_password_confirm'),
     path('convert/', ConvertJsonToBson.as_view(), name='convert-json-schema-to-bson'),
+    path('save-schema/', save_user_schema, name='save-schema'),
+
 
 
     #Generator paths

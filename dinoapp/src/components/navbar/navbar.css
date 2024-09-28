@@ -1,59 +1,84 @@
-
-.dinonavbar{ 
-    padding: 20px 0px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-height: 80px;
-    background-color: #32464F;
+/* Navbar background color */
+.dinonavbar {
+  background-color: #32464F;
 }
 
-.dinonavbar .logo {
-    max-height: auto;
-    align-items:center;
+/* Navbar brand (logo) */
+.dinonavbar .navbar-brand img {
+  height: 50px; /* Adjust the logo size as needed */
 }
 
-.dinonavbar-menu{
-    display: flex;
-    list-style: none;
-    gap: 20px;
-    max-height: 80px;
-    color: #C4C4C4;
-    font-size: 18px;
-    align-items: center;
+/* Navbar links */
+.dinonavbar .nav-link {
+  color: white;
+  padding: 0.5rem 1rem;
+  transition: color 0.3s ease;
 }
 
-
-.dinonavbar-menu a {
-    text-decoration: none;
-    color: #C4C4C4;
-    padding-top: 7px;
-    padding-left: 15px;
-    transition: color 0.3s ease;
+/* Navbar link hover effect */
+.dinonavbar .nav-link:hover {
+  color: #F0A500; /* Optional hover color */
+  text-decoration: none;
 }
 
-.dinonavbar-right{
-    display: flex;
-    align-items: center;
-    gap: 40px;
-    padding: 15px;
+/* Active link style */
+.dinonavbar .nav-link.active {
+  font-weight: bold;
+  border-bottom: 2px solid #F0A500; /* Optional underline effect for active link */
 }
+
+/* Buttons */
+.dinonavbar .btn {
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+/* Sign-up button */
+.dinonavbar .btn-primary {
+  background-color: #F0A500;
+  border: none;
+}
+
+/* Sign-up button hover effect */
+.dinonavbar .btn-primary:hover {
+  background-color: #d89300;
+}
+
+/* Sign-out/login link button */
+.dinonavbar .btn-link {
+  color: white;
+}
+
+/* GitHub button */
+.dinonavbar .btn-dark {
+  background-color: #212529;
+  border: none;
+}
+
+/* GitHub button hover effect */
+.dinonavbar .btn-dark:hover {
+  background-color: #1b1f23;
+}
+
 
 .dinonavbar button {
     background: transparent;
     font-size: 16px;
     color: #ffffff;
     background-color: #8CB8CA;
-    padding: 10px 30px;
+
     border-radius: 10px;
     cursor: pointer;
     transition: 0.3s; 
+    text-decoration: none;
 }
 
 .dinonavbar-menu a:hover {
-  color: #ffffff; /* Change color on hover */
+  color: #ffffff;
 }
 
 .dinonavbar button:hover {
-  background-color: #77A7B5; /* Slightly darker shade */
+  background-color: #45879b; 
+  color: #ddd;
+  transition: 250ms ease-in-out; 
 }

@@ -9,6 +9,7 @@ import bson
 
 # Third-party imports
 import concurrent.futures
+from django.conf import settings
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -19,6 +20,9 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from openai import OpenAI
+from pymongo import MongoClient
+
+
 
 # Django imports
 from django.contrib.auth.models import User
@@ -28,6 +32,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
+from django.db import connections
 
 # Local application imports
 from .serializers import UserSerializer
@@ -73,6 +78,7 @@ class LoginUser(APIView):
                 return Response({
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
+                    'user_id': user.id  # Accessing and returning the user's unique ID
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -142,6 +148,45 @@ class ResetPasswordConfirm(APIView):
 
 # ----------------------------
 # ----- JSON/BSON Views ------
+# ------- save-json views ---------
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .mongodb_utils import get_collection
+from django.utils import timezone
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def save_user_schema(request):
+    collection = get_collection()
+
+    schema_name = request.data.get('schema_name')
+    json_data = request.data.get('json_data')
+
+    if not schema_name or not json_data:
+        return Response({'error': 'Both schema_name and json_data are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    new_schema = {
+        'user_id': str(request.user.id),
+        'schema_name': schema_name,
+        'json_data': json_data,
+        'created_at': timezone.now()
+    }
+
+    result = collection.insert_one(new_schema)
+
+    if result.inserted_id:
+        new_schema['_id'] = str(result.inserted_id)
+        return Response(new_schema, status=status.HTTP_201_CREATED)
+    else:
+        return Response({'error': 'Failed to save schema'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# ----------------------------
+# ----- JSON/BSON Views ------
+
+
+# create your views here
 class ConvertJsonToBson(APIView):
     def post(self, request):
         try:
