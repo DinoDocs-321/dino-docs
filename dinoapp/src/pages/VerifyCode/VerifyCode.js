@@ -21,8 +21,10 @@ const VerifyCode = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    console.log("Email: ", email);
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/verify-code/', { code, email });
+
+      const response = await axios.post('http://localhost:8000/api/verify-code/', { code });
 
       if (response.status === 200) {
         navigate('/reset-password', { state: { email, code } });

@@ -16,28 +16,37 @@ const location = useLocation();
     e.preventDefault();
     setError('');
 
+    // Check if passwords match
     if (password !== confirmPassword) {
-      setError('Passwords do not match!');
-      return;
+        setError('Passwords do not match!');
+        return;
     }
 
+    // Log email and code to ensure they are not undefined
+    console.log("Email: ", email);
+    console.log("Code: ", code);
+
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/reset-password/',
-        { new_password: password },  // POST request, not GET
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Reset-Email': email,
-            'X-Reset-Code': code  // Ensure you're passing the reset code
-          }
-        }
-      );
-      navigate('/signin');
+        const response = await axios.post('http://localhost:8000/api/reset-password/',
+            {
+                email: email,  // Email from state
+                code: code,    // Code from state
+                new_password: password  // New password from input
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        );
+        navigate('/signin');
     } catch (err) {
-      setError('Failed to reset password. Please try again.');
-      console.error('Error resetting password:', err.response ? err.response.data : err.message);
+        setError('Failed to reset password. Please try again.');
+        console.error('Error resetting password:', err.response ? err.response.data : err.message);
     }
-  };
+};
+
+
 
 
   return (

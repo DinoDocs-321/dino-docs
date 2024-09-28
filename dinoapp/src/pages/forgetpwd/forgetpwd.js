@@ -19,7 +19,9 @@ const ForgotPassword = () => {
     e.preventDefault();
     setError('');
     try {
-      await axios.post('http://127.0.0.1:8000/api/forgot-password/', { email });
+      await axios.post('http://localhost:8000/api/forgot-password/', { email });
+      console.log("Navigating with email: ", email);  // this is new line
+
       navigate('/verify-code', { state: { email } });
     } catch (error) {
       setError(error.response?.data?.error || 'Failed to send verification code');
