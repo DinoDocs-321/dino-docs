@@ -15,7 +15,8 @@ import SignOut from './pages/signout/signout';
 import NotFound from './pages/notfound/notfound'
 import ForgotPassword from './pages/forgetpwd/forgetpwd';
 import ResetPassword from './pages/resetpwd/resetpwd';
-
+import Generator from './pages/generate/generator';
+import DomainGenerate from './pages/domainGenerate/domainGenerate';
 
 function App() {
   return (
@@ -41,6 +42,8 @@ function App() {
         <Route path='/signout' element={<SignOut />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/reset-password/:uidb64/:token' element={<ResetPassword />} />
+        <Route path='/generate' element={<Generator />} />
+        <Route path="/domain-generate" element={<DomainGenerate />} />
 
         <Route path='*' element={<NotFound />} />
       </Routes>
