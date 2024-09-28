@@ -121,6 +121,8 @@ from datetime import datetime, timedelta, timezone
 import random
 import string
 import logging
+from django.core.mail import send_mail
+from django.conf import settings
 
 # Setup logger
 logger = logging.getLogger(__name__)
@@ -148,9 +150,6 @@ class ForgotPasswordView(APIView):
 
         # MongoDB connection and insertion
         try:
-
-
-
             # Insert reset code into MongoDB
             reset_codes_collection.insert_one({
                 'user_id': str(user.id),
@@ -160,26 +159,24 @@ class ForgotPasswordView(APIView):
                 'expires_at': datetime.now(timezone.utc) + timedelta(minutes=15)
             })
 
-            # Even if email sending is disabled, ensure the Response is returned:
-            return Response({'message': 'Reset code generated and saved'}, status=status.HTTP_200_OK)
-
         except Exception as e:
             # Log the error and return 500 Internal Server Error
             logger.error(f"Error saving reset code: {str(e)}")
             return Response({'error': f'Error saving reset code: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # Email sending logic (if needed later, currently commented out)
-        # subject = 'Password Reset Code'
-        # message = f'Your password reset code is: {code}'
-        # from_email = settings.DEFAULT_FROM_EMAIL
-        # recipient_list = [email]
+        # Now, send the email with the reset code
+        subject = 'Password Reset Code'
+        message = f'Your password reset code is: {code}'
+        from_email = settings.DEFAULT_FROM_EMAIL  # Get this from your Django settings
+        recipient_list = [email]
 
-        # try:
-        #     send_mail(subject, message, from_email, recipient_list)
-        #     return Response({'message': 'Reset code sent to email'}, status=status.HTTP_200_OK)
-        # except Exception as e:
-        #     logger.error(f"Error sending email: {str(e)}")
-        #     return Response({'error': f'Unable to send reset code. Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        try:
+            # Send the email
+            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            return Response({'message': 'Reset code sent to email'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error sending email: {str(e)}")
+            return Response({'error': f'Unable to send reset code. Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
@@ -238,6 +235,24 @@ class ResetPasswordView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
+
+from django.core.mail import send_mail
+from django.http import HttpResponse
+from django.conf import settings
+
+def send_test_email(request):
+    # Define the subject, message, and sender/recipient details
+    subject = "Subject here"  # The subject of the email
+    message = "Here is the message."  # The plain text message
+    from_email = settings.DEFAULT_FROM_EMAIL  # This should be your verified email in settings.py
+    recipient_list = ["kuldeep_bhatia03@icloud.com"]  # List of recipient(s)
+
+    try:
+        # Call the send_mail function
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+        return HttpResponse('Test email sent successfully!')
+    except Exception as e:
+        return HttpResponse(f'Failed to send test email: {str(e)}')
 
 # ----------------------------------------------------------------------------------------------------------------
 
