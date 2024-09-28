@@ -1,68 +1,136 @@
-.manual-generate-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
-  
-  .upload-section {
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  .file-input {
-    margin: 10px 0;
-  }
-  
-  .button {
-    margin: 10px 0;
-    padding: 10px 20px;
-    cursor: pointer;
-  }
-  
-  .message {
-    color: red;
-  }
-  
-  .iframe {
-    width: 100%;
-    height: 500px;
-    border: none;
-  }
-  
-  .json-section {
-    margin-bottom: 20px;
-    width: 100%;
-    max-width: 800px;
-  }
-  
-  .textarea {
-    width: 100%;
-    height: 150px;
-    margin-bottom: 10px;
-    padding: 10px;
-  }
-  
-  .json-preview {
-    white-space: pre-wrap;
-    background-color: #f4f4f4;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    width: 100%;
-  }
-  
-  .button-row {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 800px;
-  }
-  
-  .row-button {
-    flex: 1;
-    margin: 0 5px;
-    padding: 10px;
-    cursor: pointer;
-  }
-  
+.domain-generate-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.upload-section {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.upload-box {
+  border: 2px dashed #ccc;
+  padding: 20px;
+  margin-bottom: 10px;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  position: relative; /* Added for positioning of the file input */
+  transition: border-color 0.3s ease; /* Smooth transition for border color */
+}
+
+.file-drop-area {
+  cursor: pointer; /* Change cursor to pointer for better UX */
+}
+
+.file-drop-area.dropped {
+  border-color: #3A99D8; /* Change border color when a file is dropped */
+  background-color: rgba(58, 153, 216, 0.1); /* Light background color for visual feedback */
+}
+
+
+.file-drop-area p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.file-drop-area span {
+  font-size: 12px;
+}
+
+/* New styles for file drop area */
+.file-drop-area:hover {
+  border-color: #3A99D8; /* Change border color on hover */
+  background-color: #f0f8ff; /* Light background on hover */
+}
+
+.file-drop-area.active {
+  border-color: #3A99D8; /* Change border color when active */
+  background-color: #e6f7ff; /* Light blue background when active */
+}
+
+.file-input {
+  display: none;
+}
+
+.upload-button {
+  background-color: #3A99D8;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+}
+
+.upload-button:hover {
+  background-color: #2a78b8;
+}
+
+.or-separator {
+  margin: 20px 0;
+  font-size: 20px;
+}
+
+.json-section {
+  margin-bottom: 20px;
+}
+
+.json-label {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.textarea-container {
+  position: relative;
+}
+
+.json-textarea {
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: none;
+}
+
+.edit-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  color: #3A99D8;
+}
+
+.button-row {
+  margin-top: 20px;
+}
+
+.action-button {
+  background-color: #3A99D8;
+  color: white;
+  padding: 10px 20px;
+  margin-right: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.action-button:hover {
+  background-color: #2a78b8;
+}
+
+.message {
+  margin-top: 20px;
+  color: red;
+}

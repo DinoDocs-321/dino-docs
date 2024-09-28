@@ -5,7 +5,7 @@ import binIcon from '../../assets/bin.png';
 import arrowsIcon from '../../assets/arrows.png';
 import addIcon from '../../assets/add.png';
 
-const JSONEditor = () => {
+const JSONEditor = ({ jsonSchema }) => {
   const initialFormData = [
     [{ id: Date.now(), label: 'ID', value: 'SML', type: 'Text' }],
     [{ id: Date.now() + 1, label: 'SortAs', value: 'SGML', type: 'Text' }],
@@ -34,7 +34,7 @@ const JSONEditor = () => {
 
   const transformFormData = (data) => {
     const result = {};
-  
+
     data.forEach(row => {
       if (Array.isArray(row)) {
         row.forEach(field => {
@@ -64,7 +64,7 @@ const JSONEditor = () => {
         });
       }
     });
-  
+
     return result;
   };
 
@@ -73,20 +73,23 @@ const JSONEditor = () => {
   const [isValidJson, setIsValidJson] = useState(true);
 
   useEffect(() => {
-    try {
-      const parsedJson = JSON.parse(jsonCode);
-      const updatedFormData = convertJSONToFormData(parsedJson);
-      setFormData(updatedFormData);
-      setIsValidJson(true);
-    } catch (error) {
-      console.error('Invalid JSON:', error);
-      setIsValidJson(false);
+    if (jsonSchema) {
+      try {
+        const parsedJson = JSON.parse(jsonSchema);
+        const updatedFormData = convertJSONToFormData(parsedJson);
+        setFormData(updatedFormData);
+        setJSONCode(JSON.stringify(parsedJson, null, 2)); // Use jsonSchema instead of initialFormData
+        setIsValidJson(true);
+      } catch (error) {
+        console.error('Invalid JSON:', error);
+        setIsValidJson(false);
+      }
     }
-  }, [jsonCode]);
+  }, [jsonSchema]);
 
   const convertJSONToFormData = (json) => {
     const formData = [];
-    
+
     const parseObject = (obj) => {
       const result = [];
       Object.entries(obj).forEach(([key, value]) => {
@@ -115,10 +118,9 @@ const JSONEditor = () => {
     return formData;
   };
 
-
   const addField = (rowIndex, parentId) => {
     const newField = { id: Date.now(), label: '', value: '', type: 'Text' };
-    
+
     const addFieldToGroup = (group) => {
       if (group.id === parentId) {
         if (!group.inner) {
@@ -133,7 +135,7 @@ const JSONEditor = () => {
     const updatedRows = formData.map((row, index) => {
       if (index === rowIndex) {
         let fieldAdded = false;
-  
+
         // Check if the parentId exists in the current row
         const newRow = row.map(field => {
           if (field.id === parentId && field.type === 'Group') {
@@ -142,7 +144,7 @@ const JSONEditor = () => {
           }
           return field;
         });
-  
+
         if (!fieldAdded) {
           // Add the new field directly to the row and place it under the current parent
           const parentIndex = row.findIndex(field => field.id === parentId);
@@ -152,7 +154,7 @@ const JSONEditor = () => {
             newRow.push(newField); // If parentId is not found, add it to the end
           }
         }
-  
+
         return newRow;
       }
       return row;
@@ -169,7 +171,7 @@ const JSONEditor = () => {
         group.inner.forEach(deleteFromGroup);
       }
     };
-  
+
     const updatedRows = formData.map(row => {
       row.forEach(deleteFromGroup);
       return row.filter(field => {
@@ -180,7 +182,7 @@ const JSONEditor = () => {
         return field.id !== id;
       });
     }).filter(row => row.length > 0);
-  
+
     setFormData(updatedRows);
     setJSONCode(JSON.stringify(transformFormData(updatedRows), null, 2));
   };
@@ -218,13 +220,13 @@ const JSONEditor = () => {
   const deepCopy = (obj) => {
     return JSON.parse(JSON.stringify(obj));
   };
-  
+
   const addNewObject = () => {
     const newObjectTemplate = deepCopy(initialFormData);
     const newObject = newObjectTemplate.map(row => row.map(field => ({
       ...field,
       id: Date.now() + Math.random(),
-      value: field.value, 
+      value: field.value,
     })));
 
     const updatedFormData = [...formData, ...newObject];
@@ -244,140 +246,42 @@ const JSONEditor = () => {
       });
   };
 
-  const handleDragStart = (e, rowIndex) => {
-    e.dataTransfer.setData("rowIndex", rowIndex);
-    e.currentTarget.classList.add('dragging');
-  };
-
-  const handleDragEnd = (e) => {
-    e.currentTarget.classList.remove('dragging');
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault(); 
-    e.dataTransfer.dropEffect = "move";
-  };
-
-  const handleDrop = (e, targetIndex) => {
-    e.preventDefault();
-    const draggedRowIndex = e.dataTransfer.getData("rowIndex");
-    if (draggedRowIndex === null) return;
-    if (draggedRowIndex === targetIndex.toString()) return; // No change if same position
-
-    const updatedRows = [...formData];
-    const [draggedRow] = updatedRows.splice(draggedRowIndex, 1);
-    updatedRows.splice(targetIndex, 0, draggedRow);
-
-    setFormData(updatedRows);
-    const updatedJSON = JSON.stringify(transformFormData(updatedRows), null, 2);
-    setJSONCode(updatedJSON);
-  };
-
-  const renderField = (field, rowIndex, parentFieldId = null) => {
-    const isIDField = field.label === 'ID';
-
-    if (field.type === 'Group') {
-      return (
-        <div key={field.id} className='input-container group-container'>
-          <div className='group-label'>
-            <label>
-              <input
-                value={field.label}
-                onChange={(e) => handleLabelChange(e, field.id, parentFieldId)}
-                onClick={(e) => e.stopPropagation()}
-                className='label-field'
-              />
-            </label>
-            <div className='innerButtons'>
-              <span className='status-icon add-icon' onClick={() => addField(rowIndex, field.id)}><addIcon/></span>
-              <span className='status-icon delete-icon' onClick={() => deleteField(field.id)}><binIcon/></span>
-              <span className='status-icon drag-icon'><arrowsIcon/></span>
-            </div>
-          </div>
-
-          <div className='group-fields'>
-            {field.inner.map(innerField => renderField(innerField, rowIndex, field.id))}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-        <div key={field.id} 
-          className='input-container'
-          draggable
-          onDragStart={(e) => handleDragStart(e, rowIndex)} 
-          onDragEnd={handleDragEnd}
-          onDragOver={handleDragOver}
-          onDrop={(e) => handleDrop(e, rowIndex)} 
-        >
-            <div className='input-wrapper'>
-              <label classname='label-field'>
-                <input
-                    value={field.label}
-                    onChange={(e) => handleLabelChange(e, field.id)}
-                    onClick={(e) => e.stopPropagation()}
-                    disabled={isIDField} 
-                    className={isIDField ? 'ID-input' : 'label-field'}
-                />
-              </label>
-                    
-              <input
-                className='value-input'
-                type='text'
-                value={field.value}
-                onChange={(e) => handleInputChange(e, field.id)}
-              />
-                <span className='status-icon drag-icon'><arrowsIcon/></span>
-                <span className='status-icon add-icon' onClick={() => addField(0)}><addIcon/></span>
-                <span className='status-icon delete-icon' onClick={() => deleteField(field.id)}><binIcon/></span>
-                
-                {isIDField && (
-                    <button className='unique-button'>Unique</button>
-                )}
-            </div>
-        </div>
-    );  
-  };
   return (
-    <div className='json-editor-container'>
-      <div className='editor'>
-        <div className='visual-editor'>
-          <div className="visual-editor-header">
-            <h3>Visual Editor</h3>
-            <button className='add-button' onClick={addNewObject}>+</button>
+    <div className="editor-container">
+      <h2>JSON Editor</h2>
+      <div className="form-data">
+        {formData.map((row, rowIndex) => (
+          <div key={rowIndex} className="row">
+            {row.map((field) => (
+              <div key={field.id} className={`field ${field.type}`}>
+                <input
+                  type="text"
+                  value={field.label}
+                  placeholder="Label"
+                  onChange={(e) => handleLabelChange(e, field.id)}
+                />
+                <input
+                  type="text"
+                  value={field.value}
+                  placeholder="Value"
+                  onChange={(e) => handleInputChange(e, field.id)}
+                />
+                <button onClick={() => addField(rowIndex, field.id)}>+</button>
+                <button onClick={() => deleteField(field.id)}>x</button>
+              </div>
+            ))}
           </div>
-          {formData.map((row, rowIndex) => (
-            <div 
-                key={rowIndex} 
-                className='input-row'
-                draggable
-                onDragStart={(e) => handleDragStart(e, rowIndex)}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, rowIndex)}
-                onDragEnd={handleDragEnd}>
-                {row.map(field => renderField(field, rowIndex))}
-            </div>
-          ))}
-        </div>
-        <div className='code-editor'>
-          <h3>Code Editor</h3>
-          <textarea
-            className='code-area'
-            value={jsonCode}
-            onChange={(e) => setJSONCode(e.target.value)}
-            style={{ width: '100%', height: '100%'}}
-          />
-        </div>
+        ))}
       </div>
-      
-      <div className='buttons'>
-        <button onClick={generateJSONData}>Generate JSON Data</button>
-        <button onClick={handleSubmit}>Save JSON Document</button>
-      </div>
+      <button className="generate-button" onClick={generateJSONData}>Generate JSON</button>
+      <textarea
+        className="json-code"
+        value={jsonCode}
+        readOnly
+        rows={10}
+      />
+      <button onClick={handleSubmit}>Save JSON</button>
     </div>
-
-
   );
 };
 
