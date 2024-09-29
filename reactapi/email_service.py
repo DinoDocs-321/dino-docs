@@ -28,7 +28,7 @@ def send_verification_email(to_email, verification_code):
             <h3>{verification_code}</h3>
             <p>If you did not request a password reset, please ignore this email.</p>
             <br/>
-            <p>Thank you,<br/>Your Company Team</p>
+            <p>Thank you,<br/>Dino Docs</p>
         </body>
     </html>
     '''
