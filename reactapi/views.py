@@ -33,6 +33,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.db import connections
+from django.core.files.storage import default_storage
 
 # Local application imports
 from .serializers import UserSerializer
@@ -185,8 +186,6 @@ def save_user_schema(request):
 # ----------------------------
 # ----- JSON/BSON Views ------
 
-
-# create your views here
 class ConvertJsonToBson(APIView):
     def post(self, request):
         try:
@@ -447,3 +446,15 @@ def validate_json_text(request):
 
 # ----- .JSON Validation Views --
 # ------------------------------
+class ValidateJsonFileView(APIView):
+    def post(self, request):
+        file = request.FILES.get('file')
+        if not file:
+            return Response({'message': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Save the uploaded file
+        file_path = default_storage.save(file.name, file)
+        
+        result = validate_json_file(file_path)
+
+        return Response({'message': result}, status=status.HTTP_200_OK)

@@ -1,36 +1,19 @@
 import React, { useState } from 'react';
-import { serialize } from 'bson'; // Import serialize function from bson
+import { serialize } from 'bson';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './domainGenerate.css';
-import JSONEditor from '../jsoneditor/App.js'; // Adjust the path accordingly
 
 const DomainGenerate = () => {
-  const [jsonText, setJsonText] = useState(''); // Single JSON input for schema
-  const [schemaFile, setSchemaFile] = useState(null); // File for schema
-  const [domainFile, setDomainFile] = useState(null); // File for domain
+  const [jsonText, setJsonText] = useState('');
+  const [schemaFile, setSchemaFile] = useState(null);
+  const [domainFile, setDomainFile] = useState(null);
   const [message, setMessage] = useState(null);
-  const [schemaFileContents, setSchemaFileContents] = useState(null); // For displaying schema file contents
-  const [domainFileContents, setDomainFileContents] = useState(null); // For displaying domain file contents
-  const [isSchemaDropped, setIsSchemaDropped] = useState(false); // Track if a schema file has been dropped
-  const [isDomainDropped, setIsDomainDropped] = useState(false); // Track if a domain file has been dropped
-  const [jsonSchema, setJsonSchema] = useState('');
+  const [schemaFileContents, setSchemaFileContents] = useState(null);
+  const [domainFileContents, setDomainFileContents] = useState(null);
+  const [isSchemaDropped, setIsSchemaDropped] = useState(false);
+  const [isDomainDropped, setIsDomainDropped] = useState(false);
   const navigate = useNavigate();
-
-  const handleSchemaFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    setSchemaFile(selectedFile);
-    setMessage(null); // Clear message when new file is selected
-    setSchemaFileContents(null); // Clear previous file contents
-    setIsSchemaDropped(!!selectedFile); // Update drop state based on selected file
-  };
-
-  const handleDomainFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    setDomainFile(selectedFile);
-    setMessage(null); // Clear message when new file is selected
-    setDomainFileContents(null); // Clear previous file contents
-    setIsDomainDropped(!!selectedFile); // Update drop state based on selected file
-  };
 
   const handleFileUpload = (file, isSchema) => {
     const reader = new FileReader();
@@ -49,187 +32,315 @@ const DomainGenerate = () => {
       }
     };
 
-    reader.readAsText(file); // Read the file as text
+    reader.readAsText(file);
   };
 
-  // Schema validation: Checks for basic properties in a JSON schema
-  const isValidSchema = (jsonObject) => {
-    return jsonObject && typeof jsonObject === 'object' && jsonObject.hasOwnProperty('type') && jsonObject.hasOwnProperty('properties');
+  const handleSchemaFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setSchemaFile(selectedFile);
+      handleFileUpload(selectedFile, true);
+      setIsSchemaDropped(true);
+    }
   };
 
-  // Domain validation: Define the structure for a valid domain JSON (adjust according to your domain model)
-  const isValidDomain = (jsonObject) => {
-    return jsonObject && typeof jsonObject === 'object' && jsonObject.hasOwnProperty('domain') && Array.isArray(jsonObject.domain);
+  const handleDomainFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setDomainFile(selectedFile);
+      handleFileUpload(selectedFile, false);
+      setIsDomainDropped(true);
+    }
   };
 
-  // Handles the dropped schema file and validates it
   const handleSchemaFileDrop = (e) => {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const parsedJson = JSON.parse(event.target.result);
-          if (isValidSchema(parsedJson)) {
-            setSchemaFile(droppedFile);
-            setIsSchemaDropped(true); // Update drop state
-            handleFileUpload(droppedFile, true); // Process as schema
-            setMessage('Schema file is valid.');
-          } else {
-            setMessage('Invalid Schema file.');
-          }
-        } catch (error) {
-          setMessage('Error parsing JSON in the schema file.');
-        }
-      };
-      reader.readAsText(droppedFile); // Read the file as text
+      setSchemaFile(droppedFile);
+      handleFileUpload(droppedFile, true);
+      setIsSchemaDropped(true);
     }
   };
 
-  // Handles the dropped domain file and validates it
   const handleDomainFileDrop = (e) => {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const parsedJson = JSON.parse(event.target.result);
-          if (isValidDomain(parsedJson)) {
-            setDomainFile(droppedFile);
-            setIsDomainDropped(true); // Update drop state
-            handleFileUpload(droppedFile, false); // Process as domain
-            setMessage('Domain file is valid.');
-          } else {
-            setMessage('Invalid Domain file.');
-          }
-        } catch (error) {
-          setMessage('Error parsing JSON in the domain file.');
-        }
-      };
-      reader.readAsText(droppedFile); // Read the file as text
-    }
-  };
-
-  const handleFileUploadBoth = () => {
-    if (schemaFile) {
-      handleFileUpload(schemaFile, true); // Upload schema file
-    }
-    if (domainFile) {
-      handleFileUpload(domainFile, false); // Upload domain file
-    }
-    if (!schemaFile && !domainFile) {
-      setMessage('Please upload at least one file (schema or domain).');
+      setDomainFile(droppedFile);
+      handleFileUpload(droppedFile, false);
+      setIsDomainDropped(true);
     }
   };
 
   const handleDragOver = (e) => {
-    e.preventDefault(); // Prevent default behavior to allow drop
+    e.preventDefault();
     if (e.currentTarget.dataset.type === 'schema') {
-      setIsSchemaDropped(true); // Indicate that a schema file is being dragged over
+      setIsSchemaDropped(true);
     } else {
-      setIsDomainDropped(true); // Indicate that a domain file is being dragged over
+      setIsDomainDropped(true);
     }
   };
 
   const handleDragLeave = (e) => {
     if (e.currentTarget.dataset.type === 'schema') {
-      setIsSchemaDropped(false); // Reset drop state when leaving the area
+      setIsSchemaDropped(false);
     } else {
-      setIsDomainDropped(false); // Reset drop state when leaving the area
+      setIsDomainDropped(false);
     }
   };
 
-  const handleDownloadBson = () => {
+  const handleFileUploadBoth = async () => {
+    if (!schemaFile && !domainFile) {
+      setMessage('Please upload at least one file (schema or domain).');
+      return;
+    }
+
+    const formData = new FormData();
+    if (schemaFile || domainFile) {
+      formData.append('file', schemaFile || domainFile);
+    }
+
     try {
-      let jsonData;
-
-      if (schemaFileContents) {
-        jsonData = JSON.parse(schemaFileContents);
-      } else if (jsonText) {
-        jsonData = JSON.parse(jsonText);
-      } else {
-        setMessage('No JSON content available to save as BSON.');
-        return;
-      }
-
-      const bsonData = serialize(jsonData); // Use serialize from bson
-
-      const blob = new Blob([bsonData], { type: 'application/octet-stream' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'data.bson'; // Set the filename
-      link.click();
-      URL.revokeObjectURL(url);
-
-      setMessage('BSON file downloaded successfully.');
+      const response = await axios.post('http://localhost:8000/api/validate-json-file/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setMessage(response.data.message);
     } catch (error) {
-      setMessage('Error while converting JSON to BSON.');
+      console.error(error);
+      setMessage('Error uploading files: ' + error.response?.data?.message || error.message);
     }
   };
 
-  const goToJSONEditor = () => {
+  const validateJsonFile = async (file, type) => {
+    const formData = new FormData();
+    formData.append('file', file);
     try {
-      let jsonData;
-
-      // Check if schema file content exists, otherwise use the input field
-      if (schemaFileContents) {
-        jsonData = JSON.parse(schemaFileContents);
-      } else if (jsonText) {
-        jsonData = JSON.parse(jsonText);
-      } else {
-        setMessage('No JSON content available to redirect.');
-        return;
-      }
-
-      // Pass the JSON schema as state when navigating to /JSONEditor
-      navigate('/JSONEditor', { state: { jsonSchema: jsonData } });
+      const response = await axios.post('http://localhost:8000/api/validate-json-file/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+      setMessage(response.data.message);
     } catch (error) {
-      setMessage('Error while processing the JSON schema.');
+      console.error(error);
+      setMessage('Error validating file: ' + error.response?.data?.message || error.message);
     }
   };
 
-  const goToGenerate = () => {
-    navigate('/generate');
+  const validateJsonText = async () => {
+    if (!jsonText) {
+      setMessage('Please enter JSON text to validate.');
+      return;
+    }
+    try {
+      const response = await axios.post('http://localhost:8000/api/validate-json-text/', { jsonText });
+      setMessage(response.data.message);
+    } catch (error) {
+      console.error(error);
+      
+      if (error.response) {
+        // Server responded with a status other than 2xx
+        setMessage('Error validating JSON text: ' + (error.response.data?.message || 'Unknown error from server'));
+      } else if (error.request) {
+        // Request was made but no response was received
+        setMessage('Error validating JSON text: No response from server.');
+      } else {
+        // Other errors (e.g., issue with setting up request)
+        setMessage('Error validating JSON text: ' + error.message);
+      }
+    }
+  };
+
+  // Add new onClick handlers for buttons
+  const handleValidateSchemaFile = () => {
+    if (schemaFile) {
+      validateJsonFile(schemaFile, 'schema');
+    } else {
+      setMessage('Please upload a schema file to validate.');
+    }
+  };
+
+  const handleValidateDomainFile = () => {
+    if (domainFile) {
+      validateJsonFile(domainFile, 'domain');
+    } else {
+      setMessage('Please upload a domain file to validate.');
+    }
   };
 
   const handleValidateJSONInput = () => {
+    validateJsonText();
+  };
+
+  const handleGenerate = async () => {
+    if (!schemaFile && !domainFile && !jsonText) {
+        setMessage('Please upload a schema file, domain file, or enter JSON text.');
+        return;
+    }
+
+    const formData = new FormData();
+    if (schemaFile) {
+        formData.append('schemaFile', schemaFile);
+    }
+    if (domainFile) {
+        formData.append('domainFile', domainFile);
+    }
+    if (jsonText) {
+        formData.append('jsonText', jsonText);
+    }
+
     try {
-      const parsedJson = JSON.parse(jsonText);
-      if (isValidSchema(parsedJson)) {
-        setMessage('JSON input is valid.');
-      } else {
-        setMessage('Invalid JSON input.');
-      }
+        const response = await axios.post('http://localhost:8000/api/generate/', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        // Navigate to "/generate" and pass the response data
+        navigate('generate/', { state: { generatedData: response.data } });
     } catch (error) {
-      setMessage('Invalid JSON format in the input field.');
+        console.error('Error generating data:', error);
+        setMessage('Error generating data: ' + error.message);
     }
   };
 
+  const handleJSONEditor = async () => {
+    if (!jsonText && !schemaFile && !domainFile) {
+      setMessage('Please provide JSON text, schema file, or domain file.');
+      return;
+    }
+
+    const formData = new FormData();
+    if (schemaFile) {
+      formData.append('schemaFile', schemaFile);
+    }
+    if (domainFile) {
+      formData.append('domainFile', domainFile);
+    }
+    if (jsonText) {
+      formData.append('jsonText', jsonText);
+    }
+
+    try {
+      // Send the data to your backend
+      const response = await axios.post('http://localhost:8000/api/save-schema/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // Assuming the backend responds with the saved data or a success message
+      const savedData = response.data.savedData; // Adjust based on your backend response structure
+
+      // Redirect to /JSONEditor with the saved data
+      navigate('/JSONEditor', { state: { savedData } });
+    } catch (error) {
+      console.error(error);
+      setMessage('Error saving data: ' + error.response?.data?.message || error.message);
+    }
+  };
+
+  const handleDownloadBson = async () => {
+    let dataToSend = null;
+  
+    // Check if JSON text is provided
+    if (jsonText) {
+      try {
+        dataToSend = JSON.parse(jsonText); // Parse JSON text
+      } catch (error) {
+        setMessage('Invalid JSON text provided.');
+        return;
+      }
+    } 
+
+    // Check if a schema file is uploaded
+    else if (schemaFile) {
+      try {
+        const schemaFileContent = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(JSON.parse(reader.result)); // Resolve with parsed JSON
+          reader.onerror = reject;
+          reader.readAsText(schemaFile); // Read the schema file
+        });
+        dataToSend = schemaFileContent; // Use the content of the schema file
+      } catch (error) {
+        setMessage('Error reading schema file: ' + error.message);
+        return;
+      }
+    } 
+    // Check if a domain file is uploaded
+    else if (domainFile) {
+      try {
+        const domainFileContent = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(JSON.parse(reader.result)); // Resolve with parsed JSON
+          reader.onerror = reject;
+          reader.readAsText(domainFile); // Read the domain file
+        });
+        dataToSend = domainFileContent; // Use the content of the domain file
+      } catch (error) {
+        setMessage('Error reading domain file: ' + error.message);
+        return;
+      }
+    } else {
+      setMessage('Please provide JSON data or upload a schema/domain file.');
+      return;
+    }
+  
+    // If we have valid data to send, proceed to convert to BSON
+    try {
+      const response = await axios.post('http://localhost:8000/api/convert/', {
+        data: dataToSend, // Send the collected data
+      }, {
+        responseType: 'blob', // Important for downloading files
+      });
+  
+      // Create a URL for the BSON data blob
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'data.bson'); // Set the filename
+      document.body.appendChild(link);
+      link.click(); // Trigger the download
+      link.remove(); // Clean up the DOM
+    } catch (error) {
+      console.error(error);
+      setMessage('Error downloading BSON: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+
   return (
     <div className="domain-generate-container">
-      {/* File Upload Section */}
       <div className="upload-section">
         <h2 className="section-title">Upload Files</h2>
         <div className="drop-box-container">
-          {/* Schema Drop Box */}
           <div
             className={`upload-box file-drop-area ${isSchemaDropped ? 'dropped' : ''}`}
-            data-type="schema" onDragOver={handleDragOver} onDrop={handleSchemaFileDrop} onDragLeave={handleDragLeave}
+            data-type="schema"
+            onDragOver={handleDragOver}
+            onDrop={handleSchemaFileDrop}
+            onDragLeave={handleDragLeave}
           >
-            <p>Drag n Drop Schema File Here</p>
-            <span>Or <a href="#" onClick={() => document.getElementById('schema-upload').click()}>Browse</a></span>
+            <p>Drag and Drop Schema File Here</p>
+            <span>
+              Or{' '}
+              <a href="#" onClick={() => document.getElementById('schema-upload').click()}>
+                Browse
+              </a>
+            </span>
             <input
               type="file"
               id="schema-upload"
               onChange={handleSchemaFileChange}
               className="file-input"
+              style={{ display: 'none' }} // Hide the input
             />
           </div>
 
-          {/* Domain Drop Box */}
           <div
             className={`upload-box file-drop-area ${isDomainDropped ? 'dropped' : ''}`}
             data-type="domain"
@@ -237,22 +348,29 @@ const DomainGenerate = () => {
             onDrop={handleDomainFileDrop}
             onDragLeave={handleDragLeave}
           >
-            <p>Drag n Drop Domain File Here</p>
-            <span>Or <a href="#" onClick={() => document.getElementById('domain-upload').click()}>Browse</a></span>
+            <p>Drag and Drop Domain File Here</p>
+            <span>
+              Or{' '}
+              <a href="#" onClick={() => document.getElementById('domain-upload').click()}>
+                Browse
+              </a>
+            </span>
             <input
               type="file"
               id="domain-upload"
               onChange={handleDomainFileChange}
               className="file-input"
+              style={{ display: 'none' }} // Hide the input
             />
           </div>
         </div>
 
+        <button onClick={handleValidateSchemaFile}>Validate Schema File</button>
+        <button onClick={handleValidateDomainFile}>Validate Domain File</button>
         <button onClick={handleFileUploadBoth}>Upload Both</button>
         {message && <p className="message">{message}</p>}
       </div>
 
-      {/* JSON Input Section */}
       <div className="json-input-section">
         <h2 className="section-title">Paste JSON Input</h2>
         <textarea
@@ -262,13 +380,12 @@ const DomainGenerate = () => {
           placeholder="Paste your JSON here..."
         />
         <button onClick={handleValidateJSONInput}>Validate JSON</button>
+        {message && <p className="message">{message}</p>}
       </div>
-      <div>{message && <p className="message">{message}</p>}</div>
 
-      {/* Actions */}
       <div className="action-buttons">
-        <button onClick={goToGenerate}>Generate</button>
-        <button onClick={goToJSONEditor}>Open JSON Editor</button>
+        <button onClick={handleGenerate}>Generate</button>
+        <button onClick={handleJSONEditor}>Open JSON Editor</button>
         <button onClick={handleDownloadBson}>Download BSON</button>
       </div>
     </div>
