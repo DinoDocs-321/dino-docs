@@ -319,15 +319,6 @@ const JSONEditor = () => {
     setJSONCode(updatedJSON);
   };
 
-  // const handleSubmit = () => {
-  //   axios.post('http://localhost:8000/api/save-schema/', JSON.parse(jsonCode))
-  //     .then(response => {
-  //       console.log(response.data);
-  //     })
-  //     .catch(error => {
-  //       console.error('There was an error saving the JSON data!', error);
-  //     });
-  // };
   const handleSubmit = async () => {
     const token = localStorage.getItem('accessToken');
     if (!token) {
