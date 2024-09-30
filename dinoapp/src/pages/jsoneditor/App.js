@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './JSONEditor.css';
 import binIcon from '../../assets/bin.png';
@@ -6,6 +7,7 @@ import arrowsIcon from '../../assets/arrows.png';
 import addIcon from '../../assets/add.png';
 
 const JSONEditor = () => {
+  const location = useLocation();
   const initialFormData = [
     [{
       id: Date.now(),
@@ -164,22 +166,6 @@ const JSONEditor = () => {
     return result;
   };
 
-  const [formData, setFormData] = useState(initialFormData);
-  const [jsonCode, setJSONCode] = useState(JSON.stringify(transformFormData(initialFormData), null, 2));
-  const [isValidJson, setIsValidJson] = useState(true);
-
-  useEffect(() => {
-    try {
-      const parsedJson = JSON.parse(jsonCode);
-      const updatedFormData = convertJSONToFormData(parsedJson);
-      setFormData(updatedFormData);
-      setIsValidJson(true);
-    } catch (error) {
-      console.error('Invalid JSON:', error);
-      setIsValidJson(false);
-    }
-  }, [jsonCode]);
-
   const convertJSONToFormData = (json) => {
     const formData = [];
 
@@ -211,7 +197,27 @@ const JSONEditor = () => {
     return formData;
   };
 
+  const passedData = location.state?.savedData;
+  const [formData, setFormData] = useState(passedData ? convertJSONToFormData(passedData) : initialFormData);
+  const [jsonCode, setJSONCode] = useState(JSON.stringify(transformFormData(passedData ? convertJSONToFormData(passedData) : initialFormData), null, 2));
+  const [isValidJson, setIsValidJson] = useState(true);
 
+  useEffect(() => {
+    if (passedData) {
+      try {
+        // Update formData and jsonCode with the passed data from navigate
+        const parsedData = convertJSONToFormData(passedData);
+        setFormData(parsedData);
+        setJSONCode(JSON.stringify(transformFormData(parsedData), null, 2));
+        setIsValidJson(true);
+        console.log('Parsed JSON code:', parsedData);
+      } catch (error) {
+        console.error('Invalid JSON:', error);
+        setIsValidJson(false);
+      }
+    }
+  }, [passedData]);
+  
   const addField = (rowIndex, parentId) => {
     const newField = { id: Date.now(), label: '', value: '', type: 'Text' };
 
