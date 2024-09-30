@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './JSONEditor.css';
+import toJsonSchema from 'to-json-schema';
 import binIcon from '../../assets/bin.png';
 import arrowsIcon from '../../assets/arrows.png';
 import addIcon from '../../assets/add.png';
@@ -205,19 +206,26 @@ const JSONEditor = () => {
   useEffect(() => {
     if (passedData) {
       try {
-        // Update formData and jsonCode with the passed data from navigate
-        const parsedData = convertJSONToFormData(passedData);
-        setFormData(parsedData);
-        setJSONCode(JSON.stringify(transformFormData(parsedData), null, 2));
+        // Convert the passed JSON data into a JSON schema using the package
+        const schema = toJsonSchema(passedData);  // JSON to Schema
+
+        console.log('Generated Schema:', schema);
+
+        // Convert the schema into formData (if you still want the visual editor)
+        const parsedData = convertJSONToFormData(schema);  // Convert schema to form data for the visual editor
+
+        setFormData(parsedData);  // Update the visual editor with parsed data
+
+        // Optionally, set the schema directly in the JSON code editor
+        setJSONCode(JSON.stringify(schema, null, 2));  // Display the schema in the code editor
         setIsValidJson(true);
-        console.log('Parsed JSON code:', parsedData);
       } catch (error) {
         console.error('Invalid JSON:', error);
         setIsValidJson(false);
       }
     }
   }, [passedData]);
-  
+
   const addField = (rowIndex, parentId) => {
     const newField = { id: Date.now(), label: '', value: '', type: 'Text' };
 
