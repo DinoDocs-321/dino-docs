@@ -379,14 +379,14 @@ const DomainGenerate = () => {
           onChange={(e) => setJsonText(e.target.value)}
           placeholder="Paste your JSON here..."
         />
-        <button onClick={handleValidateJSONInput}>Validate JSON Text</button>
+        <button onClick={handleValidateJSONInput}>Validate JSON</button>
         {message && <p className="message">{message}</p>}
       </div>
 
       <div className="action-buttons">
-        <button onClick={handleGenerate}>+ Edit JSON Schema</button>
-        <button onClick={handleJSONEditor}>+ Build JSON Schema</button>
-        <button onClick={handleDownloadBson}>+ Export BSON File</button>
+        <button onClick={handleGenerate}>Generate</button>
+        <button onClick={handleJSONEditor}>Open JSON Editor</button>
+        <button onClick={handleDownloadBson}>Download BSON</button>
       </div>
     </div>
   );
