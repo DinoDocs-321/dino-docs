@@ -28,7 +28,6 @@ urlpatterns = [
     
     path('validate-json-file/', validate_json_file, name='validate_json_file'),
     path('validate-json-text/', validate_json_text, name='validate_json_text'),
-    path('domainGenerate/', domain_generate, name='domain-generate'),
 
 
 
