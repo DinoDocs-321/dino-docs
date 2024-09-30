@@ -175,72 +175,109 @@ const DomainGenerate = () => {
     validateJsonText();
   };
 
-  const handleGenerate = async () => {
-    if (!schemaFile && !domainFile && !jsonText) {
-        setMessage('Please upload a schema file, domain file, or enter JSON text.');
-        return;
-    }
-
-    const formData = new FormData();
-    if (schemaFile) {
-        formData.append('schemaFile', schemaFile);
-    }
-    if (domainFile) {
-        formData.append('domainFile', domainFile);
-    }
-    if (jsonText) {
-        formData.append('jsonText', jsonText);
-    }
-
-    try {
-        const response = await axios.post('http://localhost:8000/api/generate/', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+  const handleEditJSON = async () => {
+    let dataToSend = null;
+  
+    if (schemaFile) {// Check if a schema file is uploaded
+      try {
+        const schemaFileContent = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(JSON.parse(reader.result)); // Parse the schema file
+          reader.onerror = reject;
+          reader.readAsText(schemaFile);
         });
-
-        // Navigate to "/generate" and pass the response data
-        navigate('generate/', { state: { generatedData: response.data } });
-    } catch (error) {
-        console.error('Error generating data:', error);
-        setMessage('Error generating data: ' + error.message);
+        dataToSend = schemaFileContent;
+      } catch (error) {
+        setMessage('Error reading schema file: ' + error.message);
+        return;
+      }
+    } 
+    
+    else if (domainFile) {// Check if a domain file is uploaded
+      try {
+        const domainFileContent = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(JSON.parse(reader.result)); // Parse the domain file
+          reader.onerror = reject;
+          reader.readAsText(domainFile);
+        });
+        dataToSend = domainFileContent;
+      } catch (error) {
+        setMessage('Error reading domain file: ' + error.message);
+        return;
+      }
     }
+    
+    else if (jsonText) {// Check if JSON text is provided
+      try {
+        dataToSend = JSON.parse(jsonText); // Parse the JSON text
+      } catch (error) {
+        setMessage('Invalid JSON text provided.');
+        return;
+      }
+    }
+  
+    if (!dataToSend) {
+      setMessage('Please provide a schema file, domain file, or JSON text.');
+      return;
+    }
+  
+    // Now, instead of posting to a backend, navigate to the JSONEditor page and pass the data as state
+    console.log('Navigating to /converter with data:', dataToSend);
+    navigate('/converter', { state: { savedData: dataToSend } });
   };
 
   const handleJSONEditor = async () => {
-    if (!jsonText && !schemaFile && !domainFile) {
-      setMessage('Please provide JSON text, schema file, or domain file.');
+    let dataToSend = null;
+  
+    // Check if a schema file is uploaded
+    if (schemaFile) {
+      try {
+        const schemaFileContent = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(JSON.parse(reader.result)); // Parse the schema file
+          reader.onerror = reject;
+          reader.readAsText(schemaFile);
+        });
+        dataToSend = schemaFileContent;
+      } catch (error) {
+        setMessage('Error reading schema file: ' + error.message);
+        return;
+      }
+    } 
+    // Check if a domain file is uploaded
+    else if (domainFile) {
+      try {
+        const domainFileContent = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(JSON.parse(reader.result)); // Parse the domain file
+          reader.onerror = reject;
+          reader.readAsText(domainFile);
+        });
+        dataToSend = domainFileContent;
+      } catch (error) {
+        setMessage('Error reading domain file: ' + error.message);
+        return;
+      }
+    }
+    // Check if JSON text is provided
+    else if (jsonText) {
+      try {
+        dataToSend = JSON.parse(jsonText); // Parse the JSON text
+      } catch (error) {
+        setMessage('Invalid JSON text provided.');
+        return;
+      }
+    }
+  
+    if (!dataToSend) {
+      setMessage('Please provide a schema file, domain file, or JSON text.');
       return;
     }
-
-    const formData = new FormData();
-    if (schemaFile) {
-      formData.append('schemaFile', schemaFile);
-    }
-    if (domainFile) {
-      formData.append('domainFile', domainFile);
-    }
-    if (jsonText) {
-      formData.append('jsonText', jsonText);
-    }
-
-    try {
-      // Send the data to your backend
-      const response = await axios.post('http://localhost:8000/api/save-schema/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      // Assuming the backend responds with the saved data or a success message
-      const savedData = response.data.savedData; // Adjust based on your backend response structure
-
-      // Redirect to /JSONEditor with the saved data
-      navigate('/JSONEditor', { state: { savedData } });
-    } catch (error) {
-      console.error(error);
-      setMessage('Error saving data: ' + error.response?.data?.message || error.message);
-    }
+  
+    // Now, instead of posting to a backend, navigate to the JSONEditor page and pass the data as state
+    console.log('Navigating to /JSONEditor with data:', dataToSend);
+    navigate('/JSONEditor', { state: { savedData: dataToSend } });
   };
 
   const handleDownloadBson = async () => {
@@ -384,7 +421,7 @@ const DomainGenerate = () => {
       </div>
 
       <div className="action-buttons">
-        <button onClick={handleGenerate}>+ Edit JSON Schema</button>
+        <button onClick={handleEditJSON}>+ Edit JSON Schema</button>
         <button onClick={handleJSONEditor}>+ Build JSON Schema</button>
         <button onClick={handleDownloadBson}>+ Export BSON File</button>
       </div>
