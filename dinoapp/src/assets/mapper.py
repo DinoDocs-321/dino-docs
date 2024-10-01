@@ -30,12 +30,8 @@ schema = {
   "url": {"type": "string", "format": "url"},
   "currency": {"type": "string"},
   "bankAccountNums": {"type": "string"},
-  "creditCardPAN": {"type": "string"},
   "cvv": {"type": "integer"},
   "pin": {"type": "integer"},
-  "track1": {"type": "string"},
-  "track2": {"type": "string"},
-  "chileanRUTNumber": {"type": "string"}
 }
 
 # Function to map through the JSON and print field names with types

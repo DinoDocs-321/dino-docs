@@ -66,8 +66,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
@@ -188,7 +188,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'dinoapp/build/static'),
 )
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')

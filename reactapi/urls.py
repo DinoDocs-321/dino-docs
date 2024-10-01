@@ -4,7 +4,7 @@ from .views import *
 
 
 urlpatterns = [
-    path('generate/', generate_documents_view, name='generate_documents'),
+    path('generate/', GenerateDocumentView.as_view(), name='generate_documents'),
 
     # JWT Authentication paths
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -15,10 +15,20 @@ urlpatterns = [
     path('signin/', LoginUser.as_view(), name='signin'),
     path('logout/', LogoutView.as_view(), name='logout'),
 
+    path('reset-password/<uidb64>/<token>/', ResetPasswordConfirm.as_view(), name='reset_password_confirm'),
     path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
     path('verify-code/', VerifyCodeView.as_view(), name = "verify_code"),
-    path('reset-password/', ResetPasswordView.as_view(), name = "reset-password"),
     path('convert/', ConvertJsonToBson.as_view(), name='convert-json-schema-to-bson'),
+    path('save-schema/', save_user_schema, name='save-schema'),
+
+    #Generator paths
+    path('data-types/', DataTypeList.as_view(), name='data-types'),
+    path('generate-documents/', GenerateDocumentView.as_view(), name='generate_documents'),
+    path('data-types/', DataTypeList.as_view(), name='data-types'),
+    
+    path('validate-json-file/', validate_json_file, name='validate_json_file'),
+    path('validate-json-text/', validate_json_text, name='validate_json_text'),
+
 
 
 ]

@@ -10,6 +10,9 @@ COPY . .
 # Install python dependencies
 RUN pip install -r requirements.txt
 
+# Install python-dotenv for environment variable management
+RUN pip install python-dotenv
+
 # Expose the necessary port
 EXPOSE 8000
 
