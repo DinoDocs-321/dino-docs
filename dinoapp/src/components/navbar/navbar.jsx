@@ -37,8 +37,9 @@ function DinoNavbar() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto dinonavbar-menu">
             <Nav.Link href='/homepage' className={isActive('/homepage') ? 'active' : ''}>Home</Nav.Link>
-            <Nav.Link href='/JSONEditor' className={isActive('/JSONEditor') ? 'active' : ''}>Generator</Nav.Link>
-            <Nav.Link href='/Schema-Form' className={isActive('/Schema-Form') ? 'active' : ''}>Schema</Nav.Link>
+            <Nav.Link href='/JSONEditor' className={isActive('/JSONEditor') ? 'active' : ''}>JSON Editor</Nav.Link>
+            <Nav.Link href='/generate' className={isActive('/generate') ? 'active' : ''}>AI Generator</Nav.Link>
+            <Nav.Link href='/domain-generate' className={isActive('/domain-generate') ? 'active' : ''}>Domain Generator</Nav.Link>
             <Nav.Link href='/converter' className={isActive('/converter') ? 'active' : ''}>Converter</Nav.Link>
             <Nav.Link href='/contact' className={isActive('/contact') ? 'active' : ''}>Contact</Nav.Link>
             <Nav.Link href='/About' className={isActive('/About') ? 'active' : ''}>About</Nav.Link>
