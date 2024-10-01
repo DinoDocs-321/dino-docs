@@ -1,0 +1,114 @@
+/* Main Container */
+.forgot-password-container {
+    margin-top: 50px;
+    max-width: 900px;
+  }
+
+  /* Left Column: Form and Text */
+  .left-column {
+    padding: 30px;
+  }
+
+  .back-to-login {
+    display: inline-block;
+    margin-bottom: 20px;
+    cursor: pointer;
+    color: #333; /* Dark color for text */
+  }
+
+  .bold-text {
+    font-weight: 600; /* Bold text */
+    margin-bottom: 10px;
+    font-size: 24px;
+  }
+
+  p {
+    margin-bottom: 30px;
+    color: #666; /* Gray color for subtext */
+    font-size: 16px;
+  }
+
+/* Form Controls */
+.form-control {
+    margin-bottom: 20px; /* Space below the input */
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    width: 100%; /* Full width to align with the button */
+    box-sizing: border-box; /* Ensures padding and border are included in the width */
+  }
+
+  /* Submit Button */
+  .submit-btn {
+    width: 100%; /* Full width to align with the input field */
+    background-color: #395C6B; /* Dark blue color for submit button */
+    color: #fff;
+    border: 1px solid #ddd; /* Match the border style with the input field */
+    padding: 10px; /* Match the padding with the input field */
+    font-size: 14px; /* Match the font size with the input field */
+    border-radius: 8px; /* Match the border radius with the input field */
+    margin-top: 10px; /* Space above the button */
+    cursor: pointer;
+    text-align: center; /* Center the text inside the button */
+    box-sizing: border-box; /* Ensures padding and border are included in the width */
+  }
+
+
+  .submit-btn:hover {
+    background-color: #051623; /* Slightly darker shade */
+  }
+
+  /* Divider */
+  .divider-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+  }
+
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background-color: #ddd;
+  }
+
+  .divider-text {
+    margin: 0 10px;
+    color: #888;
+    font-weight: 500;
+  }
+
+  /* Google Sign-in Button */
+  .google-signup-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+
+  .google-icon {
+    margin-right: 8px;
+  }
+
+  /* Right Column: Image */
+  .right-column {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+     /* Light background */
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  .illustration-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px; /* Rounded corners for image */
+  }

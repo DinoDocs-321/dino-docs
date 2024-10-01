@@ -12,11 +12,13 @@ import SchemaForm from './pages/SchemaForm/App';
 import SignIn from './pages/signin/signin';
 import SignUp from './pages/signup/signup'
 import SignOut from './pages/signout/signout';
-import NotFound from './pages/notfound/notfound'
+import NotFound from './pages/notfound/notfound';
 import ForgotPassword from './pages/forgetpwd/forgetpwd';
 import ResetPassword from './pages/resetpwd/resetpwd';
 import Generator from './pages/generate/generator';
 import DomainGenerate from './pages/domainGenerate/domainGenerate';
+import VerifyCode from './pages/VerifyCode/VerifyCode';
+import ResetPassword from './pages/ResetPassword/ResetPassword';
 
 function App() {
   return (
@@ -44,7 +46,8 @@ function App() {
         <Route path='/reset-password/:uidb64/:token' element={<ResetPassword />} />
         <Route path='/generate' element={<Generator />} />
         <Route path="/domain-generate" element={<DomainGenerate />} />
-
+        <Route path='/verify-code' element={<VerifyCode />} />
+        <Route path='/reset-password' element={<ResetPassword />} />
         <Route path='*' element={<NotFound />} />
       </Routes>
     </div>
