@@ -4,7 +4,6 @@ import axios from 'axios';
 import { BSON } from 'bson';
 import Form from 'react-bootstrap/Form';
 import './BSONConverter.css';
-import './converter.css';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 
