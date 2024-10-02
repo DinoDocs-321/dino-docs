@@ -14,11 +14,11 @@ import SignUp from './pages/signup/signup'
 import SignOut from './pages/signout/signout';
 import NotFound from './pages/notfound/notfound';
 import ForgotPassword from './pages/forgetpwd/forgetpwd';
-import ResetPassword from './pages/resetpwd/resetpwd';
 import Generator from './pages/generate/generator';
 import DomainGenerate from './pages/domainGenerate/domainGenerate';
 import VerifyCode from './pages/VerifyCode/VerifyCode';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
+
 
 function App() {
   return (

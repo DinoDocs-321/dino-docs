@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { BSON } from 'bson';
 import Form from 'react-bootstrap/Form';
@@ -6,16 +7,44 @@ import './BSONConverter.css';
 import './converter.css';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 
 const BSONConverter = () => {
   const [textFieldValue, setTextFieldValue] = useState('');
   const [conversionResult, setConversionResult] = useState('');
+  const location = useLocation();
+
+  // Updated function to handle a regular JSON object
+  const transformSchemaToKeyValue = (schema) => {
+    const keyValuePairs = {};
+    if (schema.properties) {
+      Object.keys(schema.properties).forEach((key) => {
+        const property = schema.properties[key];
+        // Determine the default value based on the property type
+        if (property.type === 'string') {
+          keyValuePairs[key] = ''; // Default for strings
+        } else if (property.type === 'integer') {
+          keyValuePairs[key] = 0; // Default for integers
+        } else if (property.type === 'boolean') {
+          keyValuePairs[key] = false; // Default for booleans
+        } else if (property.type === 'array') {
+          keyValuePairs[key] = []; // Default for arrays
+        } else {
+          keyValuePairs[key] = null; // Default for other types
+        }
+      });
+    }
+    return keyValuePairs;
+  };
 
   useEffect(() => {
-    const preLoadedData = '{"key": "value"}'; 
-    setTextFieldValue(preLoadedData);
-  }, []);
+    if (location.state && location.state.savedData) {
+      const transformedData = transformSchemaToKeyValue(location.state.savedData);
+      setTextFieldValue(JSON.stringify(transformedData, null, 2)); // Pretty print the JSON
+    } else {
+      const preLoadedData = '{"key": "value"}';
+      setTextFieldValue(preLoadedData);
+    }
+  }, [location.state]);
 
   const handleInputChange = (event) => {
     setTextFieldValue(event.target.value);
@@ -64,22 +93,21 @@ const BSONConverter = () => {
   return (
     <Container>
       <Row>
-    
         <Form.Group className="bsonTextField" controlId="exampleForm.ControlTextarea1">
           <Form.Control
-            as="textarea" rows={10}
+            as="textarea"
+            rows={10}
             value={textFieldValue}
             onChange={handleInputChange}
             placeholder="Enter JSON data"
           />
         </Form.Group>
-      
       </Row>
       <Row>
-      <div className="bsonbtns">
-        <button onClick={handleGenerateSave}>Save JSON Document</button>
-        <button onClick={handleGenerateBSONFile}>Generate BSON Document</button>
-      </div>
+        <div className="bsonbtns">
+          <button onClick={handleGenerateSave}>Save JSON Document</button>
+          <button onClick={handleGenerateBSONFile}>Generate BSON Document</button>
+        </div>
       {conversionResult && (
         <div className="conversionResult">
           <h3>Conversion Result (BSON as hex):</h3>
@@ -87,7 +115,6 @@ const BSONConverter = () => {
         </div>
       )}
       </Row>
-    
     </Container>
   );
 };

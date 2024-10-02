@@ -6,6 +6,41 @@ import random
 import re
 import string
 import time
+import os
+
+# Third-party imports
+import bson
+import concurrent.futures
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from openai import OpenAI
+import bson
+from dino import settings
+from reactapi.models import JSONData
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from openai import OpenAI
+from dotenv import load_dotenv
+
+# Django imports
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.files.storage import default_storage
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils import timezone
 from datetime import datetime, timedelta, timezone
 
 # Third-party imports
@@ -31,6 +66,30 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+
+# Local application imports
+from .serializers import UserSerializer
+from .mongodb_utils import get_collection
+
+# Load environment variables
+load_dotenv()
+from django.contrib.auth import get_user_model
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.core.mail import send_mail
+import random
+import string
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth.models import User
+from pymongo import MongoClient
+from datetime import datetime, timedelta, timezone
+import random
+import string
+import logging
 # REST framework imports
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -107,9 +166,6 @@ class LogoutView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class ForgotPasswordRequest(APIView):
-    permission_classes = [AllowAny]
-
 # forgot password functionality veiw
 
 
@@ -157,10 +213,6 @@ class ForgotPasswordView(APIView):
             return Response({'message': 'Reset code sent to email'}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Failed to send email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-class ResetPasswordConfirm(APIView):
-    permission_classes = [AllowAny]
 
 
 class VerifyCodeView(APIView):
@@ -224,14 +276,6 @@ class ResetPasswordView(APIView):
 
 # ----------------------------
 # ----- JSON/BSON Views ------
-# ------- save-json views ---------
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
-from .mongodb_utils import get_collection
-from django.utils import timezone
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def save_user_schema(request):
@@ -258,11 +302,6 @@ def save_user_schema(request):
     else:
         return Response({'error': 'Failed to save schema'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# ----------------------------
-# ----- JSON/BSON Views ------
-
-
-# create your views here
 class ConvertJsonToBson(APIView):
     def post(self, request):
         try:
@@ -314,21 +353,6 @@ class ConvertBsonToJson(APIView):
 
 # ------------------------------
 # ----- Schema Form Views ------
-
-# Initialize logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-import time
-
-def handle_rate_limit_error(e):
-    try:
-        retry_after = float(re.search(r'try again in (\d+\.?\d*)s', str(e)).group(1))
-        logging.info(f"Rate limit reached. Retrying in {retry_after} seconds.")
-        time.sleep(retry_after)
-    except Exception as parse_error:
-        logging.error(f"Error parsing retry time: {parse_error}")
-        time.sleep(5)  # Default wait time if parsing fails
-
 def generate_single_document(schema):
     prompt = f"""
     Generate a valid, unique sample JSON document based on the following schema: {json.dumps(schema)}.
@@ -367,10 +391,6 @@ Ensure that:
             logging.error(f"Failed to parse JSON: {decode_error}")
             raise Exception("Failed to parse generated JSON document.")
 
-    # except openai.error.RateLimitError as e:
-    #     logging.error(f"Error generating document: {e}")
-    #     handle_rate_limit_error(e)
-    #     raise Exception(f"Rate limit hit. Retrying after pause.")
     except Exception as e:
         logging.error(f"Error generating document: {str(e)}")
         raise Exception(f"Error generating document: {str(e)}")
@@ -449,12 +469,6 @@ DATA_TYPES = [
     {"value": "array", "label": "Array", "type": "array"}
 ]
 
-def map_data_type(value):
-    for data_type in DATA_TYPES:
-        if data_type["value"] == value:
-            return data_type
-    return None  # Return None if nothing is matched
-
 class DataTypeList(APIView):
     """
     Handle GET requests to return the available data types to the frontend.
@@ -505,50 +519,36 @@ class GenerateDocumentView(APIView):
 # ------- .Generate Views -------
 # ------------------------------
 
-
-
 # ------------------------------
 # ----- JSON Validation Views --
-from django.views.decorators.csrf import csrf_exempt
-
-@csrf_exempt
-def validate_json_file(request):
-    if request.method == 'POST':
-        json_file = request.FILES.get('file')  # Retrieve the uploaded file
-        if not json_file:
-            return JsonResponse({'status': 'error', 'message': 'No file uploaded'}, status=400)
+class ValidateJsonFileView(APIView):
+    def post(self, request):
+        file = request.FILES.get('file')
+        if not file:
+            return Response({'status': 'error', 'message': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            file_content = json_file.read().decode('utf-8')  # Read and decode the file content
+            file_content = file.read().decode('utf-8')  # Read and decode the file content
             json.loads(file_content)  # Attempt to parse it as JSON
-            return JsonResponse({'status': 'success', 'message': 'Valid JSON file'}, status=200)
+            return Response({'status': 'success', 'message': 'Valid JSON file'}, status=status.HTTP_200_OK)
         except json.JSONDecodeError:
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON file'}, status=400)
+            return Response({'status': 'error', 'message': 'Invalid JSON file'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': f'Error processing file: {str(e)}'}, status=500)
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+            return Response({'status': 'error', 'message': f'Error processing file: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@csrf_exempt
-def validate_json_text(request):
-    if request.method == 'POST':
+class ValidateJsonTextView(APIView):
+    def post(self, request):
+        json_text = request.data.get('jsonText')
+        if not json_text:
+            return Response({'status': 'error', 'message': 'No JSON text provided'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            body = json.loads(request.body)  # Parse the request body as JSON
-            json_text = body.get('jsonText')  # Get the JSON text from the request
-            if not json_text:
-                return JsonResponse({'status': 'error', 'message': 'No JSON text provided'}, status=400)
-
             json.loads(json_text)  # Attempt to parse it as JSON
-            return JsonResponse({'status': 'success', 'message': 'Valid JSON text'}, status=200)
+            return Response({'status': 'success', 'message': 'Valid JSON text'}, status=status.HTTP_200_OK)
         except json.JSONDecodeError:
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON text'}, status=400)
+            return Response({'status': 'error', 'message': 'Invalid JSON text'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': f'Error processing request: {str(e)}'}, status=500)
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+            return Response({'status': 'error', 'message': f'Error processing request: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # ----- .JSON Validation Views --
 # ------------------------------
-
-    except Exception as e:
-        logging.error(f"Failed to generate documents: {str(e)}")
-        return JsonResponse({'error': str(e)}, status=500)
-

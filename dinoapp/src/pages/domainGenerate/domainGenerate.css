@@ -26,6 +26,16 @@
   position: relative; /* Added for positioning of the file input */
   transition: border-color 0.3s ease; /* Smooth transition for border color */
 }
+.upload-box.file-drop-area {
+  border: 2px dashed #ccc; /* Default border */
+  padding: 20px;
+  text-align: center;
+}
+
+.upload-box.file-drop-area.dropped {
+  border-color: #3f51b5; /* Change border color on drop */
+  background-color: #f0f0f0; /* Optional background color */
+}
 
 .file-drop-area {
   cursor: pointer; /* Change cursor to pointer for better UX */

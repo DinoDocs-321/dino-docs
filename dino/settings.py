@@ -185,7 +185,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'dinoapp/build/static'),
+    os.path.join(BASE_DIR, 'dinoapp/src/assets'),
 )
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
