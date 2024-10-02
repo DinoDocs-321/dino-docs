@@ -3,6 +3,7 @@
 .env
 .DS_Store
 
+
 # ignore ALL files in ANY directory named temp
 venv/
 dino/__pycache__
@@ -14,7 +15,6 @@ generator/__pycache__
 generator/migrations/__pycache__
 supervisord.pid
 generator/__pycache__
-
-# adding a comment
-dinoDB/migrations/__pycache__/__init__.cpython-311.pyc
+.idea
+.vscode/w
 node_modules
