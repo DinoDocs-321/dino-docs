@@ -3,11 +3,12 @@ import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { BSON } from 'bson';
 import Form from 'react-bootstrap/Form';
+import './BSONConverter.css';
 import './converter.css';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 
-const Converter = () => {
+const BSONConverter = () => {
   const [textFieldValue, setTextFieldValue] = useState('');
   const [conversionResult, setConversionResult] = useState('');
   const location = useLocation();
@@ -118,4 +119,4 @@ const Converter = () => {
   );
 };
 
-export default Converter;
+export default BSONConverter;

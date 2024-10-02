@@ -1,9 +1,10 @@
-# views.py
-
 # Standard library imports
 import json
 import logging
+import os
+import random
 import re
+import string
 import time
 import os
 
@@ -40,8 +41,30 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils import timezone
+from datetime import datetime, timedelta, timezone
+
+# Third-party imports
+import bson
+import concurrent.futures
+from dotenv import load_dotenv
+from pymongo import MongoClient
+import logging
+
+# Django imports
+from django.conf import settings
+from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
+from django.db import connections
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 
 # Local application imports
@@ -67,8 +90,21 @@ from datetime import datetime, timedelta, timezone
 import random
 import string
 import logging
+# REST framework imports
+from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+
+# Local application imports
 from .email_service import send_verification_email  # Import your utility function
-from django.conf import settings
+from .serializers import UserSerializer
+from reactapi.models import JSONData
+from openai import OpenAI
+
+# Load environment variables
+load_dotenv()
 
 
 # Set OpenAI API key
@@ -290,6 +326,30 @@ class ConvertJsonToBson(APIView):
 
 # ----- .JSON/BSON Views ------
 # ----------------------------
+class ConvertBsonToJson(APIView):
+    def post(self, reuqest):
+        try:
+            #Parsing BSON data from the request body 
+            request_data = bson.loads(request.body.decode('utf-8'))
+            bson_str = request_data.get('bson_data')
+
+            if not bson_str:
+                return HttpResponseBadRequest("No BSON data provided")
+
+
+            bson_data = bytes.fromhex(bson_str)
+            json_data = bson.BSON.decode(bson_data)
+
+            return JsonResponse({'converted_data': json_data})
+
+        except bson.errors.InvalidBSON:
+            return HttpResponseBadRequest("Invalid BSON data")    
+        except json.JSONDecodeError:
+            return HttpResponseBadRequest("Invalid request format")
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))
+
+
 
 # ------------------------------
 # ----- Schema Form Views ------

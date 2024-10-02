@@ -16,5 +16,5 @@ generator/migrations/__pycache__
 supervisord.pid
 generator/__pycache__
 .idea
-.vscode/w
+.vscode/
 node_modules
