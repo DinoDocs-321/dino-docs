@@ -329,7 +329,7 @@ class ConvertJsonToBson(APIView):
 class ConvertBsonToJson(APIView):
     def post(self, reuqest):
         try:
-            #Parsing BSON data from the request body 
+            #Parsing BSON data from the request body
             request_data = bson.loads(request.body.decode('utf-8'))
             bson_str = request_data.get('bson_data')
 
@@ -343,7 +343,7 @@ class ConvertBsonToJson(APIView):
             return JsonResponse({'converted_data': json_data})
 
         except bson.errors.InvalidBSON:
-            return HttpResponseBadRequest("Invalid BSON data")    
+            return HttpResponseBadRequest("Invalid BSON data")
         except json.JSONDecodeError:
             return HttpResponseBadRequest("Invalid request format")
         except Exception as e:

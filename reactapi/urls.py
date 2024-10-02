@@ -17,13 +17,16 @@ urlpatterns = [
 
     path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
     path('verify-code/', VerifyCodeView.as_view(), name = "verify_code"),
+    path('reset-password/', ResetPasswordView.as_view(), name = "reset-password"),
     path('convert/', ConvertJsonToBson.as_view(), name='convert-json-schema-to-bson'),
     path('save-schema/', save_user_schema, name='save-schema'),
+
+
 
     #Generator paths
     path('data-types/', DataTypeList.as_view(), name='data-types'),
     path('generate-documents/', GenerateDocumentView.as_view(), name='generate_documents'),
-    
+
     path('validate-json-file/', ValidateJsonTextView.as_view(), name='validate_json_file'),
     path('validate-json-text/', ValidateJsonTextView.as_view(), name='validate_json_text'),
 
