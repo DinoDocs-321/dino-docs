@@ -100,6 +100,25 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
 
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'DELETE',
+    'OPTIONS'
+]
+
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'authorization',
+    'x-requested-with',
+    'accept',
+    'origin',
+    'user-agent',
+    'x-csrf-token'
+]
+
+
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -182,9 +201,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'apikey'  # This is the SendGrid username
-EMAIL_HOST_PASSWORD = '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'  # Replace with your SendGrid API key
-DEFAULT_FROM_EMAIL = 'contact@sohamverma.com'
+EMAIL_HOST = 'smtp.sendgrid.net'  # SendGrid SMTP server
+EMAIL_PORT = 587  # TLS uses port 587
+EMAIL_USE_TLS = True  # Enable TLS
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = os.getenv("SENDGRID_API_KEY", "")
+DEFAULT_FROM_EMAIL = 'dinodocs@mail.com'

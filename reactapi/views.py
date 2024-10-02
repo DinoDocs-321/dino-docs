@@ -12,6 +12,15 @@ import bson
 import concurrent.futures
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from openai import OpenAI
+import bson
+from dino import settings
+from reactapi.models import JSONData
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -31,6 +40,9 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils import timezone
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+
 
 # Local application imports
 from .serializers import UserSerializer
@@ -38,6 +50,26 @@ from .mongodb_utils import get_collection
 
 # Load environment variables
 load_dotenv()
+from django.contrib.auth import get_user_model
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.core.mail import send_mail
+import random
+import string
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth.models import User
+from pymongo import MongoClient
+from datetime import datetime, timedelta, timezone
+import random
+import string
+import logging
+from .email_service import send_verification_email  # Import your utility function
+from django.conf import settings
+
 
 # Set OpenAI API key
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -98,47 +130,110 @@ class LogoutView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class ForgotPasswordRequest(APIView):
-    permission_classes = [AllowAny]
+# forgot password functionality veiw
 
+
+# Setup logger
+logger = logging.getLogger(__name__)
+client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
+db = client[settings.DATABASES['default']['NAME']]
+reset_codes_collection = db['password_reset_codes']
+
+class ForgotPasswordView(APIView):
     def post(self, request):
+        # Get the email from the request
         email = request.data.get('email')
+
+        # Check if email is provided
+        if not email:
+            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if a user exists with the provided email
         try:
             user = User.objects.get(email=email)
-            token = PasswordResetTokenGenerator().make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-
-            # You should configure your email settings in settings.py for this to work.
-            mail_subject = 'Password Reset Request'
-            message = render_to_string('password_reset_email.html', {
-                'user': user,
-                'domain': 'localhost:3000',  # Your frontend domain
-                'uid': uid,
-                'token': token,
-            })
-            send_mail(mail_subject, message, 'contact@sohamverma.com', [email])
-
-            return Response({'message': 'Password reset email sent'}, status=status.HTTP_200_OK)
-
         except User.DoesNotExist:
-            return Response({'error': 'Email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-class ResetPasswordConfirm(APIView):
-    permission_classes = [AllowAny]
+        # Generate a random 6-digit reset code
+        code = ''.join(random.choices(string.digits, k=6))
 
-    def post(self, request, uidb64, token):
+        # MongoDB connection and insertion
         try:
-            uid = force_str(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(pk=uid)
-            if PasswordResetTokenGenerator().check_token(user, token):
-                new_password = request.data.get('password')
-                user.set_password(new_password)
-                user.save()
-                return Response({'message': 'Password reset successful'}, status=status.HTTP_200_OK)
-            else:
-                return Response({'error': 'Token is invalid or expired'}, status=status.HTTP_400_BAD_REQUEST)
+            # Insert reset code into MongoDB
+            reset_codes_collection.insert_one({
+                'user_id': str(user.id),
+                'email': email,
+                'code': code,
+                'created_at': datetime.now(timezone.utc),
+                'expires_at': datetime.now(timezone.utc) + timedelta(minutes=15)
+            })
+        except Exception as e:
+            # Log the error and return 500 Internal Server Error
+            logger.error(f"Error saving reset code: {str(e)}")
+            return Response({'error': f'Error saving reset code: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Send the email with the reset code using the utility function from email_service.py
+        if send_verification_email(to_email=email, verification_code=code):
+            return Response({'message': 'Reset code sent to email'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Failed to send email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class VerifyCodeView(APIView):
+    def post(self, request):
+        code = request.data.get('code')
+
+        logging.info(f"Received verification code: {code}")
+
+        if not code:
+            return Response({'error': 'Verification code is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        # Find the reset code document without requiring the email
+        reset_code = reset_codes_collection.find_one({
+            'code': code,
+            'expires_at': {'$gt': datetime.now(timezone.utc)}
+        })
+
+        if reset_code:
+            # If found, return the associated email
+            return Response({
+                'message': 'Code verified successfully',
+                'email': reset_code['email']
+            }, status=status.HTTP_200_OK)
+
+        return Response({'error': 'Invalid or expired code'}, status=status.HTTP_400_BAD_REQUEST)
+
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from django.contrib.auth import get_user_model
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from datetime import datetime
+
+User = get_user_model()
+
+class ResetPasswordView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        new_password = request.data.get('new_password')
+
+        if not email or not new_password:
+            return Response({'error': 'Invalid request. Missing required fields.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+            user.set_password(new_password)
+            user.save()
+
+            return Response({'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
+
         except User.DoesNotExist:
-            return Response({'error': 'Invalid user'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# ----------------------------------------------------------------------------------------------------------------
 
 # ----- .Login/Signup Views ------
 # -------------------------------
