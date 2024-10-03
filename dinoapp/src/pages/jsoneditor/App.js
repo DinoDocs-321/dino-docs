@@ -8,7 +8,6 @@ import addIcon from '../../assets/add.png';
 const JSONEditor = () => {
   // The JSON schema provided by the user
   const initialJSONData = {
-    "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "title": "User",
     "description": "A schema representing a user in the system.",
@@ -71,19 +70,16 @@ const JSONEditor = () => {
                 "description": "The postal code part of the user's address.",
                 "pattern": "^[0-9]{5}(-[0-9]{4})?$"
               }
-            },
-            "required": ["street", "city", "state", "postalCode"]
+            }
           }
-        },
-        "required": ["firstName", "lastName"]
+        }
       },
       "createdAt": {
         "type": "string",
         "format": "date-time",
         "description": "The date and time when the user was created."
       }
-    },
-    "required": ["id", "username", "email", "password", "profile", "createdAt"]
+    }
   };
 
   // Helper function to generate unique IDs
