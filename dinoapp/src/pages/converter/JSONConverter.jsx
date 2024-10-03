@@ -73,7 +73,7 @@ const JSONConverter = () => {
     }
 
     return (
-        <div className='container'>
+        <div className='newContainer'>
             <div className="explanation">
                 <p>Convert your Base64 BSON Binary into JSON</p>
                 <p><strong>Small sample input:</strong> DwAAABBCbGFoAAEAAAAA</p>
