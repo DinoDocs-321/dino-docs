@@ -171,7 +171,7 @@ const DomainGenerate = () => {
     }
   };
 
-  const handleValidateJSONInput = () => {
+  const handleValidateJSONText = () => {
     validateJsonText();
   };
 
@@ -416,7 +416,7 @@ const DomainGenerate = () => {
           onChange={(e) => setJsonText(e.target.value)}
           placeholder="Paste your JSON here..."
         />
-        <button onClick={handleValidateJSONInput}>Validate JSON Text</button>
+        <button onClick={handleValidateJSONText}>Validate JSON Text</button>
         {message && <p className="message">{message}</p>}
       </div>
 
