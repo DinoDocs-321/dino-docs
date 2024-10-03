@@ -4,9 +4,14 @@ import './JSONEditor.css';
 import binIcon from '../../assets/bin.png';
 import arrowsIcon from '../../assets/arrows.png';
 import addIcon from '../../assets/add.png';
+import { useLocation } from 'react-router-dom';
 
 const JSONEditor = () => {
   // The JSON schema provided by the user
+  const location = useLocation();
+  const { savedData } = location.state || {};
+  console.log("Received savedData:", savedData);
+
   const initialJSONData = {
     "type": "object",
     "title": "User",
@@ -82,6 +87,9 @@ const JSONEditor = () => {
     }
   };
 
+  const defaultJSONData = savedData || initialJSONData; // Update this line to use savedData
+  console.log("Default Form Data:", defaultJSONData);
+
   // Helper function to generate unique IDs
   const generateId = () => {
     return Date.now() + Math.random();
@@ -90,7 +98,6 @@ const JSONEditor = () => {
   // Function to convert JSON data to formData structure
   const convertJSONToFormData = (json) => {
     const formData = [];
-
     const parseObject = (obj) => {
       const result = [];
       Object.entries(obj).forEach(([key, value]) => {
@@ -119,8 +126,6 @@ const JSONEditor = () => {
     return formData;
   };
 
-  // Initialize formData by converting the initial JSON data
-  const initialFormData = convertJSONToFormData(initialJSONData);
 
   const transformFormData = (data) => {
     const result = {};
@@ -151,9 +156,10 @@ const JSONEditor = () => {
 
     return result;
   };
-
+  
+  const initialFormData = convertJSONToFormData(defaultJSONData);
+  const [jsonCode, setJSONCode] = useState(savedData ? JSON.stringify(savedData, null, 2) : "");
   const [formData, setFormData] = useState(initialFormData);
-  const [jsonCode, setJSONCode] = useState(JSON.stringify(initialJSONData, null, 2));
   const [isValidJson, setIsValidJson] = useState(true);
 
   // Ref to track if jsonCode was changed from the Code Editor
@@ -179,6 +185,15 @@ const JSONEditor = () => {
       setJSONCode(JSON.stringify(transformFormData(formData), null, 2));
     }
   }, [formData]);
+
+  useEffect(() => {
+    if (savedData) {
+      console.log("Saved Data:", savedData);
+      setJSONCode(JSON.stringify(savedData, null, 2)); // Ensure it's a string with formatting
+      const updatedFormData = convertJSONToFormData(savedData); // Use savedData here
+      setFormData(updatedFormData);
+    }
+  }, [savedData]);
 
   const addField = (rowIndex, parentId) => {
     const newField = { id: generateId(), label: '', value: '', type: 'Text' };
