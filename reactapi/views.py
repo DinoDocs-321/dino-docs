@@ -7,6 +7,7 @@ import re
 import string
 import time
 import os
+from urllib import request
 
 # Third-party imports
 import bson
@@ -14,7 +15,6 @@ import concurrent.futures
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from openai import OpenAI
 import bson
 from dino import settings
 from reactapi.models import JSONData
@@ -28,7 +28,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from openai import OpenAI
 from dotenv import load_dotenv
 
 # Django imports
@@ -101,10 +100,14 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .email_service import send_verification_email  # Import your utility function
 from .serializers import UserSerializer
 from reactapi.models import JSONData
-from openai import OpenAI
+
 
 # Load environment variables
 load_dotenv()
+
+#OpenAI imports
+import openai
+from openai import OpenAI
 
 
 # Set OpenAI API key
@@ -171,8 +174,8 @@ class LogoutView(APIView):
 
 # Setup logger
 logger = logging.getLogger(__name__)
-client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
-db = client[settings.DATABASES['default']['NAME']]
+client_mongo = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
+db = client_mongo[settings.DATABASES['default']['NAME']]
 reset_codes_collection = db['password_reset_codes']
 
 class ForgotPasswordView(APIView):
