@@ -131,26 +131,17 @@ const DomainGenerate = () => {
   };
 
   const validateJsonText = async () => {
-    if (!jsonText) {
+    if (!jsonText.trim()) {
       setMessage('Please enter JSON text to validate.');
       return;
     }
+
     try {
       const response = await axios.post('http://localhost:8000/api/validate-json-text/', { jsonText });
       setMessage(response.data.message);
     } catch (error) {
       console.error(error);
-      
-      if (error.response) {
-        // Server responded with a status other than 2xx
-        setMessage('Error validating JSON text: ' + (error.response.data?.message || 'Unknown error from server'));
-      } else if (error.request) {
-        // Request was made but no response was received
-        setMessage('Error validating JSON text: No response from server.');
-      } else {
-        // Other errors (e.g., issue with setting up request)
-        setMessage('Error validating JSON text: ' + error.message);
-      }
+      setMessage('Error validating JSON text: ' + (error.response?.data?.message || error.message));
     }
   };
 
