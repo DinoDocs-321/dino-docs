@@ -196,22 +196,24 @@ const JSONEditor = () => {
       return;
     }
 
-    const addFieldToGroup = (group) => {
-      if (group.id === parentId && group.type === 'Group') {
-        group.inner.push(newField);
-      } else if (group.inner) {
-        group.inner.forEach(addFieldToGroup);
+    const addFieldToGroup = (field) => {
+      if (field.id === parentId && field.type === 'Group') {
+        return {
+          ...field,
+          inner: [...field.inner, newField],
+        };
+      } else if (field.type === 'Group' && field.inner) {
+        return {
+          ...field,
+          inner: field.inner.map(addFieldToGroup),
+        };
       }
+      return field;
     };
 
     const updatedRows = formData.map((row, index) => {
       if (index === rowIndex) {
-        return row.map((field) => {
-          if (field.id === parentId && field.type === 'Group') {
-            addFieldToGroup(field);
-          }
-          return field;
-        });
+        return row.map(addFieldToGroup);
       }
       return row;
     });
@@ -220,18 +222,21 @@ const JSONEditor = () => {
   };
 
   const deleteField = (id) => {
-    const deleteFromGroup = (group) => {
-      if (group.inner) {
-        group.inner = group.inner.filter((innerField) => innerField.id !== id);
-        group.inner.forEach(deleteFromGroup);
+    const deleteFromGroup = (field) => {
+      if (field.id === id) {
+        return null; // Mark field for removal
       }
+      if (field.type === 'Group' && field.inner) {
+        const updatedInner = field.inner
+          .map(deleteFromGroup)
+          .filter(Boolean); // Remove null entries
+        return { ...field, inner: updatedInner };
+      }
+      return field;
     };
 
     const updatedRows = formData
-      .map((row) => {
-        row.forEach(deleteFromGroup);
-        return row.filter((field) => field.id !== id);
-      })
+      .map((row) => row.map(deleteFromGroup).filter(Boolean))
       .filter((row) => row.length > 0);
 
     setFormData(updatedRows);
@@ -239,58 +244,42 @@ const JSONEditor = () => {
 
   const handleInputChange = (e, id) => {
     const updatedRows = formData.map((row) => {
-      return row.map((field) => {
-        if (field.id === id) {
-          return { ...field, value: e.target.value };
-        } else if (field.type === 'Group' && field.inner) {
-          const updatedInner = updateFieldInGroup(field.inner, id, e.target.value);
-          return { ...field, inner: updatedInner };
-        }
-        return field;
-      });
+      return row.map((field) => updateFieldValue(field, id, e.target.value));
     });
 
     setFormData(updatedRows);
+  };
+
+  const updateFieldValue = (field, id, newValue) => {
+    if (field.id === id) {
+      return { ...field, value: newValue };
+    } else if (field.type === 'Group' && field.inner) {
+      return {
+        ...field,
+        inner: field.inner.map((innerField) => updateFieldValue(innerField, id, newValue)),
+      };
+    }
+    return field;
   };
 
   const handleLabelChange = (e, id) => {
     const updatedRows = formData.map((row) => {
-      return row.map((field) => {
-        if (field.id === id) {
-          return { ...field, label: e.target.value };
-        } else if (field.type === 'Group' && field.inner) {
-          const updatedInner = updateLabelInGroup(field.inner, id, e.target.value);
-          return { ...field, inner: updatedInner };
-        }
-        return field;
-      });
+      return row.map((field) => updateFieldLabel(field, id, e.target.value));
     });
 
     setFormData(updatedRows);
   };
 
-  const updateFieldInGroup = (innerFields, id, newValue) => {
-    return innerFields.map((innerField) => {
-      if (innerField.id === id) {
-        return { ...innerField, value: newValue };
-      } else if (innerField.type === 'Group' && innerField.inner) {
-        const updatedInner = updateFieldInGroup(innerField.inner, id, newValue);
-        return { ...innerField, inner: updatedInner };
-      }
-      return innerField;
-    });
-  };
-
-  const updateLabelInGroup = (innerFields, id, newLabel) => {
-    return innerFields.map((innerField) => {
-      if (innerField.id === id) {
-        return { ...innerField, label: newLabel };
-      } else if (innerField.type === 'Group' && innerField.inner) {
-        const updatedInner = updateLabelInGroup(innerField.inner, id, newLabel);
-        return { ...innerField, inner: updatedInner };
-      }
-      return innerField;
-    });
+  const updateFieldLabel = (field, id, newLabel) => {
+    if (field.id === id) {
+      return { ...field, label: newLabel };
+    } else if (field.type === 'Group' && field.inner) {
+      return {
+        ...field,
+        inner: field.inner.map((innerField) => updateFieldLabel(innerField, id, newLabel)),
+      };
+    }
+    return field;
   };
 
   const generateJSONData = () => {
@@ -307,10 +296,11 @@ const JSONEditor = () => {
     const newGroup = {
       id: generateId(),
       type: 'Group',
+      label: 'newGroup',
       inner: [
         {
           id: generateId(),
-          label: 'group-label',
+          label: 'property',
           value: '',
           type: 'Text',
         },
