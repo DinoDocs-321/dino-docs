@@ -7,6 +7,7 @@ import re
 import string
 import time
 import os
+import copy
 from urllib import request
 
 # Third-party imports
@@ -400,45 +401,51 @@ def generate_single_document(schema):
         logging.error(f"Error generating document: {str(e)}")
         raise Exception(f"Error generating document: {str(e)}")
 
-def generate_documents(schema: dict, num_docs: int = 1, start_value: int = 1):
-    """Generates multiple unique documents by making parallel API calls and counts successes and failures."""
-    generated_documents = []
-    retries = 3
-    success_count = 0
-    failure_count = 0
-    current_value = start_value
+def update_schema(schema, auto_increment_values):
+    """
+    Update schema with the current values for autoIncrement fields.
+    """
+    # Make a copy of the schema to avoid changing the original
+    updated_schema = copy.deepcopy(schema)
 
-    while len(generated_documents) < num_docs and retries > 0:
-        remaining_docs = num_docs - len(generated_documents)
+    # Go through each property in the schema
+    for key, value in updated_schema.get("properties", {}).items():
+        # If it's an autoIncrement field, set the start value
+        if value.get("dataType") == "autoIncrement":
+            if key not in auto_increment_values:
+                auto_increment_values[key] = value.get("startValue", 1)  # Set start value if not already set
+            value["startValue"] = auto_increment_values[key]
+
+        # If it's an object, update its properties (recursive call)
+        if value.get("type") == "object":
+            value["properties"] = update_schema(value, auto_increment_values).get("properties", {})
+
+    return updated_schema
+
+def generate_documents(schema, num_docs=1):
+    """
+    Generates multiple unique documents.
+    """
+    generated_documents = []
+    auto_increment_values = {}  # Track the current value of each autoIncrement field
+
+    for i in range(num_docs):
+        # Update schema with the current values for autoIncrement fields
+        updated_schema = update_schema(schema, auto_increment_values)
 
         try:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-                futures = [
-                    executor.submit(generate_single_document, {**schema, "currentValue": current_value + i})
-                    for i in range(remaining_docs)
-                ]
-                current_value += remaining_docs
+            # Simulate the generation of a document using the updated schema
+            document = generate_single_document(updated_schema)
+            generated_documents.append(document)
 
-                for future in concurrent.futures.as_completed(futures):
-                    try:
-                        document = future.result()
-                        generated_documents.append(document)
-                        success_count += 1
-                        logging.info(f"Successfully generated document: {document}")
-                    except Exception as e:
-                        logging.error(f"Error generating document: {e}")
-                        failure_count += 1
-                        retries -= 1
-                        if retries == 0:
-                            logging.error(f"Max retries reached. Could not generate document.")
-                        else:
-                            logging.info(f"Retrying... {retries} retries left.")
-                        continue
+            # Increment auto-increment values for the next document
+            for key in auto_increment_values:
+                auto_increment_values[key] += 1
 
         except Exception as e:
-            logging.error(f"Error in batch generation: {e}")
+            print(f"Error generating document: {e}")
 
-    return generated_documents, success_count, failure_count
+    return generated_documents
 
 
 # ----- .Schema Form Views ------

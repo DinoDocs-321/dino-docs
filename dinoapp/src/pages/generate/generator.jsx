@@ -197,24 +197,28 @@ function Generator() {
         });
         return properties;
     }
-
+    
     function processField(field) {
         var dataTypeInfo = mapDataType(field.dataType);
         if (!dataTypeInfo) {
             console.warn('Data type "' + field.dataType + '" not found.');
             return {};
         }
-
+    
         var schemaField = {
             type: dataTypeInfo.type,
             description: field.description || '',
             dataType: field.dataType, // Include dataType in the schema for autoIncrement handling
         };
-
+    
+        if (field.dataType === 'autoIncrement') {
+            schemaField.startValue = parseInt(field.description, 10); // Set start value if autoIncrement
+        }
+    
         if (dataTypeInfo.format) {
             schemaField.format = dataTypeInfo.format;
         }
-
+    
         // Include additional attributes
         var fieldAttributes = field.attributes || {};
         for (var attr in fieldAttributes) {
@@ -227,15 +231,15 @@ function Generator() {
                 }
             }
         }
-
+    
         if (dataTypeInfo.type === 'object' && field.properties && field.properties.length > 0) {
             schemaField.properties = buildProperties(field.properties);
         }
-
+    
         if (dataTypeInfo.type === 'array' && field.items) {
             schemaField.items = processField(field.items);
         }
-
+    
         return schemaField;
     }
 
