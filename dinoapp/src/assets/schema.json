@@ -1,0 +1,27 @@
+{
+  "name": "John Doe",
+  "age": 30,
+  "email": "john.doe@example.com",
+  "address": {
+    "street": "123 Elm Street",
+    "city": "Springfield",
+    "state": "IL",
+    "zip": "62701"
+  },
+  "phone_numbers": [
+    {
+      "type": "home",
+      "number": "555-1234"
+    },
+    {
+      "type": "work",
+      "number": "555-5678"
+    }
+  ],
+  "active": true,
+  "registration_date": "2024-09-19",
+  "preferences": {
+    "newsletter": true,
+    "notifications": false
+  }
+}

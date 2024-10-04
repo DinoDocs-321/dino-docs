@@ -1,0 +1,39 @@
+{
+  "domain": {
+    "entities": [
+      {
+        "name": "Student",
+        "attributes": {
+          "id": "string",
+          "name": "string",
+          "age": "integer",
+          "enrollmentDate": "date",
+          "courses": [
+            {
+              "courseId": "string",
+              "grade": "string"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Teacher",
+        "attributes": {
+          "id": "string",
+          "name": "string",
+          "subject": "string",
+          "hireDate": "date"
+        }
+      },
+      {
+        "name": "Course",
+        "attributes": {
+          "id": "string",
+          "title": "string",
+          "credits": "integer",
+          "teacherId": "string"
+        }
+      }
+    ]
+  }
+}

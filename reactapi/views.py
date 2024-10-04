@@ -359,13 +359,13 @@ class ConvertBsonToJson(APIView):
 def generate_single_document(schema):
     prompt = f"""
     Generate a valid, unique sample JSON document based on the following schema: {json.dumps(schema)}.
-Ensure that:
-1. All fields, such as names, addresses, phone numbers, dates, and any other attributes, are randomly generated and unique across multiple samples.
-2. Avoid using common or placeholder names such as 'John Doe' or 'Jane Smith.' Instead, generate names from diverse cultures (e.g., East Asian, South Asian, European, African, and Latin American names).
-3. Generate diverse and realistic addresses from different countries and regions, ensuring that postal codes, states, and cities are coherent and vary in each sample.
-4. All dates are formatted properly (e.g., ISO 8601 format) and are plausible within a recent timeframe (e.g., within the past 10 years).
-5. The document must strictly follow the schema and be output in valid JSON format without any extra text or explanations.
-"""
+    Ensure that:
+    1. All fields, such as names, addresses, phone numbers, dates, and any other attributes, are randomly generated and unique across multiple samples.
+    2. Avoid using common or placeholder names such as 'John Doe' or 'Jane Smith.' Instead, generate names from diverse cultures (e.g., East Asian, South Asian, European, African, and Latin American names).
+    3. Generate diverse and realistic addresses from different countries and regions, ensuring that postal codes, states, and cities are coherent and vary in each sample.
+    4. All dates are formatted properly (e.g., ISO 8601 format) and are plausible within a recent timeframe (e.g., within the past 10 years).
+    5. The document must strictly follow the schema and be output in valid JSON format without any extra text or explanations.
+    """
 
     try:
         response = client.chat.completions.create(
