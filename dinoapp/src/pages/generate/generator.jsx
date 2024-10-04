@@ -1,3 +1,4 @@
+//generator.jsx
 import './generator.css';
 import React, { useState, useEffect, useReducer } from 'react';
 import axios from 'axios';
@@ -10,7 +11,7 @@ function Generator() {
     // State variables for schema
     const [schemaTitle, setSchemaTitle] = useState('');
     const [schemaDescription, setSchemaDescription] = useState('');
-    const [numSamples, setNumSamples] = useState(10); // Default number of samples is 10
+    const [numSamples, setNumSamples] = useState(3); // Default number of samples is 3
     const [response, setResponse] = useState(null);
 
     // State variable for data types
@@ -244,63 +245,48 @@ function Generator() {
         return foundType || null;
     }
 
-    // Function to handle drag and drop
-    function handleDragStart(e, index, parentField) {
-        if (parentField === undefined) parentField = null;
-        e.dataTransfer.setData(
-            'text/plain',
-            JSON.stringify({ index: index, parentFieldId: parentField ? parentField.id : null })
-        );
-    }
+    // // Function to handle drag and drop
+    // function handleDragStart(e, index, parentField) {
+    //     if (parentField === undefined) parentField = null;
+    //     e.dataTransfer.setData(
+    //         'text/plain',
+    //         JSON.stringify({ index: index, parentFieldId: parentField ? parentField.id : null })
+    //     );
+    // }
 
-    function handleDragOver(e) {
-        e.preventDefault();
-    }
+    // function handleDragOver(e) {
+    //     e.preventDefault();
+    // }
 
-    function handleDrop(e, dropIndex, parentField) {
-        if (parentField === undefined) parentField = null;
-        e.preventDefault();
-        var data = JSON.parse(e.dataTransfer.getData('text/plain'));
-        var dragIndex = data.index;
-        var parentFieldId = data.parentFieldId;
+    // function handleDrop(e, dropIndex, parentField) {
+    //     if (parentField === undefined) parentField = null;
+    //     e.preventDefault();
+    //     var data = JSON.parse(e.dataTransfer.getData('text/plain'));
+    //     var dragIndex = data.index;
+    //     var parentFieldId = data.parentFieldId;
 
-        if (parentField && parentFieldId === parentField.id) {
-            var propertiesCopy = parentField.properties.slice();
-            var movedField = propertiesCopy.splice(dragIndex, 1)[0];
-            propertiesCopy.splice(dropIndex, 0, movedField);
-            dispatch({
-                type: 'UPDATE_FIELD',
-                fieldId: parentField.id,
-                key: 'properties',
-                value: propertiesCopy,
-            });
-        } else if (!parentField && !parentFieldId) {
-            var fieldsCopy = fields.slice();
-            var movedField = fieldsCopy.splice(dragIndex, 1)[0];
-            fieldsCopy.splice(dropIndex, 0, movedField);
-            dispatch({ type: 'REORDER_FIELDS', newOrder: fieldsCopy });
-        }
-    }
+    //     if (parentField && parentFieldId === parentField.id) {
+    //         var propertiesCopy = parentField.properties.slice();
+    //         var movedField = propertiesCopy.splice(dragIndex, 1)[0];
+    //         propertiesCopy.splice(dropIndex, 0, movedField);
+    //         dispatch({
+    //             type: 'UPDATE_FIELD',
+    //             fieldId: parentField.id,
+    //             key: 'properties',
+    //             value: propertiesCopy,
+    //         });
+    //     } else if (!parentField && !parentFieldId) {
+    //         var fieldsCopy = fields.slice();
+    //         var movedField = fieldsCopy.splice(dragIndex, 1)[0];
+    //         fieldsCopy.splice(dropIndex, 0, movedField);
+    //         dispatch({ type: 'REORDER_FIELDS', newOrder: fieldsCopy });
+    //     }
+    // }
 
     // Main component render
     return (
         <div>
             <h1>Data Generator</h1>
-            <div className="schema-info">
-                <input
-                    type="text"
-                    placeholder="Schema Title"
-                    value={schemaTitle}
-                    onChange={(e) => setSchemaTitle(e.target.value)}
-                />
-                <input
-                    type="text"
-                    placeholder="Schema Description"
-                    value={schemaDescription}
-                    onChange={(e) => setSchemaDescription(e.target.value)}
-                />
-            </div>
-
             <div className="sample-count">
                 <label>Number of Samples:</label>
                 <input
@@ -309,6 +295,14 @@ function Generator() {
                     onChange={(e) => setNumSamples(parseInt(e.target.value) || 1)}
                     min="1"
                     step="1"
+                />
+            </div>
+            <div className="schema-title">
+                <label>Schema Title:</label>
+                <input
+                    type="text"
+                    value={schemaTitle}
+                    onChange={(e) => setSchemaTitle(e.target.value)}
                 />
             </div>
 
@@ -324,6 +318,7 @@ function Generator() {
                     </ul>
                 </div>
             )}
+
             <div className="fields-container">
                 {fields.map((field, index) => (
                     <Field
@@ -333,9 +328,9 @@ function Generator() {
                         dataTypes={dataTypes}
                         dispatch={dispatch}
                         onRemove={() => dispatch({ type: 'REMOVE_FIELD', fieldId: field.id })}
-                        handleDragStart={handleDragStart}
-                        handleDragOver={handleDragOver}
-                        handleDrop={handleDrop}
+                        parentField={null}
+                        fields={fields} // Pass fields
+                        getUniqueId={getUniqueId} // Pass getUniqueId
                     />
                 ))}
             </div>
@@ -345,6 +340,16 @@ function Generator() {
             <button type="button" onClick={handleSubmit}>
                 Submit
             </button>
+
+            <div className="prompt-container">
+                <input
+                    type="text"
+                    placeholder="Schema Description"
+                    value={schemaDescription}
+                    onChange={(e) => setSchemaDescription(e.target.value)}
+                />
+            </div>
+
             {response && (
                 <div className="response">
                     <h3>Response from Server:</h3>

@@ -359,12 +359,14 @@ class ConvertBsonToJson(APIView):
 def generate_single_document(schema):
     prompt = f"""
     Generate a valid, unique sample JSON document based on the following schema: {json.dumps(schema)}.
+    Use the currentValue: {schema.get("currentValue", 1)} for autoIncrement fields.
     Ensure that:
     1. All fields, such as names, addresses, phone numbers, dates, and any other attributes, are randomly generated and unique across multiple samples.
     2. Avoid using common or placeholder names such as 'John Doe' or 'Jane Smith.' Instead, generate names from diverse cultures (e.g., East Asian, South Asian, European, African, and Latin American names).
     3. Generate diverse and realistic addresses from different countries and regions, ensuring that postal codes, states, and cities are coherent and vary in each sample.
     4. All dates are formatted properly (e.g., ISO 8601 format) and are plausible within a recent timeframe (e.g., within the past 10 years).
     5. The document must strictly follow the schema and be output in valid JSON format without any extra text or explanations.
+    6. If the description field mentions 'unique', than for every document generated, that property MUST be unique in respect to the other generated documents.'
     """
 
     try:
@@ -398,19 +400,25 @@ def generate_single_document(schema):
         logging.error(f"Error generating document: {str(e)}")
         raise Exception(f"Error generating document: {str(e)}")
 
-def generate_documents(schema: dict, num_docs: int = 1):
+def generate_documents(schema: dict, num_docs: int = 1, start_value: int = 1):
     """Generates multiple unique documents by making parallel API calls and counts successes and failures."""
     generated_documents = []
     retries = 3
     success_count = 0
     failure_count = 0
+    current_value = start_value
 
     while len(generated_documents) < num_docs and retries > 0:
         remaining_docs = num_docs - len(generated_documents)
 
         try:
             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-                futures = [executor.submit(generate_single_document, schema) for _ in range(remaining_docs)]
+                futures = [
+                    executor.submit(generate_single_document, {**schema, "currentValue": current_value + i})
+                    for i in range(remaining_docs)
+                ]
+                current_value += remaining_docs
+
                 for future in concurrent.futures.as_completed(futures):
                     try:
                         document = future.result()
@@ -431,6 +439,7 @@ def generate_documents(schema: dict, num_docs: int = 1):
             logging.error(f"Error in batch generation: {e}")
 
     return generated_documents, success_count, failure_count
+
 
 # ----- .Schema Form Views ------
 # ------------------------------

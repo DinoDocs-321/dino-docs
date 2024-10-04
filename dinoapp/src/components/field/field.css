@@ -1,0 +1,38 @@
+/* General field container */
+.field {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column; /* Align fields vertically within the main field container */
+}
+
+/* Field Content container for each row */
+.field-content {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Adjust spacing between elements for better alignment */
+    flex-wrap: nowrap; /* Prevent wrapping of elements within the row */
+}
+
+/* Input group for each input field, ensuring vertical alignment */
+.field-input-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Allow equal space for each input field */
+    min-width: 150px;
+}
+
+.field-input-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Scrollable container for nested fields */
+.nested-fields-container {
+    padding: 10px;
+    border-left: 3px solid #ccc; /* Visual separation for nested fields */
+    margin-top: 10px;
+    margin-left: 35px; /* Indent nested properties */
+    display: flex;
+    flex-direction: column; /* Stack nested fields vertically */
+    gap: 10px; /* Space between nested fields */
+}
