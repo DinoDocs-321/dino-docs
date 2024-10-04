@@ -44,16 +44,16 @@ function DinoNavbar() {
             <Nav.Link href='/contact' className={isActive('/contact') ? 'active' : ''}>Contact</Nav.Link>
             <Nav.Link href='/About' className={isActive('/About') ? 'active' : ''}>About</Nav.Link>
           </Nav>
-          <div className="d-flex align-items-center">
+          <div className="d-flex align-items-center justify-content-center">
             {isAuthenticated ? (
-              <>
+              <React.Fragment>
                 <Button variant="link" className="me-2" onClick={handleSignOut}>Sign Out</Button>
-              </>
+              </React.Fragment>
             ) : (
-              <>
-                <Button variant="link" className="me-2" onClick={() => navigate('/signin')}>Login</Button>
-                <Button variant="primary" className="me-3" onClick={() => navigate('/signup')}>Sign up for free</Button>
-              </>
+              <React.Fragment>
+                <Button variant="link" className="" onClick={() => navigate('/signin')}>Login</Button>
+                <Button variant="primary" className="" onClick={() => navigate('/signup')}>Sign up for free</Button>
+              </React.Fragment>
             )}
           </div>
         </Navbar.Collapse>
