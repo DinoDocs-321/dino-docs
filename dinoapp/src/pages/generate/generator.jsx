@@ -1,20 +1,15 @@
-// generator.jsx
-
 import './generator.css';
 import React, { useState, useEffect, useReducer } from 'react';
 import axios from 'axios';
+import Field from '../../components/field/field'; // Import Field component from components folder
 
-// Unique ID generator
-let uniqueId = 0;
-function getUniqueId() {
-    return ++uniqueId;
-}
+// Unique ID generator to fix issues with object property's input boxes losing focus
+import { getUniqueId } from '../../utils/uniqueID'; // Import getUniqueId function
 
 function Generator() {
-    // State variables for schema details
+    // State variables for schema
     const [schemaTitle, setSchemaTitle] = useState('');
     const [schemaDescription, setSchemaDescription] = useState('');
-    const [format, setFormat] = useState('json');
     const [numSamples, setNumSamples] = useState(10); // Default number of samples is 10
     const [response, setResponse] = useState(null);
 
@@ -25,7 +20,7 @@ function Generator() {
     const [errors, setErrors] = useState([]);
 
     // Fetch data types from the API when the component mounts
-    useEffect(function() {
+    useEffect(() => {
         async function fetchDataTypes() {
             try {
                 const response = await axios.get('http://127.0.0.1:8000/api/data-types/');
@@ -37,48 +32,65 @@ function Generator() {
         fetchDataTypes();
     }, []);
 
-    // Reducer for managing fields
     function fieldsReducer(state, action) {
         switch (action.type) {
+            // To add a new, blank field
             case 'ADD_FIELD':
-                return [
-                    ...state,
-                    {
-                        id: getUniqueId(),
-                        keyTitle: '',
-                        dataType: '',
-                        description: '',
-                        attributes: {},
-                        properties: [],
-                        items: null,
-                    },
-                ];
+                var newField = {
+                    id: getUniqueId(),
+                    keyTitle: '',
+                    dataType: '',
+                    description: '', // Used for 'Start Value' in autoIncrement
+                    attributes: {},
+                    properties: [],
+                    items: null,
+                };
+                return state.concat([newField]);
+
+            // To remove a field
             case 'REMOVE_FIELD':
-                return state.filter(field => field.id !== action.fieldId);
+                return state.filter((field) => field.id !== action.fieldId);
+
+            // To update a field
             case 'UPDATE_FIELD':
-                return state.map(field => updateField(field, action));
+                return state.map((field) => {
+                    return updateField(field, action);
+                });
+
+            // To update the fields' new order
+            case 'REORDER_FIELDS':
+                return action.newOrder;
+
+            // Default case
             default:
                 return state;
         }
     }
 
+    // Function to update fields
     function updateField(field, action) {
         if (field.id === action.fieldId) {
-            return { ...field, [action.key]: action.value };
+            var newField = Object.assign({}, field);
+            newField[action.key] = action.value;
+            return newField;
         } else {
-            let updatedField = field;
+            var updatedField = field;
+
             if (field.properties && field.properties.length > 0) {
-                updatedField = {
-                    ...field,
-                    properties: field.properties.map(prop => updateField(prop, action)),
-                };
+                updatedField = Object.assign({}, field, {
+                    properties: field.properties.map((prop) => {
+                        return updateField(prop, action);
+                    }),
+                });
             }
+
+            // Update for arrays
             if (field.items) {
-                updatedField = {
-                    ...field,
+                updatedField = Object.assign({}, updatedField, {
                     items: updateField(field.items, action),
-                };
+                });
             }
+
             return updatedField;
         }
     }
@@ -89,8 +101,16 @@ function Generator() {
     async function handleSubmit(event) {
         event.preventDefault();
 
-        // Validate fields
+        // Input validation handling
         const validationErrors = [];
+        // Validate schema title and description
+        if (!schemaTitle.trim()) {
+            validationErrors.push('Schema Title is required.');
+        }
+        if (!schemaDescription.trim()) {
+            validationErrors.push('Schema Description is required.');
+        }
+
         validateFields(fields, validationErrors);
 
         if (validationErrors.length > 0) {
@@ -113,7 +133,7 @@ function Generator() {
 
         const dataToSend = {
             schema: schemaData, // This should be the complete schema object
-            format: format,
+            format: 'json', // Hardcoded to 'json'
             num_samples: numSamples,
         };
 
@@ -125,7 +145,7 @@ function Generator() {
                     'Content-Type': 'application/json',
                 },
             });
-    
+
             console.log('Response from server:', result.data);
             setResponse(result.data);
         } catch (error) {
@@ -134,14 +154,28 @@ function Generator() {
     }
 
     // Function to validate fields recursively
-    function validateFields(fields, errors, parentKey = '') {
-        fields.forEach(field => {
-            const fieldPath = parentKey ? `${parentKey} > ${field.keyTitle || 'Unnamed Field'}` : field.keyTitle || 'Unnamed Field';
+    function validateFields(fields, errors, parentKey, rowNumber) {
+        if (parentKey === undefined) parentKey = '';
+        if (rowNumber === undefined) rowNumber = 1;
+
+        fields.forEach((field, index) => {
+            var fieldPath = parentKey ? parentKey + ' > Row ' + (index + 1) : 'Row ' + (index + 1);
+            // Validate keyTitle
             if (!field.keyTitle) {
-                errors.push(`Key Title is required for field "${fieldPath}".`);
+                errors.push('Key Title is required for ' + fieldPath + '.');
+            } else if (/\s/.test(field.keyTitle)) {
+                errors.push('Key Title cannot contain spaces in ' + fieldPath + '.');
             }
             if (!field.dataType) {
-                errors.push(`Data Type is required for field "${fieldPath}".`);
+                errors.push('Data Type is required for ' + fieldPath + '.');
+            }
+            // Validate 'Start Value' for autoIncrement
+            if (field.dataType === 'autoIncrement') {
+                if (!field.description || field.description.trim() === '') {
+                    errors.push('Start Value is required for ' + fieldPath + ' (autoIncrement).');
+                } else if (isNaN(field.description)) {
+                    errors.push('Start Value must be a number in ' + fieldPath + ' (autoIncrement).');
+                }
             }
             if (field.dataType === 'object' && field.properties) {
                 validateFields(field.properties, errors, fieldPath);
@@ -154,8 +188,8 @@ function Generator() {
 
     // Function to build properties recursively
     function buildProperties(fields) {
-        const properties = {};
-        fields.forEach(field => {
+        var properties = {};
+        fields.forEach((field) => {
             if (field.keyTitle && field.dataType) {
                 properties[field.keyTitle] = processField(field);
             }
@@ -164,15 +198,16 @@ function Generator() {
     }
 
     function processField(field) {
-        const dataTypeInfo = mapDataType(field.dataType);
+        var dataTypeInfo = mapDataType(field.dataType);
         if (!dataTypeInfo) {
-            console.warn(`Data type "${field.dataType}" not found.`);
+            console.warn('Data type "' + field.dataType + '" not found.');
             return {};
         }
 
-        const schemaField = {
+        var schemaField = {
             type: dataTypeInfo.type,
             description: field.description || '',
+            dataType: field.dataType, // Include dataType in the schema for autoIncrement handling
         };
 
         if (dataTypeInfo.format) {
@@ -180,9 +215,11 @@ function Generator() {
         }
 
         // Include additional attributes
-        for (const [attr, value] of Object.entries(field.attributes || {})) {
+        var fieldAttributes = field.attributes || {};
+        for (var attr in fieldAttributes) {
+            var value = fieldAttributes[attr];
             if (value !== '') {
-                if (['minLength', 'maxLength', 'minimum', 'maximum'].includes(attr)) {
+                if (['minLength', 'maxLength', 'minimum', 'maximum'].indexOf(attr) !== -1) {
                     schemaField[attr] = parseInt(value, 10);
                 } else {
                     schemaField[attr] = value;
@@ -203,10 +240,46 @@ function Generator() {
 
     // Function to map data type value to its info
     function mapDataType(value) {
-        var foundType = dataTypes.find(function(dataType) {
-            return dataType.value === value;
-        });
+        var foundType = dataTypes.find((dataType) => dataType.value === value);
         return foundType || null;
+    }
+
+    // Function to handle drag and drop
+    function handleDragStart(e, index, parentField) {
+        if (parentField === undefined) parentField = null;
+        e.dataTransfer.setData(
+            'text/plain',
+            JSON.stringify({ index: index, parentFieldId: parentField ? parentField.id : null })
+        );
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+    }
+
+    function handleDrop(e, dropIndex, parentField) {
+        if (parentField === undefined) parentField = null;
+        e.preventDefault();
+        var data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        var dragIndex = data.index;
+        var parentFieldId = data.parentFieldId;
+
+        if (parentField && parentFieldId === parentField.id) {
+            var propertiesCopy = parentField.properties.slice();
+            var movedField = propertiesCopy.splice(dragIndex, 1)[0];
+            propertiesCopy.splice(dropIndex, 0, movedField);
+            dispatch({
+                type: 'UPDATE_FIELD',
+                fieldId: parentField.id,
+                key: 'properties',
+                value: propertiesCopy,
+            });
+        } else if (!parentField && !parentFieldId) {
+            var fieldsCopy = fields.slice();
+            var movedField = fieldsCopy.splice(dragIndex, 1)[0];
+            fieldsCopy.splice(dropIndex, 0, movedField);
+            dispatch({ type: 'REORDER_FIELDS', newOrder: fieldsCopy });
+        }
     }
 
     // Main component render
@@ -218,39 +291,25 @@ function Generator() {
                     type="text"
                     placeholder="Schema Title"
                     value={schemaTitle}
-                    onChange={function(e) {
-                        setSchemaTitle(e.target.value);
-                    }}
+                    onChange={(e) => setSchemaTitle(e.target.value)}
                 />
                 <input
                     type="text"
                     placeholder="Schema Description"
                     value={schemaDescription}
-                    onChange={function(e) {
-                        setSchemaDescription(e.target.value);
-                    }}
+                    onChange={(e) => setSchemaDescription(e.target.value)}
                 />
             </div>
 
-            {/* Input for Number of Samples */}
             <div className="sample-count">
                 <label>Number of Samples:</label>
                 <input
                     type="number"
                     value={numSamples}
-                    onChange={e => setNumSamples(parseInt(e.target.value) || 1)}
+                    onChange={(e) => setNumSamples(parseInt(e.target.value) || 1)}
                     min="1"
                     step="1"
                 />
-            </div>
-
-            {/* Output Format Selection */}
-            <div className="output-format">
-                <label>Output Format:</label>
-                <select value={format} onChange={e => setFormat(e.target.value)}>
-                    <option value="json">JSON</option>
-                    <option value="bson">BSON</option>
-                </select>
             </div>
 
             {errors.length > 0 && (
@@ -266,155 +325,32 @@ function Generator() {
                 </div>
             )}
             <div className="fields-container">
-                {fields.map(field => (
+                {fields.map((field, index) => (
                     <Field
                         key={field.id}
                         field={field}
+                        index={index}
                         dataTypes={dataTypes}
                         dispatch={dispatch}
                         onRemove={() => dispatch({ type: 'REMOVE_FIELD', fieldId: field.id })}
+                        handleDragStart={handleDragStart}
+                        handleDragOver={handleDragOver}
+                        handleDrop={handleDrop}
                     />
                 ))}
             </div>
             <button type="button" onClick={() => dispatch({ type: 'ADD_FIELD' })}>
                 Add Property
             </button>
-            <button type="button" onClick={handleSubmit}>Submit</button>
+            <button type="button" onClick={handleSubmit}>
+                Submit
+            </button>
             {response && (
                 <div className="response">
                     <h3>Response from Server:</h3>
                     <pre>{JSON.stringify(response, null, 2)}</pre>
                 </div>
             )}
-        </div>
-    );
-}
-
-// Field component
-function Field(props) {
-    const { field, dataTypes, dispatch, onRemove } = props;
-
-    const handleChange = (key, value) => {
-        dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, key, value });
-    };
-
-    const addNestedField = () => {
-        const newField = {
-            id: getUniqueId(),
-            keyTitle: '',
-            dataType: '',
-            description: '',
-            attributes: {},
-            properties: [],
-            items: null,
-        };
-        dispatch({
-            type: 'UPDATE_FIELD',
-            fieldId: field.id,
-            key: 'properties',
-            value: [...(field.properties || []), newField],
-        });
-    };
-
-    const removeNestedField = (nestedFieldId) => {
-        dispatch({
-            type: 'UPDATE_FIELD',
-            fieldId: field.id,
-            key: 'properties',
-            value: field.properties.filter(f => f.id !== nestedFieldId),
-        });
-    };
-
-    const addArrayItem = () => {
-        const newItem = {
-            id: getUniqueId(),
-            keyTitle: '',
-            dataType: '',
-            description: '',
-            attributes: {},
-            properties: [],
-            items: null,
-        };
-        dispatch({
-            type: 'UPDATE_FIELD',
-            fieldId: field.id,
-            key: 'items',
-            value: newItem,
-        });
-    };
-
-    const removeArrayItem = () => {
-        dispatch({
-            type: 'UPDATE_FIELD',
-            fieldId: field.id,
-            key: 'items',
-            value: null,
-        });
-    };
-
-    return (
-        <div className="field" style={{ marginLeft: '20px', borderLeft: '1px solid #ccc', paddingLeft: '10px' }}>
-            <select value={field.dataType} onChange={e => handleChange('dataType', e.target.value)}>
-                <option value="">Select Data Type</option>
-                {dataTypes.map(type => (
-                    <option key={type.value} value={type.value}>
-                        {type.label}
-                    </option>
-                ))}
-            </select>
-            <input
-                type="text"
-                placeholder="Key Title"
-                value={field.keyTitle}
-                onChange={e => handleChange('keyTitle', e.target.value)}
-            />
-            <input
-                type="text"
-                placeholder="Description"
-                value={field.description}
-                onChange={e => handleChange('description', e.target.value)}
-            />
-
-            {/* Handle nested objects */}
-            {field.dataType === 'object' && (
-                <div style={{ marginTop: '10px' }}>
-                    <button type="button" onClick={addNestedField}>
-                        Add Nested Property
-                    </button>
-                    {field.properties && field.properties.map(propField => (
-                        <Field
-                            key={propField.id}
-                            field={propField}
-                            dataTypes={dataTypes}
-                            dispatch={dispatch}
-                            onRemove={() => removeNestedField(propField.id)}
-                        />
-                    ))}
-                </div>
-            )}
-
-            {/* Handle arrays */}
-            {field.dataType === 'array' && (
-                <div style={{ marginTop: '10px' }}>
-                    <h4>Array Items:</h4>
-                    {field.items ? (
-                        <Field
-                            field={field.items}
-                            dataTypes={dataTypes}
-                            dispatch={dispatch}
-                            onRemove={removeArrayItem}
-                        />
-                    ) : (
-                        <button type="button" onClick={addArrayItem}>
-                            Add Array Item
-                        </button>
-                    )}
-                </div>
-            )}
-
-            <button type="button" onClick={onRemove}>
-                Remove
-            </button>
         </div>
     );
 }
