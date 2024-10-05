@@ -7,6 +7,7 @@ import re
 import string
 import time
 import os
+import copy
 from urllib import request
 
 # Third-party imports
@@ -359,12 +360,14 @@ class ConvertBsonToJson(APIView):
 def generate_single_document(schema):
     prompt = f"""
     Generate a valid, unique sample JSON document based on the following schema: {json.dumps(schema)}.
+    Use the currentValue: {schema.get("currentValue", 1)} for autoIncrement fields.
     Ensure that:
     1. All fields, such as names, addresses, phone numbers, dates, and any other attributes, are randomly generated and unique across multiple samples.
     2. Avoid using common or placeholder names such as 'John Doe' or 'Jane Smith.' Instead, generate names from diverse cultures (e.g., East Asian, South Asian, European, African, and Latin American names).
     3. Generate diverse and realistic addresses from different countries and regions, ensuring that postal codes, states, and cities are coherent and vary in each sample.
     4. All dates are formatted properly (e.g., ISO 8601 format) and are plausible within a recent timeframe (e.g., within the past 10 years).
     5. The document must strictly follow the schema and be output in valid JSON format without any extra text or explanations.
+    6. If the description field mentions 'unique', than for every document generated, that property MUST be unique in respect to the other generated documents.'
     """
 
     try:
@@ -398,39 +401,52 @@ def generate_single_document(schema):
         logging.error(f"Error generating document: {str(e)}")
         raise Exception(f"Error generating document: {str(e)}")
 
-def generate_documents(schema: dict, num_docs: int = 1):
-    """Generates multiple unique documents by making parallel API calls and counts successes and failures."""
-    generated_documents = []
-    retries = 3
-    success_count = 0
-    failure_count = 0
+def update_schema(schema, auto_increment_values):
+    """
+    Update schema with the current values for autoIncrement fields.
+    """
+    # Make a copy of the schema to avoid changing the original
+    updated_schema = copy.deepcopy(schema)
 
-    while len(generated_documents) < num_docs and retries > 0:
-        remaining_docs = num_docs - len(generated_documents)
+    # Go through each property in the schema
+    for key, value in updated_schema.get("properties", {}).items():
+        # If it's an autoIncrement field, set the start value
+        if value.get("dataType") == "autoIncrement":
+            if key not in auto_increment_values:
+                auto_increment_values[key] = value.get("startValue", 1)  # Set start value if not already set
+            value["startValue"] = auto_increment_values[key]
+
+        # If it's an object, update its properties (recursive call)
+        if value.get("type") == "object":
+            value["properties"] = update_schema(value, auto_increment_values).get("properties", {})
+
+    return updated_schema
+
+def generate_documents(schema, num_docs=1):
+    """
+    Generates multiple unique documents.
+    """
+    generated_documents = []
+    auto_increment_values = {}  # Track the current value of each autoIncrement field
+
+    for i in range(num_docs):
+        # Update schema with the current values for autoIncrement fields
+        updated_schema = update_schema(schema, auto_increment_values)
 
         try:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-                futures = [executor.submit(generate_single_document, schema) for _ in range(remaining_docs)]
-                for future in concurrent.futures.as_completed(futures):
-                    try:
-                        document = future.result()
-                        generated_documents.append(document)
-                        success_count += 1
-                        logging.info(f"Successfully generated document: {document}")
-                    except Exception as e:
-                        logging.error(f"Error generating document: {e}")
-                        failure_count += 1
-                        retries -= 1
-                        if retries == 0:
-                            logging.error(f"Max retries reached. Could not generate document.")
-                        else:
-                            logging.info(f"Retrying... {retries} retries left.")
-                        continue
+            # Simulate the generation of a document using the updated schema
+            document = generate_single_document(updated_schema)
+            generated_documents.append(document)
+
+            # Increment auto-increment values for the next document
+            for key in auto_increment_values:
+                auto_increment_values[key] += 1
 
         except Exception as e:
-            logging.error(f"Error in batch generation: {e}")
+            print(f"Error generating document: {e}")
 
-    return generated_documents, success_count, failure_count
+    return generated_documents
+
 
 # ----- .Schema Form Views ------
 # ------------------------------

@@ -1,5 +1,7 @@
+// field.jsx
 import React from 'react';
-import { getUniqueId } from '../../utils/uniqueID'; // Import getUniqueId function
+import './field.css';
+import { getUniqueId } from '../../utils/uniqueID';
 
 function Field(props) {
     const {
@@ -9,9 +11,8 @@ function Field(props) {
         dispatch,
         onRemove,
         parentField,
-        handleDragStart,
-        handleDragOver,
-        handleDrop,
+        fields, // Add fields prop
+        getUniqueId, // Add getUniqueId prop
     } = props;
 
     function handleChange(key, value) {
@@ -72,50 +73,106 @@ function Field(props) {
         });
     }
 
+    // Drag-and-Drop Handlers
+    function handleDragStart(e) {
+        e.dataTransfer.setData(
+            'text/plain',
+            JSON.stringify({ fieldId: field.id, parentFieldId: parentField ? parentField.id : null })
+        );
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        const draggedFieldId = data.fieldId;
+        const draggedParentFieldId = data.parentFieldId;
+
+        if (parentField && draggedParentFieldId === parentField.id) {
+            // Rearranging within the same parent field
+            const propertiesCopy = [...parentField.properties];
+            const dragIndex = propertiesCopy.findIndex(f => f.id === draggedFieldId);
+            const dropIndex = propertiesCopy.findIndex(f => f.id === field.id);
+
+            if (dragIndex !== -1 && dropIndex !== -1 && dragIndex !== dropIndex) {
+                const movedField = propertiesCopy.splice(dragIndex, 1)[0];
+                propertiesCopy.splice(dropIndex, 0, movedField);
+                dispatch({
+                    type: 'UPDATE_FIELD',
+                    fieldId: parentField.id,
+                    key: 'properties',
+                    value: propertiesCopy,
+                });
+            }
+        } else if (!parentField && !draggedParentFieldId) {
+            // Rearranging at the root level
+            const fieldsCopy = [...fields];
+            const dragIndex = fieldsCopy.findIndex(f => f.id === draggedFieldId);
+            const dropIndex = fieldsCopy.findIndex(f => f.id === field.id);
+
+            if (dragIndex !== -1 && dropIndex !== -1 && dragIndex !== dropIndex) {
+                const movedField = fieldsCopy.splice(dragIndex, 1)[0];
+                fieldsCopy.splice(dropIndex, 0, movedField);
+                dispatch({ type: 'REORDER_FIELDS', newOrder: fieldsCopy });
+            }
+        }
+    }
+
     return (
         <div
             className="field"
-            style={{ marginLeft: '20px', borderLeft: '1px solid #ccc', paddingLeft: '10px' }}
             draggable
-            onDragStart={(e) => handleDragStart(e, index, parentField)}
+            onDragStart={handleDragStart}
             onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, index, parentField)}
+            onDrop={handleDrop}
         >
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Row {index + 1}</span>
-                <select
-                    value={field.dataType}
-                    onChange={(e) => handleChange('dataType', e.target.value)}
-                >
-                    <option value="">Select Data Type</option>
-                    {dataTypes.map((type) => (
-                        <option key={type.value} value={type.value}>
-                            {type.label}
-                        </option>
-                    ))}
-                </select>
-                <input
-                    type="text"
-                    placeholder="Key Title"
-                    value={field.keyTitle}
-                    onChange={(e) => handleChange('keyTitle', e.target.value)}
-                />
-                {/* Conditional rendering of 'Start Value' or 'Description' */}
-                {field.dataType === 'autoIncrement' ? (
-                    <input
-                        type="number"
-                        placeholder="Start Value"
-                        value={field.description}
-                        onChange={(e) => handleChange('description', e.target.value)}
-                    />
-                ) : (
+            {/* Field content */}
+            <div className="field-content">
+                <label>Row {index + 1}</label>
+                <div className="field-input-group">
+                    <label>Data Type</label>
+                    <select
+                        value={field.dataType}
+                        onChange={(e) => handleChange('dataType', e.target.value)}
+                    >
+                        <option value="">Select Data Type</option>
+                        {dataTypes.map((type) => (
+                            <option key={type.value} value={type.value}>
+                                {type.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="field-input-group">
+                    <label>Key Title</label>
                     <input
                         type="text"
-                        placeholder="Description"
-                        value={field.description}
-                        onChange={(e) => handleChange('description', e.target.value)}
+                        placeholder="Key Title"
+                        value={field.keyTitle}
+                        onChange={(e) => handleChange('keyTitle', e.target.value)}
                     />
-                )}
+                </div>
+                <div className="field-input-group">
+                    <label>Description</label>
+                    {field.dataType === 'autoIncrement' ? (
+                        <input
+                            type="number"
+                            placeholder="Start Value"
+                            value={field.description}
+                            onChange={(e) => handleChange('description', e.target.value)}
+                        />
+                    ) : (
+                        <input
+                            type="text"
+                            placeholder="Description"
+                            value={field.description}
+                            onChange={(e) => handleChange('description', e.target.value)}
+                        />
+                    )}
+                </div>
                 <button type="button" onClick={onRemove} style={{ marginLeft: 'auto' }}>
                     &times;
                 </button>
@@ -123,10 +180,7 @@ function Field(props) {
 
             {/* Handle nested objects */}
             {field.dataType === 'object' && (
-                <div style={{ marginTop: '10px' }}>
-                    <button type="button" onClick={addNestedField}>
-                        Add Nested Property
-                    </button>
+                <div className="nested-fields-container">
                     {field.properties &&
                         field.properties.map((propField, idx) => (
                             <Field
@@ -137,11 +191,14 @@ function Field(props) {
                                 dispatch={dispatch}
                                 onRemove={() => removeNestedField(propField.id)}
                                 parentField={field}
-                                handleDragStart={handleDragStart}
-                                handleDragOver={handleDragOver}
-                                handleDrop={handleDrop}
+                                fields={fields}
+                                getUniqueId={getUniqueId}
                             />
                         ))}
+
+                    <button type="button" onClick={addNestedField}>
+                        Add Nested Property
+                    </button>
                 </div>
             )}
 
@@ -152,9 +209,13 @@ function Field(props) {
                     {field.items ? (
                         <Field
                             field={field.items}
+                            index={0}
                             dataTypes={dataTypes}
                             dispatch={dispatch}
                             onRemove={removeArrayItem}
+                            parentField={field}
+                            fields={fields}
+                            getUniqueId={getUniqueId}
                         />
                     ) : (
                         <button type="button" onClick={addArrayItem}>
