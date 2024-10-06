@@ -41,6 +41,7 @@ function DinoNavbar() {
             <Nav.Link href='/generate' className={isActive('/generate') ? 'active' : ''}>AI Generator</Nav.Link>
             <Nav.Link href='/domain-generate' className={isActive('/domain-generate') ? 'active' : ''}>Domain Generator</Nav.Link>
             <Nav.Link href='/converter' className={isActive('/converter') ? 'active' : ''}>Converter</Nav.Link>
+            <Nav.Link href='/docs' className={isActive('/docs') ? 'active' : ''}>Docs</Nav.Link>
             <Nav.Link href='/contact' className={isActive('/contact') ? 'active' : ''}>Contact</Nav.Link>
             <Nav.Link href='/About' className={isActive('/About') ? 'active' : ''}>About</Nav.Link>
           </Nav>
