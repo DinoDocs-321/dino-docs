@@ -165,14 +165,14 @@ const TableOfContents = () => {
     <div className="table-of-contents">
       <h2>Table of Contents</h2>
       <ol>
-        <li><a href="#introduction">1. Introduction</a></li>
-        <li><a href="#ai-schemas">2. AI-Generated Schemas</a></li>
-        <li><a href="#domain-schemas">3. User-Specified Domain Schemas</a></li>
-        <li><a href="#supported-data-types">4. Supported Data Types</a></li>
-        <li><a href="#best-practices">5. Best Practices</a></li>
-        <li><a href="#example-schema">6. Example Schema</a></li>
-        <li><a href="#resources">7. Resources</a></li>
-        <li><a href="#conclusion">8. Conclusion</a></li>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#ai-schemas">AI-Generated Schemas</a></li>
+        <li><a href="#domain-schemas">User-Specified Domain Schemas</a></li>
+        <li><a href="#supported-data-types">Supported Data Types</a></li>
+        <li><a href="#best-practices">Best Practices</a></li>
+        <li><a href="#example-schema">Example Schema</a></li>
+        <li><a href="#resources">Resources</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
       </ol>
     </div>
   );
