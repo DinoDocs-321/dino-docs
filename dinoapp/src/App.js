@@ -18,6 +18,8 @@ import Generator from './pages/generate/generator';
 import DomainGenerate from './pages/domainGenerate/domainGenerate';
 import VerifyCode from './pages/VerifyCode/VerifyCode';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
+import DocsPage from './pages/docs/DocsPage';
+import JSONSchemaDocs from'./pages/docs/JSONSchemaDocs'; 
 
 
 function App() {
@@ -48,6 +50,8 @@ function App() {
         <Route path="/domain-generate" element={<DomainGenerate />} />
         <Route path='/verify-code' element={<VerifyCode />} />
         <Route path='/reset-password' element={<ResetPassword />} />
+        <Route path='/docs' element={<DocsPage />} />
+        <Route path='/jsonschema-docs' element={<JSONSchemaDocs />} />
         <Route path='*' element={<NotFound />} />
       </Routes>
     </div>
