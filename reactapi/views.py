@@ -14,7 +14,7 @@ from urllib import request
 import bson
 import concurrent.futures
 from dotenv import load_dotenv
-import openai
+from openai import OpenAI
 from pymongo import MongoClient
 
 # Django imports
@@ -52,7 +52,7 @@ from reactapi.models import JSONData
 load_dotenv()
 
 # Initialize OpenAI client
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -277,7 +277,7 @@ def generate_single_document(schema):
     """
 
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4-turbo",
             messages=[
                 {"role": "system", "content": "You are a JSON document generator."},
