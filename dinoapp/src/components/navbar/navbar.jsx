@@ -45,7 +45,7 @@ function DinoNavbar() {
             <Nav.Link href='/contact' className={isActive('/contact') ? 'active' : ''}>Contact</Nav.Link>
             <Nav.Link href='/About' className={isActive('/About') ? 'active' : ''}>About</Nav.Link>
           </Nav>
-          <div className="d-flex align-items-center justify-content-center">
+          <div className="d-flex align-items-center justify-content-center" style={{gap: 25 + 'px'}}>
             {isAuthenticated ? (
               <React.Fragment>
                 <Button variant="link" className="me-2" onClick={handleSignOut}>Sign Out</Button>

@@ -229,8 +229,7 @@ def save_user_schema(request):
     else:
         return Response({'error': 'Failed to save schema'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
+"""
 class ConvertJsonToBson(APIView):
     def post(self, request):
         try:
@@ -269,6 +268,39 @@ class ConvertBsonToJson(APIView):
             return HttpResponseBadRequest("Invalid request format")
         except Exception as e:
             return HttpResponseBadRequest(str(e))
+
+
+"""
+
+
+@api_view(['POST'])
+def convert(request):
+    try:
+        data = request.data.get('data', '')
+        file_type = request.data.get('fileType', 'json')
+
+        if file_type == 'json':
+            # Convert JSON to BSON
+            json_data = json.loads(data)
+            bson_data = bson.BSON.encode(json_data)
+            # Return the BSON data as a base64-encoded string or hex for easier display
+            converted_data = bson_data.hex()  # For display in the frontend
+            return JsonResponse({'converted_data': converted_data}, status=200)
+        
+        elif file_type == 'bson':
+            # Convert BSON to JSON
+            # The input should be a hex string that represents BSON data
+            bson_data = bytes.fromhex(data)
+            json_data = bson.BSON(bson_data).decode()
+            return JsonResponse({'converted_data': json.dumps(json_data, indent=2)}, status=200)
+        
+        else:
+            return JsonResponse({'error': 'Unsupported file type'}, status=400)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
 
 
 # ------------------------------

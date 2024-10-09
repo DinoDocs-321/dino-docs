@@ -20,6 +20,7 @@ import VerifyCode from './pages/VerifyCode/VerifyCode';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
 import DocsPage from './pages/docs/DocsPage';
 import JSONSchemaDocs from'./pages/docs/JSONSchemaDocs'; 
+import Converter from './pages/converter/converter';
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
         <Route path='/' element={<Homepage />} />
         <Route path='/BSONConverter' element={<BSONConverter />} />
         <Route path='/JSONConverter' element={<JSONConverter />} />
+        <Route path='/converter' element={<Converter />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/JSONEditor' element={<JSONEditor />} />
         <Route path='/schema-form' element={<SchemaForm />} />

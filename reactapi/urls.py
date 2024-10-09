@@ -17,7 +17,8 @@ urlpatterns = [
 
     path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
     path('verify-code/', VerifyCodeView.as_view(), name = "verify_code"),
-    path('convert/', ConvertJsonToBson.as_view(), name='convert-json-schema-to-bson'),
+    # path('convert/', ConvertJsonToBson.as_view(), name='convert-json-schema-to-bson'),
+    path('convert/', convert, name='convert'),
     path('save-schema/', save_user_schema, name='save-schema'),
 
     #Generator paths

@@ -8,12 +8,20 @@
     box-sizing: border-box;
 }
 
+h1 {
+    text-align: center; /* Center the heading */
+    margin-bottom: 40px; /* Add space below the heading */
+    font-size: 2.5rem; /* Adjust the size as needed */
+    color: #333; /* Optional: Adjust text color */
+}
+
 .bsonTextField {
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* Ensure form is centered */
     align-items: flex-start; 
     width: 100%;
-    padding: 10px; 
+    padding: 10px;
+    margin-top: 20px; /* Additional space between the form and the rest */
 }
 
 .bsonTextField textarea {
@@ -21,11 +29,15 @@
     height: 400px;
     resize: none;
     font-size: 16px; 
+    padding: 10px; /* Add padding inside the textarea for better UX */
+    border-radius: 8px; /* Optional: Rounded edges for a smoother look */
+    border: 1px solid #ccc; /* Optional: Add border for clarity */
 }
 
 .bsonbtns {
     margin-top: 20px;
     display: flex;
+    justify-content: center; /* Center buttons */
 }
 
 .bsonbtns button {
@@ -37,5 +49,6 @@
    padding: 10px 30px;
    border-radius: 10px;
    cursor: pointer;
-   transition: 0.3s; 
+   transition: 0.3s;
+   border: none; /* Remove any border for a clean look */
 }
