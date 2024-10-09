@@ -11,6 +11,22 @@
     align-items: center;
     gap: 20px; /* Adjust spacing between elements for better alignment */
     flex-wrap: nowrap; /* Prevent wrapping of elements within the row */
+    /*min-height: 60px; /* Set a minimum height to ensure everything stays aligned */
+    height: 60px;
+}
+
+/* Align the row number vertically with the input boxes */
+.field-content label {
+    align-self: center; /* Vertically align the row number */
+}
+
+/* Style the remove button (the 'x') to center-align with the inputs */
+.field-content button {
+    align-self: center; /* Vertically align the 'x' button */
+    height: 40px; /* Set the button height equal to input box height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Input group for each input field, ensuring vertical alignment */
@@ -26,13 +42,72 @@
     font-weight: bold;
 }
 
+/* Styling the input and select fields */
+.field-input-group select,
+.field-input-group input {
+    padding: 10px; /* Same padding for both input and select */
+    width: 100%; /* Ensure they both take up the same width */
+    border: 1px solid #ccc; /* Same border for both */
+    border-radius: 4px; /* Optional, for rounded corners */
+    box-sizing: border-box; /* Ensure padding is included in the width */
+    font-size: 16px; /* Same font size */
+    height: 40px; /* Same height for both */
+}
+
+/* Ensure consistency in the focus state */
+.field-input-group select:focus,
+.field-input-group input:focus {
+    outline: none; /* Remove default focus outline */
+    border-color: #4a90e2; /* Add a custom focus border color */
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5); /* Optional, adds focus shadow */
+}
+
 /* Scrollable container for nested fields */
 .nested-fields-container {
     padding: 10px;
     border-left: 3px solid #ccc; /* Visual separation for nested fields */
     margin-top: 10px;
-    margin-left: 35px; /* Indent nested properties */
+    margin-left: 50px; /* Indent nested properties */
     display: flex;
     flex-direction: column; /* Stack nested fields vertically */
     gap: 10px; /* Space between nested fields */
+}
+
+/* Error styling */
+.error {
+    border-color: red !important;
+}
+
+.description-div input {
+    width:max-content;
+}
+
+.drag-handle {
+    cursor: grab;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 0 10px;
+    color: #666;
+    user-select: none; /* Prevent text selection */
+    display: flex;
+    align-items: center; /* Vertically center align with the row */
+    margin-top: 30px;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.add-nested {
+    width: 250px;
+    /*align-self: center;*/
+}
+
+.field-content button {
+    margin-top: 29px;
+}
+
+.row {
+    margin-top: 30px;
+    font-size: 16px;
 }

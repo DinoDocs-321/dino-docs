@@ -43,3 +43,79 @@
     margin-right: 10px;
 }
 
+.my-container {
+    padding: 10px
+}
+
+/* Error styling */
+.error {
+    border-color: red !important;
+}
+
+/* Style for the validation error message */
+.validation-error-message {
+    background-color: #f8d7da; /* Light red background */
+    color: #721c24; /* Dark red text */
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #f5c6cb; /* Red border */
+    border-radius: 4px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.add-prop{
+
+    margin: 20px 0;
+    align-items: center;
+}
+
+.btn-con {
+    display:flex;
+    justify-content: center;
+}
+
+.schema-title{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.schema-title input{
+    margin: 0px 20px 0px 5px;
+    width:auto
+}
+
+.title-desc input {
+    margin-left: 15px;
+    height: auto;
+}
+
+.title-desc col {
+    width: 25rem;
+}
+
+.ndchild input {
+    width: 30rem;
+}
+
+.input-div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-div input{
+    margin-left: 15px;
+}
+
+.input-div button{
+    margin-right: 80px;
+    margin-left: 30px;
+}
+
+.container {
+    margin-top: 30px;
+}

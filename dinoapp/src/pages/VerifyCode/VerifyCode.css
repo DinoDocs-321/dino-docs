@@ -107,9 +107,9 @@ button.btn-primary:hover {
 }
 
 /* Ensure row and column containers have no background or border */
-.row,
+/* .row,
 .col {
-    background-color: transparent !important; /* Remove any background color */
-    box-shadow: none; /* Ensure no shadow effect */
-    border: none; /* Ensure no borders */
-}
+    background-color: transparent !important;
+    box-shadow: none;
+    border: none;
+} */

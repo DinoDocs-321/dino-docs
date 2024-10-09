@@ -205,6 +205,15 @@ def save_user_schema(request):
     if not schema_name or not json_data:
         return Response({'error': 'Both schema_name and json_data are required'}, status=status.HTTP_400_BAD_REQUEST)
 
+    # Check if schema with the same name exists for this user
+    existing_schema = collection.find_one({
+        'user_id': str(request.user.id),
+        'schema_name': schema_name
+    })
+
+    if existing_schema:
+        return Response({'error': 'A schema with this name already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+
     new_schema = {
         'user_id': str(request.user.id),
         'schema_name': schema_name,
@@ -219,6 +228,7 @@ def save_user_schema(request):
         return Response(new_schema, status=status.HTTP_201_CREATED)
     else:
         return Response({'error': 'Failed to save schema'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class ConvertJsonToBson(APIView):
