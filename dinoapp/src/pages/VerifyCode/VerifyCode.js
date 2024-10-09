@@ -59,7 +59,7 @@ const VerifyCode = () => {
                   required
                 />
               </Form.Group>
-              <Button type="submit" className="btn-primary">Verify</Button> {/* Ensure type="submit" is present */}
+              <Button type="submit" className="btn-primary verify-btn">Verify</Button> {/* Ensure type="submit" is present */}
             </Form>
             {error && <p className="text-danger mt-3">{error}</p>}
             {message && <p className="text-success mt-3">{message}</p>}

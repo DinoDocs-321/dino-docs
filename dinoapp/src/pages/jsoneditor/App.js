@@ -449,15 +449,16 @@ const JSONEditor = () => {
   };
 
   return (
-    <div className='json-editor-container'>
+    <div className='mycontainer'>
       <div className='editor'>
-        <div className='visual-editor'>
+        <div className='container visual-editor'>
           <div className='visual-editor-header'>
             <h3>Visual Editor</h3>
             <button className='add-button' onClick={addNewObject}>
               +
             </button>
           </div>
+          <div className='fields-container'>
           {formData.map((row, rowIndex) => (
             <div
               key={rowIndex}
@@ -471,9 +472,10 @@ const JSONEditor = () => {
               {row.map((field) => renderField(field, rowIndex))}
             </div>
           ))}
+          </div>
         </div>
 
-        <div className='code-editor'>
+        <div className='code-editor container'>
           <h3>Code Editor</h3>
           <textarea
             className='code-area'
@@ -482,14 +484,13 @@ const JSONEditor = () => {
               jsonCodeFromEditor.current = true;
               setJSONCode(e.target.value);
             }}
-            style={{ width: '100%', height: '100%' }}
           />
         </div>
       </div>
 
       <div className='cusButtons'>
-        <button onClick={generateJSONData}>Generate JSON Data</button>
-        <button onClick={handleSubmit}>Save JSON Document</button>
+        <button className="cusbtn" onClick={generateJSONData}>Generate JSON Data</button>
+        <button className='cusbtn' onClick={handleSubmit}>Save JSON Document</button>
       </div>
     </div>
   );
