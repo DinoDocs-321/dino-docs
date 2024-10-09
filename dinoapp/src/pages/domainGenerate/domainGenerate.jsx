@@ -214,8 +214,8 @@ const DomainGenerate = () => {
     }
   
     // Now, instead of posting to a backend, navigate to the JSONEditor page and pass the data as state
-    console.log('Navigating to /converter with data:', dataToSend);
-    navigate('/converter', { state: { savedData: dataToSend } });
+    console.log('Navigating to /BSONConverter with data:', dataToSend);
+    navigate('/BSONConverter', { state: { savedData: dataToSend } });
   };
 
   const handleJSONEditor = async () => {
