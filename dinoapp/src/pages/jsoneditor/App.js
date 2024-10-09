@@ -487,7 +487,7 @@ const JSONEditor = () => {
         </div>
       </div>
 
-      <div className='buttons'>
+      <div className='cusButtons'>
         <button onClick={generateJSONData}>Generate JSON Data</button>
         <button onClick={handleSubmit}>Save JSON Document</button>
       </div>

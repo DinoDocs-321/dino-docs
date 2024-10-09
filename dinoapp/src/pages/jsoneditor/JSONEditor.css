@@ -118,7 +118,7 @@ h3 {
   min-width: 0; /* Allow group to shrink */
 }
 
-.buttons {
+.cusButtons {
   display: flex;
   justify-content: flex-end;
   margin-top: 20px;
