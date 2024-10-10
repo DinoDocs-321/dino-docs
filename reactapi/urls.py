@@ -16,6 +16,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
 
     path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
+    path('reset-password/', ResetPasswordView.as_view(), name='reset_password'),
     path('verify-code/', VerifyCodeView.as_view(), name = "verify_code"),
     # path('convert/', ConvertJsonToBson.as_view(), name='convert-json-schema-to-bson'),
     path('convert/', convert, name='convert'),
