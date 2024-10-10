@@ -56,13 +56,11 @@ function SchemaList({ savedSchemas, onClose, onSchemaSelect, fetchSavedSchemas }
                     <p>No saved schemas found.</p>
                 ) : (
                     <ul className="schemaList">
-
                         {savedSchemas.map((schema) => (
                             <li key={schema._id}>
                                 <span>{schema.schema_name}</span>
                                 <div className="schema-actions">
-
-                                    <button onClick={() => onSchemaSelect(schema._id)}>
+                                    <button className="import-btn" onClick={() => onSchemaSelect(schema._id)}>
                                         Import
                                     </button>
                                     <button
@@ -71,11 +69,11 @@ function SchemaList({ savedSchemas, onClose, onSchemaSelect, fetchSavedSchemas }
                                     >
                                         Delete
                                     </button>
-
                                 </div>
                             </li>
                         ))}
                     </ul>
+
                 )}
             </div>
         </div>
