@@ -1,5 +1,4 @@
-// generator.jsx
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer, useCallback } from 'react';
 import axios from 'axios';
 import Container from 'react-bootstrap/Container';
 import './generator.css';
@@ -51,7 +50,7 @@ function Generator() {
     }, [showValidationError]);
 
     // Fetch saved schemas
-    const fetchSavedSchemas = async () => {
+    const fetchSavedSchemas = useCallback(async () => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
             alert('Please log in to import a schema.');
@@ -67,6 +66,12 @@ function Generator() {
             console.error('Error fetching saved schemas:', err);
             alert('Session inactive, please log in again.');
         }
+    }, []);
+
+    // Handle opening the schema modal and fetching schemas
+    const handleOpenSchemaModal = () => {
+        fetchSavedSchemas();
+        setShowSchemaModal(true);
     };
 
     // Handle schema selection from saved schemas
@@ -511,7 +516,7 @@ function Generator() {
         }
     };
 
-    // return component
+    // Return component
     return (
 
         <Container>
@@ -524,7 +529,7 @@ function Generator() {
                 )}
 
                 <div className="import-button-container">
-                    <button type="button" onClick={() => setShowSchemaModal(true)}>
+                    <button type="button" onClick={handleOpenSchemaModal}>
                         Import Saved Schema
                     </button>
                 </div>
@@ -603,8 +608,6 @@ function Generator() {
                     </button>
                 </div>
 
-
-
                 {isLoading && (
                     <div className="loading-spinner">
                         <div className="spinner"></div>
@@ -623,7 +626,7 @@ function Generator() {
                     </div>
                 )}
             </div>
-            
+
         </Container>
     );
 }

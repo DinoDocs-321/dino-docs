@@ -1,14 +1,3 @@
-button {
-  background-color: #8cb8ca;
-  justify-content: flex-end;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
 .editor {
   display: flex;
   flex-direction: row;
@@ -42,6 +31,7 @@ button {
   margin-bottom: 10px;
 }
 
+
 .code-editor {
   overflow: hidden; /* Prevent overflow */
 }
@@ -60,9 +50,9 @@ h3 {
 
 .label-field {
   display: block;
-  margin: 5px 0;
+  margin: 5px 0 5px;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 10px;
   background: none;
   border: none;
   cursor: default;
@@ -72,71 +62,67 @@ h3 {
 
 .input-container {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background-color: #f9f9f9;
-  padding: 15px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  margin-bottom: 15px;
+  align-items: center;
+  margin-bottom: 10px;
   min-width: 0; /* Allow container to shrink */
 }
 
 .input-wrapper {
   display: flex;
-  gap: 8px;
   align-items: center;
+  min-width: 0; /* Allow wrapper to shrink */
 }
 
-.input-container input,
-.input-container select {
-  flex: 1 1 auto;
+.input-container input {
+  flex: 1 1 auto; /* Allow inputs to shrink */
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
   transition: border-color 0.3s;
+  margin-right: 8px;
+  min-width: 0; /* Allow input to shrink */
 }
 
-.input-container input:focus,
-.input-container select:focus {
+.input-container input:focus {
   border-color: #007bff;
   outline: none;
 }
 
 .status-icon {
   cursor: pointer;
+  font-size: 16px;
+  margin-left: 5px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: transparent;
-  border: none;
-  margin: 0 4px;
-}
-
-.status-icon img {
-  width: 16px;
-  height: 16px;
 }
 
 .status-icon.add-icon {
   background-image: url('../../assets/add.png');
   background-size: cover;
+  width: 16px;
+  height: 16px;
+}
+
+.status-icon.drag-icon {
+  background-image: url('../../assets/arrows.png');
+  background-size: cover;
+  width: 16px;
+  height: 16px;
 }
 
 .status-icon.delete-icon {
   background-image: url('../../assets/bin.png');
   background-size: cover;
+  width: 16px;
+  height: 16px;
 }
 
 .group-container {
+  margin-bottom: 15px;
+  padding: 10px;
   background-color: #f9f9f9;
   border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  border-radius: 5px;
+  min-width: 0; /* Allow group to shrink */
 }
 
 .cusButtons {
@@ -147,27 +133,19 @@ h3 {
   background-color: #ffffff;
   border-top: 1px solid #e0e0e0;
 }
-
 .add-button img {
   width: 15px;
   height: auto;
 }
-
-.add-button, .cusbtn {
+.add-button, button {
   background-color: #8cb8ca;
+  justify-content: flex-end;
   color: white;
   border: none;
   padding: 10px 15px;
   border-radius: 5px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
   margin-left: 10px;
-}
-
-.add-button:hover, .cusbtn:hover {
-  background-color: #76a3b0;
 }
 
 /* .code-editor {
@@ -201,47 +179,21 @@ h3 {
 }
 
 .value-input {
-  width: 100%;
-  font-size: 12px;
+  width: 120px;
+  font-size: 10px;
 }
 
 .innerButtons {
   display: flex;
-  gap: 5px;
-  margin-top: 10px;
-  padding-right: 10px;
-  transform: scale(0.6);
-}
-.innerButtons img {
-  width: 5px;
-  height: 5px;
+  padding: 10px;
+  font-size: 12px;
 }
 
 .group-label {
-  display: flex;
-  flex-direction: row;
-  gap: 5px;
-  align-items: space-between;
+  align-items: flex-start;
+  flex-direction: column;
 }
 
 .dragging {
   opacity: 0.5;
-}
-
-.status-message {
-  padding: 15px 20px;
-  border-radius: 5px;
-  text-align: center;
-  margin: 20px 0;
-  transition: opacity 0.5s ease-in-out;
-}
-
-.save-msg {
-  background-color: #d4edda; /* Light green background */
-  color: #155724; /* Dark green text */
-}
-
-.error-msg {
-  background-color: #f8d7da; /* Light red background */
-  color: #721c24; /* Dark red text */
 }

@@ -13,13 +13,13 @@ const Homepage = () => {
     <Row className="justify-content-md-center">
       <Col className='text-center'>
           <p className="mt-3 mb-4 selectoption">Select an option</p>
-          <Link to="/JSONEditor">
+          <Link to="/generate">
             <button className='GFSbtn'>
-              Generate From Scratch
+              Generate From AI
             </button>
           </Link>
           <br />
-          <Link to="/manual-generate">
+          <Link to="/domain-generate">
             <button className='PSbtn'>
               Provide Schema
             </button>

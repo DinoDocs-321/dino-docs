@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { BSON } from 'bson';
-import axios from 'axios';
 import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -12,9 +11,24 @@ const Converter = () => {
     const [textFieldValue, setTextFieldValue] = useState('');
     const [conversionResult, setConversionResult] = useState('');
     const [fileType, setFileType] = useState('json'); // 'json' or 'bson'
+    const [isValidJson, setIsValidJson] = useState(false);
+    const [uploadMessage, setUploadMessage] = useState('');
 
     const handleInputChange = (event) => {
-        setTextFieldValue(event.target.value);
+        const content = event.target.value;
+        setTextFieldValue(content);
+        validateJson(content);
+    };
+
+    const validateJson = (content) => {
+        try {
+            JSON.parse(content);
+            setIsValidJson(true);
+            setUploadMessage('Valid JSON uploaded.');
+        } catch (e) {
+            setIsValidJson(false);
+            setUploadMessage('Invalid JSON. Please correct the format.');
+        }
     };
 
     const handleFileUpload = (event) => {
@@ -27,11 +41,14 @@ const Converter = () => {
             if (file.type === 'application/json' || file.name.endsWith('.json')) {
                 setFileType('json');
                 setTextFieldValue(content);
+                validateJson(content);
             } else if (file.type === 'application/octet-stream' || file.name.endsWith('.bson')) {
                 setFileType('bson');
                 const bsonBuffer = new Uint8Array(content);
                 const jsonObject = BSON.deserialize(bsonBuffer);
-                setTextFieldValue(JSON.stringify(jsonObject, null, 2));
+                const jsonString = JSON.stringify(jsonObject, null, 2);
+                setTextFieldValue(jsonString);
+                validateJson(jsonString);
             } else {
                 alert('Unsupported file type. Please upload a JSON or BSON file.');
             }
@@ -45,9 +62,15 @@ const Converter = () => {
 
     const handleGenerateFile = () => {
         try {
+            // Parse the input JSON
             const data = JSON.parse(textFieldValue);
+    
+            // Wrap the data in an object if it is an array
+            const dataToSerialize = Array.isArray(data) ? { data } : data;
+    
             if (fileType === 'json') {
-                const bsonData = BSON.serialize(data);
+                // Serialize the wrapped data or object
+                const bsonData = BSON.serialize(dataToSerialize);
                 const blob = new Blob([bsonData.buffer], { type: 'application/bson' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -56,6 +79,7 @@ const Converter = () => {
                 link.click();
                 URL.revokeObjectURL(url);
             } else {
+                // For JSON, directly convert to a file
                 const blob = new Blob([textFieldValue], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -65,23 +89,10 @@ const Converter = () => {
                 URL.revokeObjectURL(url);
             }
         } catch (error) {
-            console.error('Error generating file:', error);
-            alert('Invalid JSON. Please check your input.');
+            console.error('Error generating file:', error.message);
+            alert(`Invalid JSON. Error: ${error.message}`);
         }
-    };
-
-    // const handleConvert = async () => {
-    //     try {
-    //         const response = await axios.post('http://localhost:8000/api/convert/', {
-    //             data: textFieldValue,
-    //             fileType,
-    //         });
-    //         setConversionResult(response.data.converted_data);
-    //     } catch (error) {
-    //         console.error('Error during conversion:', error);
-    //         alert('An error occurred during conversion. Please check the console for more details.');
-    //     }
-    // };
+    };    
 
     return (
         <Container className="mt-4">
@@ -91,6 +102,7 @@ const Converter = () => {
                         <Form.Label>Upload JSON or BSON File</Form.Label>
                         <Form.Control type="file" accept=".json,.bson" onChange={handleFileUpload} />
                     </Form.Group>
+                    {uploadMessage && <div className="upload-message">{uploadMessage}</div>}
                 </Col>
             </Row>
             <Row>
@@ -105,12 +117,13 @@ const Converter = () => {
                 </Form.Group>
             </Row>
             <Row>
-                <div className="buttons">
-                    <button onClick={handleGenerateFile}>
-                        {fileType === 'json' ? 'Generate BSON File' : 'Generate JSON File'}
-                    </button>
-                    {/* <button onClick={handleConvert}>Convert via API</button> */}
-                </div>
+                {isValidJson && (
+                     <div className="buttons">
+                        <button onClick={handleGenerateFile} className="me-2 btn btn-link">
+                            {fileType === 'json' ? 'Generate BSON File' : 'Generate JSON File'}
+                        </button>
+                    </div>
+                )}
             </Row>
             {conversionResult && (
                 <Row>

@@ -51,6 +51,7 @@ function SchemaList({ savedSchemas, onClose, onSchemaSelect, fetchSavedSchemas }
                 <button className="close-button" onClick={onClose}>
                     &times;
                 </button>
+                <button onClick={fetchSavedSchemas}>Refresh</button> {/* Add a Refresh button */}
                 {savedSchemas.length === 0 ? (
                     <p>No saved schemas found.</p>
                 ) : (

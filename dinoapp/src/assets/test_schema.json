@@ -1,0 +1,79 @@
+{
+  "type": "object",
+  "title": "User",
+  "description": "A schema representing a user in the system.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The unique identifier for a user.",
+      "dataType": "alphanumeric"
+    },
+    "username": {
+      "type": "string",
+      "description": "The username for the user.",
+      "dataType": "names",
+      "minLength": 3,
+      "maxLength": 20
+    },
+    "email": {
+      "type": "string",
+      "description": "The user's email address.",
+      "dataType": "email"
+    },
+    "password": {
+      "type": "string",
+      "description": "The user's password.",
+      "dataType": "alphanumeric",
+      "minLength": 8
+    },
+    "profile": {
+      "type": "object",
+      "description": "The user's profile information.",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "description": "The user's first name.",
+          "dataType": "names"
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The user's last name.",
+          "dataType": "names"
+        },
+        "age": {
+          "type": "integer",
+          "description": "The user's age.",
+          "dataType": "randomNumber",
+          "minimum": 0
+        },
+        "address": {
+          "type": "object",
+          "description": "The user's address.",
+          "properties": {
+            "street": {
+              "type": "string",
+              "description": "The street part of the user's address.",
+              "dataType": "streetAddress"
+            },
+            "city": {
+              "type": "string",
+              "description": "The city part of the user's address.",
+              "dataType": "city"
+            },
+            "state": {
+              "type": "string",
+              "description": "The state part of the user's address.",
+              "dataType": "city"
+            },
+            "postalCode": {
+              "type": "string",
+              "description": "The postal code part of the user's address.",
+              "dataType": "postalZip",
+              "pattern": "^[0-9]{5}(-[0-9]{4})?$"
+            }
+          }
+        }
+      }
+    }
+  }
+}

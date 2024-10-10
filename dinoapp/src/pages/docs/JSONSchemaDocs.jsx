@@ -1,7 +1,7 @@
 // JsonSchemaDocs.jsx
 
 import React, { useState } from 'react';
-import './JSONSchemaDocs.css'; // Make sure to create and import the CSS file
+import './JSONSchemaDocs.css';
 
 const JsonSchemaDocs = () => {
   return (

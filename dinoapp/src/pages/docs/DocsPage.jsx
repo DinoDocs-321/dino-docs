@@ -12,10 +12,7 @@ const MainDocsPage = () => {
           <Link to="/jsonschema-docs">JSON Schema Creation Guide</Link>
         </li>
         <li>
-          <Link to="/api-usage-docs">API Usage Guide</Link>
-        </li>
-        <li>
-          <Link to="/getting-started-docs">Getting Started Guide</Link>
+          <Link to="/getting-started">Getting Started Guide</Link>
         </li>
         {/* Add more links to other guides as needed */}
       </ul>

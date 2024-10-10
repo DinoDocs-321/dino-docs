@@ -71,6 +71,12 @@
 .error {
     border-color: red !important;
 }
+.description-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
 .description-div input {
     width: auto;
