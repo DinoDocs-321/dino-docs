@@ -103,6 +103,7 @@ function Field(props) {
 
     // Drag-and-Drop Handlers
     function handleDragStart(e) {
+        e.stopPropagation();
         e.dataTransfer.setData(
             'text/plain',
             JSON.stringify({ fieldId: field.id, parentFieldId: parentField ? parentField.id : null })
@@ -110,10 +111,12 @@ function Field(props) {
     }
 
     function handleDragOver(e) {
+        e.stopPropagation();
         e.preventDefault();
     }
 
     function handleDrop(e) {
+        e.stopPropagation();
         e.preventDefault();
         const data = JSON.parse(e.dataTransfer.getData('text/plain'));
         const draggedFieldId = data.fieldId;
@@ -152,14 +155,14 @@ function Field(props) {
     return (
         <div
             className="field"
-            draggable
-            onDragStart={handleDragStart}
+            // draggable
+            // onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
         >
             {/* Field content */}
             <div className="field-content">
-                <div className="drag-handle">⠿</div> 
+                <div className="drag-handle" draggable onDragStart={handleDragStart}>⠿</div> 
                 <label className="row">Row {index + 1}</label>
                 <div className="field-input-group">
                     <label>Data Type</label>

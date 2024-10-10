@@ -22,6 +22,9 @@ function Generator() {
     const [schemaErrors, setSchemaErrors] = useState({});
     const [showValidationError, setShowValidationError] = useState(false);
 
+    const [isLoading, setIsLoading] = useState(false);
+
+
 
     // Fetch data types from the API when the component mounts
     useEffect(() => {
@@ -135,6 +138,8 @@ function Generator() {
             setShowValidationError(false);
         }
 
+        setIsLoading(true);
+
         const schemaData = buildSchemaData();
 
         console.log('Generated Schema Data:', JSON.stringify(schemaData, null, 2));
@@ -158,6 +163,8 @@ function Generator() {
             setResponse(result.data);
         } catch (error) {
             console.error('There was an error generating the documents!', error);
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -298,6 +305,23 @@ function Generator() {
         };
     }
 
+    function handleDownload() {
+        if (response && response.documents) {
+            const dataStr = JSON.stringify(response.documents, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+    
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${schemaTitle || 'generated_data'}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    }
+    
+
     //Save schema to database
     async function handleSaveSchema() {
         const { fieldErrors, schemaErrors } = validateFields(fields);
@@ -357,7 +381,7 @@ function Generator() {
         <div className="my-container">
         {showValidationError && (
             <div className="validation-error-message">
-                Please fill in the fields highlighted in red.
+                The fields highlighted in red must not have spaces or be empty.
             </div>
         )}
 
@@ -425,10 +449,33 @@ function Generator() {
 
             {response && (
                 <div className="response">
-                    <h3>Response from Server:</h3>
-                    <pre>{JSON.stringify(response, null, 2)}</pre>
+                    {/* <h3>Response from Server:</h3>
+                    <pre>{JSON.stringify(response, null, 2)}</pre> */}
                 </div>
             )}
+
+            {/* Loading Spinner */}
+            {isLoading && (
+                <div className="loading-spinner">
+                    <div className="spinner"></div>
+                    <p>Generating data, please wait...</p>
+                </div>
+            )}
+            {/* Response and Download Button */}
+            {!isLoading && response && (
+                <div className="response">
+                    <div className="response-header">
+                        <h3>Generated Documents:</h3>
+                        <button type="button" onClick={handleDownload}>
+                            Download JSON
+                        </button>
+                    </div>
+                    <pre>{JSON.stringify(response.documents, null, 2)}</pre>
+
+
+                </div>
+            )}
+
         </div>
         </Container>
     );
