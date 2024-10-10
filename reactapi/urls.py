@@ -27,5 +27,9 @@ urlpatterns = [
     
     path('validate-json-file/', ValidateJsonFileView.as_view(), name='validate_json_file'),
     path('validate-json-text/', ValidateJsonTextView.as_view(), name='validate_json_text'),
+
+    path('saved-schemas/', list_user_schemas, name='list_saved_schemas'),
+    path('saved-schemas/<str:schema_id>/', user_schema_detail, name='user_schema_detail'),
+    path('saved-schemas/<str:schema_id>/', delete_user_schema, name='delete_saved_schema'),
 ]
 

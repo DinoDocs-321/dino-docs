@@ -65,14 +65,14 @@
 }
 
 .add-prop{
-
     margin: 20px 0;
-    align-items: center;
+    /*align-items: center;*/
 }
 
 .btn-con {
     display:flex;
     justify-content: center;
+    border-bottom: 3px solid #ccc;
 }
 
 .schema-title{
@@ -105,6 +105,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 20px
 }
 
 .input-div input{
@@ -129,8 +130,8 @@
 }
 
 .spinner {
-    border: 8px solid #f3f3f3; /* Light grey */
-    border-top: 8px solid #4a90e2; /* Blue */
+    border: 8px solid #f3f3f3; 
+    border-top: 8px solid #4a90e2; 
     border-radius: 50%;
     width: 60px;
     height: 60px;
@@ -143,7 +144,7 @@
     100% { transform: rotate(360deg); }
 }
 
-/* Style for the download button */
+/* style for download button*/
 .response button {
     padding: 10px 20px;
     margin-top: 10px;
@@ -155,18 +156,18 @@
     border-radius: 4px;
 }
 
-/* Style for the response header */
+/* style for response header */
 .response-header {
-    margin-top: 30px;
-    border-top: 3px solid #ccc; /* Visual separation for nested fields */
+    margin-top: 20px;
+    border-top: 3px solid #ccc;
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Add space between header and button */
+    justify-content: space-between;
     margin-bottom: 10px;
 }
 
 .response-header h3 {
-    margin: 0; /* Remove default margin */
+    margin: 0;
 }
 
 .download-button {
@@ -179,7 +180,7 @@
     border-radius: 4px;
 }
 
-/* Optional: Adjust the preformatted text styling */
+/* generated data output styling */
 .response pre {
     background-color: #f5f5f5;
     padding: 10px;
