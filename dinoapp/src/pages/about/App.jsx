@@ -51,7 +51,7 @@ const AboutOwners = () => {
     <Container className="my-5">
       <h1 className="text-center mb-4">About the Owners</h1>
       <p className="text-center mb-5">
-        Our team consists of six dedicated students, each bringing their unique skills to develop this system. Under the supervision of Dr. Sarah Supervisor, we worked together to deliver a seamless and efficient solution.
+        Our team consists of six dedicated students, each bringing their unique skills to develop this system. Under the supervision of our Supervisor, we worked together to deliver a seamless and efficient solution.
       </p>
       <Row>
         {teamMembers.map((member, index) => (

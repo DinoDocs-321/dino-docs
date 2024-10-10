@@ -8,28 +8,28 @@ import { getUniqueId } from '../../utils/uniqueID';
 
 function Generator() {
 
-    // States
+    //States
     const [schemaTitle, setSchemaTitle] = useState('');
     const [schemaDescription, setSchemaDescription] = useState('');
     const [numSamples, setNumSamples] = useState(3);
     const [response, setResponse] = useState(null);
 
-    // Available data types for fields
+    // Datatypes for fields
     const [dataTypes, setDataTypes] = useState([]);
 
-    // Error handling
+    // error handling
     const [fieldErrors, setFieldErrors] = useState({});
     const [schemaErrors, setSchemaErrors] = useState({});
     const [showValidationError, setShowValidationError] = useState(false);
 
-    // Loading state
+    // State for loading
     const [isLoading, setIsLoading] = useState(false);
 
-    // Saved schemas
+    // Saving schemas state
     const [savedSchemas, setSavedSchemas] = useState([]);
     const [showSchemaModal, setShowSchemaModal] = useState(false);
 
-    // Fetch data types when component mounts
+    //Get datatypes request
     useEffect(() => {
         const fetchDataTypes = async () => {
             try {
@@ -42,14 +42,14 @@ function Generator() {
         fetchDataTypes();
     }, []);
 
-    // Scroll to top when validation errors are shown
+    //Scroll to top for validation error
     useEffect(() => {
         if (showValidationError) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }, [showValidationError]);
 
-    // Fetch saved schemas
+    // Get request for a user's saved schemas
     const fetchSavedSchemas = useCallback(async () => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
@@ -68,13 +68,12 @@ function Generator() {
         }
     }, []);
 
-    // Handle opening the schema modal and fetching schemas
+    //Open the schema modal to display list of schemas to select
     const handleOpenSchemaModal = () => {
         fetchSavedSchemas();
         setShowSchemaModal(true);
     };
 
-    // Handle schema selection from saved schemas
     const handleSchemaSelect = async (schemaId) => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
@@ -95,14 +94,13 @@ function Generator() {
         }
     };
 
-    // Import schema data into form fields
+    //import schema
     const importSchema = (schemaData) => {
         if (dataTypes.length === 0) {
             alert('Data types are not loaded yet. Please try again in a moment.');
             return;
         }
 
-        // Basic validation
         if (
             schemaData &&
             schemaData.type === 'object' &&
@@ -165,7 +163,7 @@ function Generator() {
         return fieldsArray;
     };
 
-    // Convert a single schema property to a form field
+    // To convert a single schema property to a form field
     const schemaPropertyToField = (prop) => {
         const field = {
             id: getUniqueId(),
@@ -177,19 +175,18 @@ function Generator() {
             items: null,
         };
 
-        // Map relevant attributes
+        // Mapping attributes
         ['minLength', 'maxLength', 'minimum', 'maximum'].forEach((attr) => {
             if (prop[attr] !== undefined) {
                 field.attributes[attr] = prop[attr];
             }
         });
 
-        // Handle nested objects
+        // Handle nested objects, arrays and lists
         if (prop.type === 'object' && prop.properties) {
             field.properties = schemaPropertiesToFields(prop.properties);
         }
 
-        // Handle arrays and lists
         if (prop.type === 'array' && prop.items) {
             if (Array.isArray(prop.items)) {
                 field.dataType = 'list';
@@ -244,7 +241,7 @@ function Generator() {
         }
     };
 
-    // Helper to update a field based on action
+    // Update a field
     const updateField = (field, action) => {
         if (field.id === action.fieldId) {
             return { ...field, [action.key]: action.value };
@@ -314,12 +311,11 @@ function Generator() {
         }
     };
 
-    // Validate form fields recursively
+    // Initial validation for schema fields
     const validateFields = (fields) => {
         let fieldErrors = {};
         let schemaErrors = {};
 
-        // Validate schema title and description
         if (!schemaTitle.trim()) {
             schemaErrors.schemaTitle = 'Schema Title is required.';
         }
@@ -327,23 +323,20 @@ function Generator() {
             schemaErrors.schemaDescription = 'Schema Description is required.';
         }
 
-        // Validate each field
         fields.forEach((field) => {
             let errors = {};
 
-            // Key Title validation
             if (!field.keyTitle) {
                 errors.keyTitle = 'Key Title is required.';
             } else if (/\s/.test(field.keyTitle)) {
                 errors.keyTitle = 'Key Title cannot contain spaces.';
             }
 
-            // Data Type validation
             if (!field.dataType) {
                 errors.dataType = 'Data Type is required.';
             }
 
-            // AutoIncrement Start Value validation
+            //Determining if auto increment is present
             if (field.dataType === 'autoIncrement') {
                 if (!field.description || field.description.trim() === '') {
                     errors.description = 'Start Value is required.';
@@ -352,7 +345,7 @@ function Generator() {
                 }
             }
 
-            // Recursive validation for nested fields
+            // validation for nested fields
             if (field.dataType === 'object' && field.properties) {
                 const { fieldErrors: childErrors } = validateFields(field.properties);
                 if (Object.keys(childErrors).length > 0) {
@@ -376,7 +369,7 @@ function Generator() {
         return { fieldErrors, schemaErrors };
     };
 
-    // Build schema properties recursively
+    // construct schema properties
     const buildProperties = (fields) => {
         const properties = {};
         fields.forEach((field) => {
@@ -387,7 +380,7 @@ function Generator() {
         return properties;
     };
 
-    // Process a single field into schema format
+    // Process a singular field
     const processField = (field) => {
         const dataTypeInfo = mapDataType(field.dataType);
         if (!dataTypeInfo) {
@@ -421,7 +414,7 @@ function Generator() {
             }
         }
 
-        // Handle nested fields
+        // Handle nested fields for object, array and list
         if (dataTypeInfo.type === 'object' && field.properties.length > 0) {
             schemaField.properties = buildProperties(field.properties);
         }
@@ -437,12 +430,12 @@ function Generator() {
         return schemaField;
     };
 
-    // Map form data type to schema data type info
+    //Map form data type to schema data type info
     const mapDataType = (value) => {
         return dataTypes.find((dataType) => dataType.value === value) || null;
     };
 
-    // Build the complete schema data
+    // Build the complete schema
     const buildSchemaData = () => {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
@@ -453,7 +446,7 @@ function Generator() {
         };
     };
 
-    // Handle download of generated documents
+    //handle download of generated documents
     const handleDownload = () => {
         if (response && response.documents) {
             const dataStr = JSON.stringify(response.documents, null, 2);
@@ -470,7 +463,7 @@ function Generator() {
         }
     };
 
-    // Save schema to the database
+    //Save the current schema built
     const handleSaveSchema = async () => {
         const { fieldErrors, schemaErrors } = validateFields(fields);
 
@@ -516,7 +509,6 @@ function Generator() {
         }
     };
 
-    // Return component
     return (
 
         <Container>

@@ -1,4 +1,3 @@
-// field.jsx
 import React from 'react';
 import './field.css';
 //import { getUniqueId } from '../../utils/uniqueID';
@@ -11,8 +10,8 @@ function Field(props) {
         dispatch,
         onRemove,
         parentField,
-        fields, // Add fields prop
-        getUniqueId, // Add getUniqueId prop
+        fields,
+        getUniqueId,
         error,
     } = props;
 
