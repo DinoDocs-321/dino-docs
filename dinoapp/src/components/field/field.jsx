@@ -1,7 +1,7 @@
 // field.jsx
 import React from 'react';
 import './field.css';
-import { getUniqueId } from '../../utils/uniqueID';
+//import { getUniqueId } from '../../utils/uniqueID';
 
 function Field(props) {
     const {
@@ -13,6 +13,7 @@ function Field(props) {
         parentField,
         fields, // Add fields prop
         getUniqueId, // Add getUniqueId prop
+        error,
     } = props;
 
     function handleChange(key, value) {
@@ -73,8 +74,36 @@ function Field(props) {
         });
     }
 
+    function addListItem() {
+        const newItem = {
+            id: getUniqueId(),
+            keyTitle: '',
+            dataType: '',
+            description: '',
+            attributes: {},
+            properties: [],
+            items: null,
+        };
+        dispatch({
+            type: 'UPDATE_FIELD',
+            fieldId: field.id,
+            key: 'items',
+            value: (field.items || []).concat([newItem]),
+        });
+    }
+    
+    function removeListItem(itemId) {
+        dispatch({
+            type: 'UPDATE_FIELD',
+            fieldId: field.id,
+            key: 'items',
+            value: field.items.filter((f) => f.id !== itemId),
+        });
+    }
+
     // Drag-and-Drop Handlers
     function handleDragStart(e) {
+        e.stopPropagation();
         e.dataTransfer.setData(
             'text/plain',
             JSON.stringify({ fieldId: field.id, parentFieldId: parentField ? parentField.id : null })
@@ -82,10 +111,12 @@ function Field(props) {
     }
 
     function handleDragOver(e) {
+        e.stopPropagation();
         e.preventDefault();
     }
 
     function handleDrop(e) {
+        e.stopPropagation();
         e.preventDefault();
         const data = JSON.parse(e.dataTransfer.getData('text/plain'));
         const draggedFieldId = data.fieldId;
@@ -124,19 +155,21 @@ function Field(props) {
     return (
         <div
             className="field"
-            draggable
-            onDragStart={handleDragStart}
+            // draggable
+            // onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
         >
             {/* Field content */}
             <div className="field-content">
-                <label>Row {index + 1}</label>
+                <div className="drag-handle" draggable onDragStart={handleDragStart}>⠿</div> 
+                <label className="row">Row {index + 1}</label>
                 <div className="field-input-group">
                     <label>Data Type</label>
                     <select
                         value={field.dataType}
                         onChange={(e) => handleChange('dataType', e.target.value)}
+                        className={error && error.dataType ? 'error' : ''}
                     >
                         <option value="">Select Data Type</option>
                         {dataTypes.map((type) => (
@@ -153,24 +186,33 @@ function Field(props) {
                         placeholder="Key Title"
                         value={field.keyTitle}
                         onChange={(e) => handleChange('keyTitle', e.target.value)}
+                        className={error && error.keyTitle ? 'error' : ''}
                     />
                 </div>
                 <div className="field-input-group">
-                    <label>Description</label>
+                    
                     {field.dataType === 'autoIncrement' ? (
-                        <input
-                            type="number"
-                            placeholder="Start Value"
-                            value={field.description}
-                            onChange={(e) => handleChange('description', e.target.value)}
-                        />
+                        <div>
+                            <label>Start Value</label>
+                            <input
+                                type="number"
+                                placeholder="Start Value"
+                                value={field.description}
+                                onChange={(e) => handleChange('description', e.target.value)}
+                                className={error && error.description ? 'error' : ''}
+                            />
+                        </div>
                     ) : (
-                        <input
-                            type="text"
-                            placeholder="Description"
-                            value={field.description}
-                            onChange={(e) => handleChange('description', e.target.value)}
-                        />
+                        <div classname='description-div'>
+                            <label>Description</label>
+                            <input
+                                type="text"
+                                placeholder="Description"
+                                value={field.description}
+                                onChange={(e) => handleChange('description', e.target.value)}
+                                className={error && error.description ? 'error' : ''}
+                            />
+                        </div>
                     )}
                 </div>
                 <button type="button" onClick={onRemove} style={{ marginLeft: 'auto' }}>
@@ -178,52 +220,80 @@ function Field(props) {
                 </button>
             </div>
 
-            {/* Handle nested objects */}
-            {field.dataType === 'object' && (
-                <div className="nested-fields-container">
-                    {field.properties &&
-                        field.properties.map((propField, idx) => (
-                            <Field
-                                key={propField.id}
-                                field={propField}
-                                index={idx}
-                                dataTypes={dataTypes}
-                                dispatch={dispatch}
-                                onRemove={() => removeNestedField(propField.id)}
-                                parentField={field}
-                                fields={fields}
-                                getUniqueId={getUniqueId}
-                            />
-                        ))}
-
-                    <button type="button" onClick={addNestedField}>
-                        Add Nested Property
-                    </button>
-                </div>
-            )}
-
-            {/* Handle arrays */}
-            {field.dataType === 'array' && (
-                <div style={{ marginTop: '10px' }}>
-                    <h4>Array Items:</h4>
-                    {field.items ? (
+        {/* Handle nested objects */}
+        {field.dataType === 'object' && (
+            <div className="nested-fields-container">
+                {field.properties &&
+                    field.properties.map((propField, idx) => (
                         <Field
-                            field={field.items}
-                            index={0}
+                            key={propField.id}
+                            field={propField}
+                            index={idx}
                             dataTypes={dataTypes}
                             dispatch={dispatch}
-                            onRemove={removeArrayItem}
+                            onRemove={() => removeNestedField(propField.id)}
                             parentField={field}
                             fields={fields}
                             getUniqueId={getUniqueId}
+                            error={error && error.properties ? error.properties[propField.id] : null}
                         />
-                    ) : (
-                        <button type="button" onClick={addArrayItem}>
-                            Add Array Item
-                        </button>
-                    )}
-                </div>
-            )}
+                    ))}
+
+                <button type="button" className="add-nested" onClick={addNestedField}>
+                    + Add Nested Property
+                </button>
+            </div>
+        )}
+
+        {/* Handle arrays */}
+        {field.dataType === 'array' && (
+            <div className="nested-fields-container">
+                <h5>Array Item:</h5>
+                {field.items ? (
+                    <Field
+                        field={field.items}
+                        index={0}
+                        dataTypes={dataTypes}
+                        dispatch={dispatch}
+                        onRemove={removeArrayItem}
+                        parentField={field}
+                        fields={fields}
+                        getUniqueId={getUniqueId}
+                        error={error && error.items ? error.items : null}
+                    />
+                ) : (
+                    <button type="button" onClick={addArrayItem}>
+                        + Add Array Item
+                    </button>
+                )}
+            </div>
+        )}
+
+        {/* Handle lists */}
+        {field.dataType === 'list' && (
+            <div className="nested-fields-container">
+                <h5>List Items:</h5>
+                {field.items &&
+                    field.items.map((itemField, idx) => (
+                        <Field
+                            key={itemField.id}
+                            field={itemField}
+                            index={idx}
+                            dataTypes={dataTypes}
+                            dispatch={dispatch}
+                            onRemove={() => removeListItem(itemField.id)}
+                            parentField={field}
+                            fields={fields}
+                            getUniqueId={getUniqueId}
+                            error={error && error.items ? error.items[itemField.id] : null}
+                        />
+                    ))}
+
+                <button type="button" onClick={addListItem}>
+                    + Add List Item
+                </button>
+            </div>
+        )}
         </div>
     );
 }

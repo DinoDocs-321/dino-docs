@@ -2,31 +2,38 @@
   display: flex;
   flex-direction: row;
   width: 100%;
-  /* overflow-x: auto;  Uncomment this line if needed */
+  height: 100vh; /* Fill the entire viewport */
 }
 
-.visual-editor, 
+.visual-editor,
 .code-editor {
   flex: 1;
+  display: flex;
+  flex-direction: column; /* Ensure proper layout for children */
   padding: 20px;
-  min-width: 0;
   background-color: #ffffff;
+  min-width: 0; /* Prevent overflow */
 }
 
 .visual-editor {
   border-right: 1px solid #e0e0e0;
-  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow: hidden; /* Prevent scrolling of the entire visual editor */
 }
 
-@media (max-width: 1000px) {
-  .editor {
-    flex-direction: column;
-    margin: 20px auto;
-  }
+.fields-container {
+  flex-grow: 1; /* Allow the fields-container to grow and fill remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding-right: 10px;
+  margin-top: 10px;
+}
 
-  .visual-editor {
-    border-right: none;
-  }
+.input-row {
+  margin-bottom: 10px;
+}
+
+
+.code-editor {
+  overflow: hidden; /* Prevent overflow */
 }
 
 .visual-editor-header {
@@ -118,7 +125,7 @@ h3 {
   min-width: 0; /* Allow group to shrink */
 }
 
-.buttons {
+.cusButtons {
   display: flex;
   justify-content: flex-end;
   margin-top: 20px;
@@ -138,18 +145,21 @@ h3 {
   margin-left: 10px;
 }
 
-textarea {
+/* .code-editor {
   width: 100%;
-  height: 200px;
+  height: 100%;
+} */
+.code-area {
+  flex-grow: 1; /* Ensure the textarea grows with its container */
   padding: 10px;
   font-size: 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  resize: none;
+  resize: none; /* Disable resizing to avoid unexpected behavior */
   font-family: monospace;
 }
 
-textarea:focus {
+.code-area:focus {
   border-color: #007bff;
   outline: none;
 }
