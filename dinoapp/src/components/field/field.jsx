@@ -203,7 +203,7 @@ function Field(props) {
                             />
                         </div>
                     ) : (
-                        <div classname='description-div'>
+                        <div className='description-div'>
                             <label>Description</label>
                             <input
                                 type="text"

@@ -90,7 +90,7 @@ const DomainGenerate = () => {
     }
   };
 
-  const handleFileUploadBoth = async () => {
+  /* const handleFileUploadBoth = async () => {
     if (!schemaFile && !domainFile) {
       setMessage('Please upload at least one file (schema or domain).');
       return;
@@ -112,7 +112,7 @@ const DomainGenerate = () => {
       console.error(error);
       setMessage('Error uploading files: ' + error.response?.data?.message || error.message);
     }
-  };
+  }; */
 
   const validateJsonFile = async (file, type) => {
     const formData = new FormData();
@@ -340,7 +340,6 @@ const DomainGenerate = () => {
     }
   };
 
-
   return (
     <div className="domain-generate-container">
       <div className="upload-section">
@@ -356,9 +355,7 @@ const DomainGenerate = () => {
             <p>Drag and Drop Schema File Here</p>
             <span>
               Or{' '}
-              <a href="#" onClick={() => document.getElementById('schema-upload').click()}>
-                Browse
-              </a>
+              <a href="#" onClick={() => document.getElementById('schema-upload').click()}>Browse</a>
             </span>
             <input
               type="file"
@@ -368,7 +365,6 @@ const DomainGenerate = () => {
               style={{ display: 'none' }} // Hide the input
             />
           </div>
-
           <div
             className={`upload-box file-drop-area ${isDomainDropped ? 'dropped' : ''}`}
             data-type="domain"
@@ -379,9 +375,7 @@ const DomainGenerate = () => {
             <p>Drag and Drop Domain File Here</p>
             <span>
               Or{' '}
-              <a href="#" onClick={() => document.getElementById('domain-upload').click()}>
-                Browse
-              </a>
+              <a href="#" onClick={() => document.getElementById('domain-upload').click()}>Browse</a>
             </span>
             <input
               type="file"
@@ -392,13 +386,10 @@ const DomainGenerate = () => {
             />
           </div>
         </div>
-
         <button onClick={handleValidateSchemaFile}>Validate Schema File</button>
         <button onClick={handleValidateDomainFile}>Validate Domain File</button>
-        <button onClick={handleFileUploadBoth}>Upload Both</button>
-        {message && <p className="message">{message}</p>}
+        <p className="message">{message || '\u00A0'}</p>
       </div>
-
       <div className="json-input-section">
         <h2 className="section-title">Paste JSON Input</h2>
         <textarea
@@ -408,9 +399,9 @@ const DomainGenerate = () => {
           placeholder="Paste your JSON here..."
         />
         <button onClick={handleValidateJSONText}>Validate JSON Text</button>
-        {message && <p className="message">{message}</p>}
+        <p className="message">{message || '\u00A0'}</p>
       </div>
-
+      <br />
       <div className="action-buttons">
         <button onClick={handleEditJSON}>+ Edit JSON Schema</button>
         <button onClick={handleJSONEditor}>+ Build JSON Schema</button>
@@ -419,5 +410,4 @@ const DomainGenerate = () => {
     </div>
   );
 };
-
 export default DomainGenerate;

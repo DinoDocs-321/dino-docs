@@ -12,6 +12,8 @@ from urllib import request
 
 # Third-party imports
 import bson
+from bson.objectid import ObjectId
+from bson.errors import InvalidId
 import concurrent.futures
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -51,10 +53,10 @@ from reactapi.models import JSONData
 # Load environment variables
 load_dotenv()
 
-# Initialize OpenAI client
+# Initialise OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Initialize logging
+# Initialise logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -65,15 +67,15 @@ User = get_user_model()
 # ----- Login/Signup Views ------
 class RegisterUser(APIView):
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
+        serialiser = UserSerializer(data=request.data)
+        if serialiser.is_valid():
+            user = serialiser.save()
             refresh = RefreshToken.for_user(user)
             return Response({
                 'refresh': str(refresh),
                 'token': str(refresh.access_token),
             }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginUser(APIView):
@@ -228,50 +230,93 @@ def save_user_schema(request):
         return Response(new_schema, status=status.HTTP_201_CREATED)
     else:
         return Response({'error': 'Failed to save schema'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_user_schemas(request):
+    collection = get_collection()
+    user_id = str(request.user.id)
 
-"""
-class ConvertJsonToBson(APIView):
-    def post(self, request):
+    try:
+        # Fetch schemas belonging to the user, only include specific fields
+        schemas = list(collection.find(
+            {'user_id': user_id},
+            {'schema_name': 1, 'created_at': 1}
+        ))
+
+        # Convert ObjectId to string and format dates
+        for schema in schemas:
+            schema['_id'] = str(schema['_id'])
+            if 'created_at' in schema:
+                schema['created_at'] = schema['created_at'].isoformat()
+
+        return Response(schemas, status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f"Error fetching schemas: {e}")
+        return Response({'error': 'Failed to fetch schemas'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Function to retrieve or delete a specific schema
+@api_view(['GET', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def user_schema_detail(request, schema_id):
+    collection = get_collection()
+    user_id = str(request.user.id)
+
+    try:
+        # Validate schema ID
         try:
-            request_data = json.loads(request.body.decode('utf-8'))
-            json_data = request_data.get('data')
+            schema_obj_id = ObjectId(schema_id)
+        except InvalidId:
+            return Response({'error': 'Invalid schema ID'}, status=status.HTTP_400_BAD_REQUEST)
 
-            if not json_data:
-                return HttpResponseBadRequest("No data provided")
+        if request.method == 'GET':
+            # Retrieve the schema
+            schema = collection.find_one({'_id': schema_obj_id, 'user_id': user_id})
+            if not schema:
+                return Response({'error': 'Schema not found'}, status=status.HTTP_404_NOT_FOUND)
 
-            bson_data = bson.BSON.encode({"data": json_data})
-            bson_str = bson_data.hex()
+            # Convert ObjectId to string and format date
+            schema['_id'] = str(schema['_id'])
+            if 'created_at' in schema:
+                schema['created_at'] = schema['created_at'].isoformat()
 
-            return JsonResponse({'converted_data': bson_str})
-        except json.JSONDecodeError:
-            return HttpResponseBadRequest("Invalid JSON")
-        except Exception as e:
-            return HttpResponseBadRequest(str(e))
+            return Response(schema, status=status.HTTP_200_OK)
 
+        elif request.method == 'DELETE':
+            # Delete the schema
+            result = collection.delete_one({'_id': schema_obj_id, 'user_id': user_id})
+            if result.deleted_count == 0:
+                return Response({'error': 'Schema not found or unauthorised'}, status=status.HTTP_404_NOT_FOUND)
 
-class ConvertBsonToJson(APIView):
-    def post(self, request):
+            return Response({'message': 'Schema deleted successfully.'}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        logger.error(f"Error processing request: {e}")
+        return Response({'error': 'Failed to process request.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Function to delete a specific schema (if you prefer a separate endpoint)
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_user_schema(request, schema_id):
+    collection = get_collection()
+    user_id = str(request.user.id)
+
+    try:
+        # Validate schema ID
         try:
-            request_data = json.loads(request.body.decode('utf-8'))
-            bson_str = request_data.get('bson_data')
+            schema_obj_id = ObjectId(schema_id)
+        except InvalidId:
+            return Response({'error': 'Invalid schema ID'}, status=status.HTTP_400_BAD_REQUEST)
 
-            if not bson_str:
-                return HttpResponseBadRequest("No BSON data provided")
+        # Delete the schema
+        result = collection.delete_one({'_id': schema_obj_id, 'user_id': user_id})
+        if result.deleted_count == 0:
+            return Response({'error': 'Schema not found or unauthorised'}, status=status.HTTP_404_NOT_FOUND)
 
-            bson_data = bytes.fromhex(bson_str)
-            json_data = bson.BSON.decode(bson_data)
-
-            return JsonResponse({'converted_data': json_data})
-        except bson.errors.InvalidBSON:
-            return HttpResponseBadRequest("Invalid BSON data")
-        except json.JSONDecodeError:
-            return HttpResponseBadRequest("Invalid request format")
-        except Exception as e:
-            return HttpResponseBadRequest(str(e))
-
-
-"""
-
+        return Response({'message': 'Schema deleted successfully.'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f"Error deleting schema: {e}")
+        return Response({'error': 'Failed to delete schema.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
 def convert(request):
@@ -306,6 +351,7 @@ def convert(request):
 # ------------------------------
 # ----- Document Generation ------
 def generate_single_document(schema):
+    #Generation prompt
     prompt = f"""
     Generate a valid, unique sample JSON document based on the following schema: {json.dumps(schema)}.
     Use the currentValue: {schema.get("currentValue", 1)} for autoIncrement fields.
@@ -330,6 +376,7 @@ def generate_single_document(schema):
         document_content = response.choices[0].message.content
         logger.info(f"Raw response: {document_content}")
 
+
         # Attempt to parse JSON from the response
         document_content = document_content.strip()
         json_start = document_content.find('{')
@@ -352,18 +399,18 @@ def update_schema(schema, auto_increment_values):
     """
     Update schema with the current values for autoIncrement fields.
     """
-    # Make a copy of the schema to avoid changing the original
+    # Deep copy of schema to manipulate
     updated_schema = copy.deepcopy(schema)
 
-    # Go through each property in the schema
+    #Loop for schema properties
     for key, value in updated_schema.get("properties", {}).items():
-        # If it's an autoIncrement field, set the start value
+        #Start value set for auto-increment
         if value.get("dataType") == "autoIncrement":
             if key not in auto_increment_values:
                 auto_increment_values[key] = value.get("startValue", 1)  # Set start value if not already set
             value["startValue"] = auto_increment_values[key]
 
-        # If it's an object, update its properties recursively
+        #If it's an object, update its nested properties
         if value.get("type") == "object":
             value["properties"] = update_schema(value, auto_increment_values).get("properties", {})
 
@@ -375,10 +422,11 @@ def generate_documents(schema, num_docs=1):
     Generates multiple unique documents.
     """
     generated_documents = []
-    auto_increment_values = {}  # Track the current value of each autoIncrement field
+    #Recoord and increment the values for auto-increment datatype
+    auto_increment_values = {}
 
     for _ in range(num_docs):
-        # Update schema with the current values for autoIncrement fields
+        # Update schema with the current values for auto-increment fields
         updated_schema = update_schema(schema, auto_increment_values)
 
         try:
@@ -386,7 +434,7 @@ def generate_documents(schema, num_docs=1):
             document = generate_single_document(updated_schema)
             generated_documents.append(document)
 
-            # Increment auto-increment values for the next document
+            #increment values for next document
             for key in auto_increment_values:
                 auto_increment_values[key] += 1
 
@@ -399,7 +447,7 @@ def generate_documents(schema, num_docs=1):
     return generated_documents, success_count, failure_count
 
 
-# Data types available for document generation
+#List of all datatypes to populate datatype select box
 DATA_TYPES = [
     {"value": "names", "label": "Names", "type": "string"},
     {"value": "phoneFax", "label": "Phone / Fax", "type": "string"},

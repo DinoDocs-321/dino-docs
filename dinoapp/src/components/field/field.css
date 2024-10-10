@@ -1,112 +1,102 @@
-/* General field container */
+/* field layout */
 .field {
     margin-bottom: 20px;
     display: flex;
-    flex-direction: column; /* Align fields vertically within the main field container */
+    flex-direction: column;
 }
 
-/* Field Content container for each row */
+/* layout for field content */
 .field-content {
     display: flex;
     align-items: center;
-    gap: 20px; /* Adjust spacing between elements for better alignment */
-    flex-wrap: nowrap; /* Prevent wrapping of elements within the row */
-    /*min-height: 60px; /* Set a minimum height to ensure everything stays aligned */
+    gap: 20px;
+    flex-wrap: nowrap;
     height: 60px;
 }
-
-/* Align the row number vertically with the input boxes */
 .field-content label {
-    align-self: center; /* Vertically align the row number */
+    align-self: center;
 }
-
-/* Style the remove button (the 'x') to center-align with the inputs */
 .field-content button {
-    align-self: center; /* Vertically align the 'x' button */
-    height: 40px; /* Set the button height equal to input box height */
+    align-self: center;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 29px;
 }
 
-/* Input group for each input field, ensuring vertical alignment */
+/* styling for field-input-group div*/
 .field-input-group {
     display: flex;
     flex-direction: column;
-    flex: 1; /* Allow equal space for each input field */
+    flex-grow: 1;
     min-width: 150px;
 }
-
 .field-input-group label {
     margin-bottom: 5px;
     font-weight: bold;
 }
 
-/* Styling the input and select fields */
 .field-input-group select,
 .field-input-group input {
-    padding: 10px; /* Same padding for both input and select */
-    width: 100%; /* Ensure they both take up the same width */
-    border: 1px solid #ccc; /* Same border for both */
-    border-radius: 4px; /* Optional, for rounded corners */
-    box-sizing: border-box; /* Ensure padding is included in the width */
-    font-size: 16px; /* Same font size */
-    height: 40px; /* Same height for both */
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; 
+    font-size: 16px;
+    height: 40px;
 }
-
-/* Ensure consistency in the focus state */
+/* focus state styling for input and select elements */
 .field-input-group select:focus,
 .field-input-group input:focus {
-    outline: none; /* Remove default focus outline */
-    border-color: #4a90e2; /* Add a custom focus border color */
-    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5); /* Optional, adds focus shadow */
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
 }
 
-/* Scrollable container for nested fields */
+
+/* nested fields container styling */
 .nested-fields-container {
     padding: 10px;
-    border-left: 3px solid #ccc; /* Visual separation for nested fields */
+    border-left: 3px solid #ccc;
     margin-top: 10px;
-    margin-left: 50px; /* Indent nested properties */
+    margin-left: 50px;
     display: flex;
-    flex-direction: column; /* Stack nested fields vertically */
-    gap: 10px; /* Space between nested fields */
+    flex-direction: column;
+    gap: 10px;
 }
 
-/* Error styling */
+/* colour for errors */
 .error {
     border-color: red !important;
 }
 
 .description-div input {
-    width:max-content;
+    width: auto;
 }
 
+/* drag handle styling */
 .drag-handle {
     cursor: grab;
     font-size: 18px;
     font-weight: bold;
     padding: 0 10px;
     color: #666;
-    user-select: none; /* Prevent text selection */
+    user-select: none;
     display: flex;
-    align-items: center; /* Vertically center align with the row */
+    align-items: center;
     margin-top: 30px;
 }
-
 .drag-handle:active {
     cursor: grabbing;
 }
-
+/* set width for add nested property */
 .add-nested {
     width: 250px;
-    /*align-self: center;*/
 }
 
-.field-content button {
-    margin-top: 29px;
-}
-
+/* styling for rows */
 .row {
     margin-top: 30px;
     font-size: 16px;
