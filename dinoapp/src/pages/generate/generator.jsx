@@ -51,37 +51,36 @@ function Generator() {
 
     // Get request for a user's saved schemas
     const fetchSavedSchemas = useCallback(async () => {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            alert('Please log in to import a schema.');
-            return;
-        }
-
         try {
+            const token = localStorage.getItem('accessToken'); // Token is assumed to be available
             const res = await axios.get('http://127.0.0.1:8000/api/saved-schemas/', {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             setSavedSchemas(res.data);
         } catch (err) {
             console.error('Error fetching saved schemas:', err);
+            localStorage.removeItem('accessToken');
+            window.location.href = '/signin'; // Redirect to the signin page
             alert('Session inactive, please log in again.');
         }
     }, []);
+    
 
     //Open the schema modal to display list of schemas to select
     const handleOpenSchemaModal = () => {
-        fetchSavedSchemas();
-        setShowSchemaModal(true);
-    };
-
-    const handleSchemaSelect = async (schemaId) => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
             alert('Please log in to import a schema.');
             return;
         }
+        fetchSavedSchemas();
+        setShowSchemaModal(true);
+    };
+    
 
+    const handleSchemaSelect = async (schemaId) => {
         try {
+            const token = localStorage.getItem('accessToken'); // Token is assumed to be available
             const res = await axios.get(`http://127.0.0.1:8000/api/saved-schemas/${schemaId}/`, {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
@@ -93,6 +92,7 @@ function Generator() {
             alert('Failed to fetch schema details.');
         }
     };
+    
 
     //import schema
     const importSchema = (schemaData) => {

@@ -83,3 +83,24 @@
     justify-content: space-between;
     align-items: center;
 }
+
+.our-btn {
+  background-color: #8cb8ca;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px;
+  text-decoration: none;
+}
+.our-btn:hover {
+  background-color: #407c94;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px;
+  text-decoration: none;
+}

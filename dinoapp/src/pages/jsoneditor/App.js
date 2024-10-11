@@ -343,8 +343,12 @@ const JSONEditor = () => {
     <div className="mycontainer">
       <div className="editor">
         <div className="container visual-editor">
+          <div className="col-4">
+            <a href="/jsonschema-docs" className="read-btn ">Read Documentation for Schema Creation</a>
+          </div>
           <div className="visual-editor-header">
-            <h3>Visual Editor</h3>
+          
+          <h3>Visual Editor</h3>
             <button className="add-button" onClick={() => addNewField(null)}>
               +
             </button>
