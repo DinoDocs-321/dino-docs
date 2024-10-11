@@ -66,20 +66,19 @@ const JSONEditor = () => {
       label: 'title',
       type: 'string',
       description: 'The title of the schema.',
-      dataType: '',
-      isMandatory: true,
+      dataType: 'string',
+      isMandatory: true, // Indicates this is a mandatory field that cannot be deleted
     },
     {
       id: generateId().toString(),
       label: 'description',
       type: 'string',
       description: 'A description of the schema.',
-      dataType: '',
-      isMandatory: true,
-    },
+      dataType: 'string',
+      isMandatory: true, // Indicates this is a mandatory field that cannot be deleted
+    }
   ]);
   const [jsonCode, setJSONCode] = useState('{}');
-  const [statusMessage, setStatusMessage] = useState('');
   const jsonCodeFromEditor = useRef(false);
 
   const sensors = useSensors(
@@ -122,7 +121,7 @@ const JSONEditor = () => {
   }, []);
 
   const deleteField = useCallback((id) => {
-    const removeField = (fields) =>
+    const removeField = (fields) => 
       fields
         .filter((field) => field.id !== id || field.isMandatory)
         .map((field) => ({
@@ -165,18 +164,19 @@ const JSONEditor = () => {
 
   const convertFormDataToJson = (fields) => {
     const jsonObject = {
-      type: 'object',
       title: '',
       description: '',
       properties: {},
     };
-
+  
     fields.forEach((field) => {
+      // Handle the root-level title and description separately.
       if (field.label === 'title') {
         jsonObject.title = field.description || 'Title of schema';
       } else if (field.label === 'description') {
         jsonObject.description = field.description || 'Description of schema';
       } else {
+        // Process other fields into properties.
         const processFields = (fields) =>
           fields.reduce((acc, field) => {
             const fieldData = {
@@ -184,31 +184,34 @@ const JSONEditor = () => {
               description: field.description,
               dataType: field.dataType,
             };
-
+  
+            // Include minLength and maxLength if present and applicable.
             if (field.minLength !== undefined && field.minLength !== '') {
               fieldData.minLength = parseInt(field.minLength, 10);
             }
             if (field.maxLength !== undefined && field.maxLength !== '') {
               fieldData.maxLength = parseInt(field.maxLength, 10);
             }
-
+  
+            // Process nested properties if this field is an object.
             if (field.children && field.children.length > 0) {
               fieldData.properties = processFields(field.children);
             }
-
+  
             acc[field.label] = fieldData;
             return acc;
           }, {});
-
+  
         jsonObject.properties = {
           ...jsonObject.properties,
           ...processFields([field]),
         };
       }
     });
-
+  
     return jsonObject;
-  };
+  }
+  
 
   const convertJsonToFormData = (json) => {
     const formData = [
@@ -227,14 +230,14 @@ const JSONEditor = () => {
         description: json.description || '',
         dataType: '',
         isMandatory: true,
-      },
+      }
     ];
-
-    const processFields = (obj) =>
+  
+    const processFields = (obj, parentKey = null) =>
       Object.keys(obj).map((key) => {
         const field = obj[key];
         const id = generateId().toString();
-
+  
         return {
           id,
           label: key,
@@ -243,16 +246,17 @@ const JSONEditor = () => {
           dataType: field.type === 'object' ? 'object' : field.dataType || '',
           minLength: field.minLength || '',
           maxLength: field.maxLength || '',
-          children: field.properties ? processFields(field.properties) : [],
+          children: field.properties ? processFields(field.properties, id) : [],
         };
       });
-
+  
     if (json.properties) {
       formData.push(...processFields(json.properties));
     }
-
+  
     return formData;
   };
+  
 
   useEffect(() => {
     if (!jsonCodeFromEditor.current) {
@@ -283,12 +287,6 @@ const JSONEditor = () => {
     try {
       const schemaName = prompt('Enter the schema name:', 'GeneratedSchema');
       const token = localStorage.getItem('accessToken');
-  
-      if (!token) {
-        setStatusMessage('Error: No access token found. Please log in.');
-        return;
-      }
-  
       const response = await axios.post(
         'http://localhost:8000/api/save-schema/',
         {
@@ -299,35 +297,11 @@ const JSONEditor = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
-      setStatusMessage('Schema saved successfully!');
+      console.log('Schema saved:', response.data);
     } catch (error) {
       console.error('Error saving schema:', error);
-  
-      // Handle 401 Unauthorized error
-      if (error.response?.status === 401) {
-        setStatusMessage('Error: Unauthorized. Please sign in again.');
-        localStorage.removeItem('accessToken');
-        window.location.href = '/signin'; // Redirect to the signin page
-      } 
-      // Handle 400 Bad Request with a specific error message
-      else if (error.response?.status === 400 && error.response.data?.error === 'A schema with this name already exists.') {
-        setStatusMessage('Error: A schema with this name already exists. Please choose a different name.');
-      } 
-      // Handle other errors
-      else {
-        const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
-        setStatusMessage(`Error saving schema: ${errorMessage}`);
-      }
     }
-  
-    // Clear the status message after 10 seconds
-    setTimeout(() => setStatusMessage(''), 10000);
   };
-  
-  
-  
-  
 
   const generateJSONData = () => {
     const blob = new Blob([jsonCode], { type: 'application/json' });
@@ -385,17 +359,6 @@ const JSONEditor = () => {
           Save JSON Document
         </button>
       </div>
-      <div className="container col-6">
-        {statusMessage && (
-          <div
-            className={`status-message ${statusMessage.startsWith('Error') ? 'error-msg' : 'save-msg'}`}
-          >
-            {statusMessage}
-          </div>
-        )}
-      </div>
-
-
     </div>
   );
 };
@@ -410,7 +373,10 @@ const SortableItem = ({ field, path, onInputChange, addNewField, deleteField }) 
     transition,
   };
 
+  // Determine if the field should not show a dataType selector
   const isTitleOrDescription = field.label === 'title' || field.label === 'description';
+
+  // Determine if the field needs minLength and maxLength inputs based on its dataType
   const requiresLength = ['number', 'alphanumeric', 'numberRange', 'bankAccountNums'].includes(
     field.dataType
   );
@@ -430,7 +396,7 @@ const SortableItem = ({ field, path, onInputChange, addNewField, deleteField }) 
           onChange={(e) => onInputChange(field.id, 'label', e.target.value)}
           className="label-field"
           placeholder="Field Name"
-          readOnly={isTitleOrDescription}
+          readOnly={isTitleOrDescription} // Prevent changing the label of title and description
         />
         <div className="innerButtons">
           {!isTitleOrDescription && (
@@ -446,6 +412,7 @@ const SortableItem = ({ field, path, onInputChange, addNewField, deleteField }) 
         </div>
       </div>
 
+      {/* Data Type Selector: Show only if it's not title or description */}
       {!isTitleOrDescription && (
         <select
           value={field.dataType}
@@ -461,6 +428,7 @@ const SortableItem = ({ field, path, onInputChange, addNewField, deleteField }) 
         </select>
       )}
 
+      {/* Description Field Input */}
       <input
         type="text"
         value={field.description}
@@ -469,6 +437,7 @@ const SortableItem = ({ field, path, onInputChange, addNewField, deleteField }) 
         placeholder="Description"
       />
 
+      {/* MinLength and MaxLength Inputs - shown only if the dataType requires them */}
       {requiresLength && (
         <>
           <input
@@ -488,6 +457,7 @@ const SortableItem = ({ field, path, onInputChange, addNewField, deleteField }) 
         </>
       )}
 
+      {/* Render nested fields if present */}
       {field.children && field.children.length > 0 && (
         <div className="fields-container">
           {field.children.map((child, index) => (
@@ -505,5 +475,6 @@ const SortableItem = ({ field, path, onInputChange, addNewField, deleteField }) 
     </div>
   );
 };
+
 
 export default JSONEditor;

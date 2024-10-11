@@ -18,3 +18,4 @@ generator/__pycache__
 .idea
 .vscode/
 node_modules
+dinoapp/build/

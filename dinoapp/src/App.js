@@ -18,6 +18,12 @@ import Generator from './pages/generate/generator';
 import DomainGenerate from './pages/domainGenerate/domainGenerate';
 import VerifyCode from './pages/VerifyCode/VerifyCode';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
+import DocsPage from './pages/docs/DocsPage';
+import JSONSchemaDocs from'./pages/docs/JSONSchemaDocs'; 
+import GettingStarted from'./pages/docs/GettingStarted'; 
+import Converter from './pages/converter/converter';
+import OldEditor from './pages/jsoneditor/works'
+import About from './pages/about/App'
 
 
 function App() {
@@ -36,6 +42,7 @@ function App() {
         <Route path='/' element={<Homepage />} />
         <Route path='/BSONConverter' element={<BSONConverter />} />
         <Route path='/JSONConverter' element={<JSONConverter />} />
+        <Route path='/converter' element={<Converter />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/JSONEditor' element={<JSONEditor />} />
         <Route path='/schema-form' element={<SchemaForm />} />
@@ -45,9 +52,14 @@ function App() {
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/reset-password/:uidb64/:token' element={<ResetPassword />} />
         <Route path='/generate' element={<Generator />} />
+        <Route path='/oldeditor' element={<OldEditor />} />
         <Route path="/domain-generate" element={<DomainGenerate />} />
         <Route path='/verify-code' element={<VerifyCode />} />
         <Route path='/reset-password' element={<ResetPassword />} />
+        <Route path='/docs' element={<DocsPage />} />
+        <Route path='/about' element={<About />} />
+        <Route path='/jsonschema-docs' element={<JSONSchemaDocs />} />
+        <Route path='/getting-started' element={<GettingStarted />} />
         <Route path='*' element={<NotFound />} />
       </Routes>
     </div>

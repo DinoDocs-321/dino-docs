@@ -1,0 +1,112 @@
+/* styling for the imported save schema lists. */
+.schemaList-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    max-height: 80%;
+    overflow-y: auto;
+    position: relative;
+}
+
+.schemaList-content h3 {
+    margin-top: 0;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.schemaList {
+    list-style-type: none;
+    padding: 0;
+}
+
+.schemaList li {
+    margin-bottom: 10px;
+}
+
+/* .schemaList button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4a90e2;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+} */
+
+.delete-button {
+    background-color: #ff0000;
+    color: #ffffff;
+}
+
+.import-btn {
+    background-color: #2f9400;
+    color: #ffffff;
+}
+
+.schemaList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.schemaList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9f9f9;
+    margin: 25px 0;
+    padding: 10px 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease;
+}
+
+.schemaList li:hover {
+    background: #eaeaea;
+}
+
+.schemaList span {
+    font-weight: 600;
+    color: #333;
+}
+
+.schema-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.import-btn, .delete-button {
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.import-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.import-btn:hover {
+    background: #45a049;
+}
+
+.delete-button {
+    background: #f44336;
+    color: white;
+}
+
+.delete-button:hover {
+    background: #e53935;
+}

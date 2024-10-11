@@ -1,119 +1,300 @@
-// generator.jsx
-
-import './generator.css';
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer, useCallback } from 'react';
 import axios from 'axios';
-
-// Unique ID generator
-let uniqueId = 0;
-function getUniqueId() {
-    return ++uniqueId;
-}
+import Container from 'react-bootstrap/Container';
+import './generator.css';
+import Field from '../../components/field/field';
+import SchemaList from '../../components/schema/schemaList.jsx';
+import { getUniqueId } from '../../utils/uniqueID';
 
 function Generator() {
-    // State variables for schema details
+
+    // States
     const [schemaTitle, setSchemaTitle] = useState('');
     const [schemaDescription, setSchemaDescription] = useState('');
-    const [format, setFormat] = useState('json');
-    const [numSamples, setNumSamples] = useState(10); // Default number of samples is 10
+    const [numSamples, setNumSamples] = useState(3);
     const [response, setResponse] = useState(null);
 
-    // State variable for data types
+    // Available data types for fields
     const [dataTypes, setDataTypes] = useState([]);
 
-    // State variable for form validation errors
-    const [errors, setErrors] = useState([]);
+    // Error handling
+    const [fieldErrors, setFieldErrors] = useState({});
+    const [schemaErrors, setSchemaErrors] = useState({});
+    const [showValidationError, setShowValidationError] = useState(false);
 
-    // Fetch data types from the API when the component mounts
-    useEffect(function() {
-        async function fetchDataTypes() {
+    // Loading state
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Saved schemas
+    const [savedSchemas, setSavedSchemas] = useState([]);
+    const [showSchemaModal, setShowSchemaModal] = useState(false);
+
+    // Fetch data types when component mounts
+    useEffect(() => {
+        const fetchDataTypes = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/api/data-types/');
-                setDataTypes(response.data);
-            } catch (error) {
-                console.error('Error fetching data types:', error);
+                const res = await axios.get('http://127.0.0.1:8000/api/data-types/');
+                setDataTypes(res.data);
+            } catch (err) {
+                console.error('Error fetching data types:', err);
             }
-        }
+        };
         fetchDataTypes();
     }, []);
 
-    // Reducer for managing fields
-    function fieldsReducer(state, action) {
+    // Scroll to top when validation errors are shown
+    useEffect(() => {
+        if (showValidationError) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, [showValidationError]);
+
+    // Fetch saved schemas
+    const fetchSavedSchemas = useCallback(async () => {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            alert('Please log in to import a schema.');
+            return;
+        }
+
+        try {
+            const res = await axios.get('http://127.0.0.1:8000/api/saved-schemas/', {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            setSavedSchemas(res.data);
+        } catch (err) {
+            console.error('Error fetching saved schemas:', err);
+            alert('Session inactive, please log in again.');
+        }
+    }, []);
+
+    // Handle opening the schema modal and fetching schemas
+    const handleOpenSchemaModal = () => {
+        fetchSavedSchemas();
+        setShowSchemaModal(true);
+    };
+
+    // Handle schema selection from saved schemas
+    const handleSchemaSelect = async (schemaId) => {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            alert('Please log in to import a schema.');
+            return;
+        }
+
+        try {
+            const res = await axios.get(`http://127.0.0.1:8000/api/saved-schemas/${schemaId}/`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            const schemaData = res.data.json_data;
+            importSchema(schemaData);
+            setShowSchemaModal(false);
+        } catch (err) {
+            console.error('Error fetching schema details:', err);
+            alert('Failed to fetch schema details.');
+        }
+    };
+
+    // Import schema data into form fields
+    const importSchema = (schemaData) => {
+        if (dataTypes.length === 0) {
+            alert('Data types are not loaded yet. Please try again in a moment.');
+            return;
+        }
+
+        // Basic validation
+        if (
+            schemaData &&
+            schemaData.type === 'object' &&
+            schemaData.properties &&
+            typeof schemaData.properties === 'object'
+        ) {
+            const importedFields = schemaPropertiesToFields(schemaData.properties);
+            setSchemaTitle(schemaData.title || '');
+            setSchemaDescription(schemaData.description || '');
+            dispatch({ type: 'SET_FIELDS', fields: importedFields });
+        } else {
+            alert('Invalid schema format. Cannot import this schema.');
+        }
+    };
+
+    // Convert schema properties to form fields
+    const schemaPropertiesToFields = (properties) => {
+        const fieldsArray = [];
+
+        for (const key in properties) {
+            if (properties.hasOwnProperty(key)) {
+                const prop = properties[key];
+                const field = {
+                    id: getUniqueId(),
+                    keyTitle: key,
+                    dataType: mapSchemaPropertyToDataType(prop),
+                    description: prop.description || '',
+                    attributes: {},
+                    properties: [],
+                    items: null,
+                };
+
+                // Map relevant attributes
+                ['minLength', 'maxLength', 'minimum', 'maximum'].forEach((attr) => {
+                    if (prop[attr] !== undefined) {
+                        field.attributes[attr] = prop[attr];
+                    }
+                });
+
+                // Handle nested objects
+                if (prop.type === 'object' && prop.properties) {
+                    field.properties = schemaPropertiesToFields(prop.properties);
+                }
+
+                // Handle arrays and lists
+                if (prop.type === 'array' && prop.items) {
+                    if (Array.isArray(prop.items)) {
+                        field.dataType = 'list';
+                        field.items = prop.items.map((item) => schemaPropertyToField(item));
+                    } else {
+                        field.dataType = 'array';
+                        field.items = schemaPropertyToField(prop.items);
+                    }
+                }
+
+                fieldsArray.push(field);
+            }
+        }
+
+        return fieldsArray;
+    };
+
+    // Convert a single schema property to a form field
+    const schemaPropertyToField = (prop) => {
+        const field = {
+            id: getUniqueId(),
+            keyTitle: '',
+            dataType: mapSchemaPropertyToDataType(prop),
+            description: prop.description || '',
+            attributes: {},
+            properties: [],
+            items: null,
+        };
+
+        // Map relevant attributes
+        ['minLength', 'maxLength', 'minimum', 'maximum'].forEach((attr) => {
+            if (prop[attr] !== undefined) {
+                field.attributes[attr] = prop[attr];
+            }
+        });
+
+        // Handle nested objects
+        if (prop.type === 'object' && prop.properties) {
+            field.properties = schemaPropertiesToFields(prop.properties);
+        }
+
+        // Handle arrays and lists
+        if (prop.type === 'array' && prop.items) {
+            if (Array.isArray(prop.items)) {
+                field.dataType = 'list';
+                field.items = prop.items.map((item) => schemaPropertyToField(item));
+            } else {
+                field.dataType = 'array';
+                field.items = schemaPropertyToField(prop.items);
+            }
+        }
+
+        return field;
+    };
+
+    // Map schema property to form data type
+    const mapSchemaPropertyToDataType = (prop) => {
+        const { type, format, dataType } = prop;
+
+        if (dataType) {
+            return dataType;
+        }
+
+        const dataTypeEntry = dataTypes.find((dt) => dt.type === type && dt.format === format);
+        return dataTypeEntry ? dataTypeEntry.value : '';
+    };
+
+    // Reducer to manage form fields state
+    const fieldsReducer = (state, action) => {
         switch (action.type) {
             case 'ADD_FIELD':
-                return [
-                    ...state,
-                    {
-                        id: getUniqueId(),
-                        keyTitle: '',
-                        dataType: '',
-                        description: '',
-                        attributes: {},
-                        properties: [],
-                        items: null,
-                    },
-                ];
+                const newField = {
+                    id: getUniqueId(),
+                    keyTitle: '',
+                    dataType: '',
+                    description: '',
+                    attributes: {},
+                    properties: [],
+                    items: null,
+                };
+                return [...state, newField];
+
             case 'REMOVE_FIELD':
-                return state.filter(field => field.id !== action.fieldId);
+                return state.filter((field) => field.id !== action.fieldId);
+
             case 'UPDATE_FIELD':
-                return state.map(field => updateField(field, action));
+                return state.map((field) => updateField(field, action));
+
+            case 'SET_FIELDS':
+                return action.fields;
+
             default:
                 return state;
         }
-    }
+    };
 
-    function updateField(field, action) {
+    // Helper to update a field based on action
+    const updateField = (field, action) => {
         if (field.id === action.fieldId) {
             return { ...field, [action.key]: action.value };
         } else {
-            let updatedField = field;
+            let updatedField = { ...field };
+
             if (field.properties && field.properties.length > 0) {
-                updatedField = {
-                    ...field,
-                    properties: field.properties.map(prop => updateField(prop, action)),
-                };
+                updatedField.properties = field.properties.map((prop) => updateField(prop, action));
             }
+
             if (field.items) {
-                updatedField = {
-                    ...field,
-                    items: updateField(field.items, action),
-                };
+                if (Array.isArray(field.items)) {
+                    updatedField.items = field.items.map((item) => updateField(item, action));
+                } else {
+                    updatedField.items = updateField(field.items, action);
+                }
             }
+
             return updatedField;
         }
-    }
+    };
 
     const [fields, dispatch] = useReducer(fieldsReducer, []);
 
-    // Function to handle form submission
-    async function handleSubmit(event) {
+    // Handle form submission
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Validate fields
-        const validationErrors = [];
-        validateFields(fields, validationErrors);
+        const { fieldErrors, schemaErrors } = validateFields(fields);
 
-        if (validationErrors.length > 0) {
-            setErrors(validationErrors);
+        if (Object.keys(fieldErrors).length > 0 || Object.keys(schemaErrors).length > 0) {
+            setFieldErrors(fieldErrors);
+            setSchemaErrors(schemaErrors);
+            setShowValidationError(true);
             return;
         } else {
-            setErrors([]);
+            setFieldErrors({});
+            setSchemaErrors({});
+            setShowValidationError(false);
         }
 
-        // Build the schema from the fields state
-        const schemaData = {
-            $schema: 'http://json-schema.org/draft-07/schema#',
-            type: 'object',
-            title: schemaTitle || 'Generated Schema',
-            description: schemaDescription || 'This schema was generated by the user',
-            properties: buildProperties(fields),
-        };
+        setIsLoading(true);
+
+        const schemaData = buildSchemaData();
 
         console.log('Generated Schema Data:', JSON.stringify(schemaData, null, 2));
 
         const dataToSend = {
-            schema: schemaData, // This should be the complete schema object
-            format: format,
+            schema: schemaData,
+            format: 'json',
             num_samples: numSamples,
         };
 
@@ -121,49 +302,93 @@ function Generator() {
 
         try {
             const result = await axios.post('http://127.0.0.1:8000/api/generate-documents/', dataToSend, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
             });
-    
+
             console.log('Response from server:', result.data);
             setResponse(result.data);
-        } catch (error) {
-            console.error('There was an error generating the documents!', error);
+        } catch (err) {
+            console.error('Error generating the documents!', err);
+        } finally {
+            setIsLoading(false);
         }
-    }
+    };
 
-    // Function to validate fields recursively
-    function validateFields(fields, errors, parentKey = '') {
-        fields.forEach(field => {
-            const fieldPath = parentKey ? `${parentKey} > ${field.keyTitle || 'Unnamed Field'}` : field.keyTitle || 'Unnamed Field';
+    // Validate form fields recursively
+    const validateFields = (fields) => {
+        let fieldErrors = {};
+        let schemaErrors = {};
+
+        // Validate schema title and description
+        if (!schemaTitle.trim()) {
+            schemaErrors.schemaTitle = 'Schema Title is required.';
+        }
+        if (!schemaDescription.trim()) {
+            schemaErrors.schemaDescription = 'Schema Description is required.';
+        }
+
+        // Validate each field
+        fields.forEach((field) => {
+            let errors = {};
+
+            // Key Title validation
             if (!field.keyTitle) {
-                errors.push(`Key Title is required for field "${fieldPath}".`);
+                errors.keyTitle = 'Key Title is required.';
+            } else if (/\s/.test(field.keyTitle)) {
+                errors.keyTitle = 'Key Title cannot contain spaces.';
             }
+
+            // Data Type validation
             if (!field.dataType) {
-                errors.push(`Data Type is required for field "${fieldPath}".`);
+                errors.dataType = 'Data Type is required.';
             }
+
+            // AutoIncrement Start Value validation
+            if (field.dataType === 'autoIncrement') {
+                if (!field.description || field.description.trim() === '') {
+                    errors.description = 'Start Value is required.';
+                } else if (isNaN(field.description)) {
+                    errors.description = 'Start Value must be a number.';
+                }
+            }
+
+            // Recursive validation for nested fields
             if (field.dataType === 'object' && field.properties) {
-                validateFields(field.properties, errors, fieldPath);
+                const { fieldErrors: childErrors } = validateFields(field.properties);
+                if (Object.keys(childErrors).length > 0) {
+                    errors.properties = childErrors;
+                }
             }
-            if (field.dataType === 'array' && field.items) {
-                validateFields([field.items], errors, fieldPath);
+
+            if ((field.dataType === 'array' || field.dataType === 'list') && field.items) {
+                const items = Array.isArray(field.items) ? field.items : [field.items];
+                const { fieldErrors: childErrors } = validateFields(items);
+                if (Object.keys(childErrors).length > 0) {
+                    errors.items = childErrors;
+                }
+            }
+
+            if (Object.keys(errors).length > 0) {
+                fieldErrors[field.id] = errors;
             }
         });
-    }
 
-    // Function to build properties recursively
-    function buildProperties(fields) {
+        return { fieldErrors, schemaErrors };
+    };
+
+    // Build schema properties recursively
+    const buildProperties = (fields) => {
         const properties = {};
-        fields.forEach(field => {
+        fields.forEach((field) => {
             if (field.keyTitle && field.dataType) {
                 properties[field.keyTitle] = processField(field);
             }
         });
         return properties;
-    }
+    };
 
-    function processField(field) {
+    // Process a single field into schema format
+    const processField = (field) => {
         const dataTypeInfo = mapDataType(field.dataType);
         if (!dataTypeInfo) {
             console.warn(`Data type "${field.dataType}" not found.`);
@@ -173,14 +398,20 @@ function Generator() {
         const schemaField = {
             type: dataTypeInfo.type,
             description: field.description || '',
+            dataType: field.dataType,
         };
+
+        if (field.dataType === 'autoIncrement') {
+            schemaField.startValue = parseInt(field.description, 10);
+        }
 
         if (dataTypeInfo.format) {
             schemaField.format = dataTypeInfo.format;
         }
 
         // Include additional attributes
-        for (const [attr, value] of Object.entries(field.attributes || {})) {
+        for (const attr in field.attributes) {
+            const value = field.attributes[attr];
             if (value !== '') {
                 if (['minLength', 'maxLength', 'minimum', 'maximum'].includes(attr)) {
                     schemaField[attr] = parseInt(value, 10);
@@ -190,232 +421,213 @@ function Generator() {
             }
         }
 
-        if (dataTypeInfo.type === 'object' && field.properties && field.properties.length > 0) {
+        // Handle nested fields
+        if (dataTypeInfo.type === 'object' && field.properties.length > 0) {
             schemaField.properties = buildProperties(field.properties);
         }
 
-        if (dataTypeInfo.type === 'array' && field.items) {
+        if (field.dataType === 'array' && field.items) {
             schemaField.items = processField(field.items);
         }
 
+        if (field.dataType === 'list' && field.items && field.items.length > 0) {
+            schemaField.items = field.items.map(processField);
+        }
+
         return schemaField;
-    }
-
-    // Function to map data type value to its info
-    function mapDataType(value) {
-        var foundType = dataTypes.find(function(dataType) {
-            return dataType.value === value;
-        });
-        return foundType || null;
-    }
-
-    // Main component render
-    return (
-        <div>
-            <h1>Data Generator</h1>
-            <div className="schema-info">
-                <input
-                    type="text"
-                    placeholder="Schema Title"
-                    value={schemaTitle}
-                    onChange={function(e) {
-                        setSchemaTitle(e.target.value);
-                    }}
-                />
-                <input
-                    type="text"
-                    placeholder="Schema Description"
-                    value={schemaDescription}
-                    onChange={function(e) {
-                        setSchemaDescription(e.target.value);
-                    }}
-                />
-            </div>
-
-            {/* Input for Number of Samples */}
-            <div className="sample-count">
-                <label>Number of Samples:</label>
-                <input
-                    type="number"
-                    value={numSamples}
-                    onChange={e => setNumSamples(parseInt(e.target.value) || 1)}
-                    min="1"
-                    step="1"
-                />
-            </div>
-
-            {/* Output Format Selection */}
-            <div className="output-format">
-                <label>Output Format:</label>
-                <select value={format} onChange={e => setFormat(e.target.value)}>
-                    <option value="json">JSON</option>
-                    <option value="bson">BSON</option>
-                </select>
-            </div>
-
-            {errors.length > 0 && (
-                <div className="errors">
-                    <h3>Form Errors:</h3>
-                    <ul>
-                        {errors.map((error, index) => (
-                            <li key={index} style={{ color: 'red' }}>
-                                {error}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-            <div className="fields-container">
-                {fields.map(field => (
-                    <Field
-                        key={field.id}
-                        field={field}
-                        dataTypes={dataTypes}
-                        dispatch={dispatch}
-                        onRemove={() => dispatch({ type: 'REMOVE_FIELD', fieldId: field.id })}
-                    />
-                ))}
-            </div>
-            <button type="button" onClick={() => dispatch({ type: 'ADD_FIELD' })}>
-                Add Property
-            </button>
-            <button type="button" onClick={handleSubmit}>Submit</button>
-            {response && (
-                <div className="response">
-                    <h3>Response from Server:</h3>
-                    <pre>{JSON.stringify(response, null, 2)}</pre>
-                </div>
-            )}
-        </div>
-    );
-}
-
-// Field component
-function Field(props) {
-    const { field, dataTypes, dispatch, onRemove } = props;
-
-    const handleChange = (key, value) => {
-        dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, key, value });
     };
 
-    const addNestedField = () => {
-        const newField = {
-            id: getUniqueId(),
-            keyTitle: '',
-            dataType: '',
-            description: '',
-            attributes: {},
-            properties: [],
-            items: null,
+    // Map form data type to schema data type info
+    const mapDataType = (value) => {
+        return dataTypes.find((dataType) => dataType.value === value) || null;
+    };
+
+    // Build the complete schema data
+    const buildSchemaData = () => {
+        return {
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            type: 'object',
+            title: schemaTitle || 'Generated Schema',
+            description: schemaDescription || 'This schema was generated by the user',
+            properties: buildProperties(fields),
         };
-        dispatch({
-            type: 'UPDATE_FIELD',
-            fieldId: field.id,
-            key: 'properties',
-            value: [...(field.properties || []), newField],
-        });
     };
 
-    const removeNestedField = (nestedFieldId) => {
-        dispatch({
-            type: 'UPDATE_FIELD',
-            fieldId: field.id,
-            key: 'properties',
-            value: field.properties.filter(f => f.id !== nestedFieldId),
-        });
+    // Handle download of generated documents
+    const handleDownload = () => {
+        if (response && response.documents) {
+            const dataStr = JSON.stringify(response.documents, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${schemaTitle || 'generated_data'}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
     };
 
-    const addArrayItem = () => {
-        const newItem = {
-            id: getUniqueId(),
-            keyTitle: '',
-            dataType: '',
-            description: '',
-            attributes: {},
-            properties: [],
-            items: null,
-        };
-        dispatch({
-            type: 'UPDATE_FIELD',
-            fieldId: field.id,
-            key: 'items',
-            value: newItem,
-        });
+    // Save schema to the database
+    const handleSaveSchema = async () => {
+        const { fieldErrors, schemaErrors } = validateFields(fields);
+
+        if (Object.keys(fieldErrors).length > 0 || Object.keys(schemaErrors).length > 0) {
+            setFieldErrors(fieldErrors);
+            setSchemaErrors(schemaErrors);
+            setShowValidationError(true);
+            return;
+        } else {
+            setFieldErrors({});
+            setSchemaErrors({});
+            setShowValidationError(false);
+        }
+
+        const schemaData = buildSchemaData();
+
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            alert('Please log in to save your schema.');
+            return;
+        }
+
+        try {
+            const result = await axios.post(
+                'http://127.0.0.1:8000/api/save-schema/',
+                {
+                    schema_name: schemaTitle,
+                    json_data: schemaData,
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                }
+            );
+
+            console.log(result.data.message);
+            alert('Schema saved successfully!');
+        } catch (err) {
+            console.error(err.response);
+            alert('Failed to save schema.');
+        }
     };
 
-    const removeArrayItem = () => {
-        dispatch({
-            type: 'UPDATE_FIELD',
-            fieldId: field.id,
-            key: 'items',
-            value: null,
-        });
-    };
-
+    // Return component
     return (
-        <div className="field" style={{ marginLeft: '20px', borderLeft: '1px solid #ccc', paddingLeft: '10px' }}>
-            <select value={field.dataType} onChange={e => handleChange('dataType', e.target.value)}>
-                <option value="">Select Data Type</option>
-                {dataTypes.map(type => (
-                    <option key={type.value} value={type.value}>
-                        {type.label}
-                    </option>
-                ))}
-            </select>
-            <input
-                type="text"
-                placeholder="Key Title"
-                value={field.keyTitle}
-                onChange={e => handleChange('keyTitle', e.target.value)}
-            />
-            <input
-                type="text"
-                placeholder="Description"
-                value={field.description}
-                onChange={e => handleChange('description', e.target.value)}
-            />
 
-            {/* Handle nested objects */}
-            {field.dataType === 'object' && (
-                <div style={{ marginTop: '10px' }}>
-                    <button type="button" onClick={addNestedField}>
-                        Add Nested Property
+        <Container>
+
+            <div className="my-container">
+                {showValidationError && (
+                    <div className="validation-error-message">
+                        The fields highlighted in red must not have spaces or be empty.
+                    </div>
+                )}
+
+                <div className="import-button-container">
+                    <button type="button" onClick={handleOpenSchemaModal}>
+                        Import Saved Schema
                     </button>
-                    {field.properties && field.properties.map(propField => (
+                </div>
+
+                {showSchemaModal && (
+                    <SchemaList
+                        savedSchemas={savedSchemas}
+                        onClose={() => setShowSchemaModal(false)}
+                        onSchemaSelect={handleSchemaSelect}
+                        fetchSavedSchemas={fetchSavedSchemas}
+                    />
+                )}
+
+                <div className="row justify-content-center title-desc">
+                    <div className="col-4 d-flex justify-content-center align-items-center">
+                        <label>Schema Title:</label>
+                        <input
+                            type="text"
+                            placeholder="Title"
+                            value={schemaTitle}
+                            onChange={(e) => setSchemaTitle(e.target.value)}
+                            className={schemaErrors.schemaTitle ? 'error' : ''}
+                        />
+                    </div>
+                    <div className="col-8 d-flex justify-content-end align-items-center ndchild">
+                        <label>Schema Description:</label>
+                        <input
+                            type="text"
+                            placeholder="Schema Description (prompt AI)"
+                            value={schemaDescription}
+                            onChange={(e) => setSchemaDescription(e.target.value)}
+                            className={schemaErrors.schemaDescription ? 'error' : ''}
+                        />
+                    </div>
+                </div>
+
+                <div className="container">
+                    {fields.map((field, index) => (
                         <Field
-                            key={propField.id}
-                            field={propField}
+                            key={field.id}
+                            field={field}
+                            index={index}
                             dataTypes={dataTypes}
                             dispatch={dispatch}
-                            onRemove={() => removeNestedField(propField.id)}
+                            onRemove={() => dispatch({ type: 'REMOVE_FIELD', fieldId: field.id })}
+                            parentField={null}
+                            fields={fields}
+                            getUniqueId={getUniqueId}
+                            error={fieldErrors[field.id]}
                         />
                     ))}
                 </div>
-            )}
-
-            {/* Handle arrays */}
-            {field.dataType === 'array' && (
-                <div style={{ marginTop: '10px' }}>
-                    <h4>Array Items:</h4>
-                    {field.items ? (
-                        <Field
-                            field={field.items}
-                            dataTypes={dataTypes}
-                            dispatch={dispatch}
-                            onRemove={removeArrayItem}
-                        />
-                    ) : (
-                        <button type="button" onClick={addArrayItem}>
-                            Add Array Item
-                        </button>
-                    )}
+                <div className="btn-con">
+                    <button
+                        type="button"
+                        className="add-prop"
+                        onClick={() => dispatch({ type: 'ADD_FIELD' })}
+                    >
+                        + Add Property
+                    </button>
                 </div>
-            )}
+                <div className="input-div">
+                    <label>Number of Documents:</label>
+                    <input
+                        type="number"
+                        value={numSamples}
+                        onChange={(e) => setNumSamples(parseInt(e.target.value) || 1)}
+                        min="1"
+                        step="1"
+                    />
+                    <button type="button" onClick={handleSubmit}>
+                        Generate
+                    </button>
+                    <button type="button" onClick={handleSaveSchema}>
+                        Save Schema
+                    </button>
+                </div>
 
-            <button type="button" onClick={onRemove}>
-                Remove
-            </button>
-        </div>
+                {isLoading && (
+                    <div className="loading-spinner">
+                        <div className="spinner"></div>
+                        <p>Generating data, please wait...</p>
+                    </div>
+                )}
+                {!isLoading && response && (
+                    <div className="response">
+                        <div className="response-header">
+                            <h3>Generated Documents:</h3>
+                            <button type="button" onClick={handleDownload}>
+                                Download JSON
+                            </button>
+                        </div>
+                        <pre>{JSON.stringify(response.documents, null, 2)}</pre>
+                    </div>
+                )}
+            </div>
+
+        </Container>
     );
 }
 

@@ -4,47 +4,25 @@ import axios from 'axios';
 import { BSON } from 'bson';
 import Form from 'react-bootstrap/Form';
 import './BSONConverter.css';
-import './converter.css';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { Buffer } from 'buffer';
 
 const BSONConverter = () => {
   const [textFieldValue, setTextFieldValue] = useState('');
   const [conversionResult, setConversionResult] = useState('');
   const location = useLocation();
-
-  // Updated function to handle a regular JSON object
-  const transformSchemaToKeyValue = (schema) => {
-    const keyValuePairs = {};
-    if (schema.properties) {
-      Object.keys(schema.properties).forEach((key) => {
-        const property = schema.properties[key];
-        // Determine the default value based on the property type
-        if (property.type === 'string') {
-          keyValuePairs[key] = ''; // Default for strings
-        } else if (property.type === 'integer') {
-          keyValuePairs[key] = 0; // Default for integers
-        } else if (property.type === 'boolean') {
-          keyValuePairs[key] = false; // Default for booleans
-        } else if (property.type === 'array') {
-          keyValuePairs[key] = []; // Default for arrays
-        } else {
-          keyValuePairs[key] = null; // Default for other types
-        }
-      });
-    }
-    return keyValuePairs;
-  };
-
+  const { savedData } = location.state || {};
+  
   useEffect(() => {
-    if (location.state && location.state.savedData) {
-      const transformedData = transformSchemaToKeyValue(location.state.savedData);
-      setTextFieldValue(JSON.stringify(transformedData, null, 2)); // Pretty print the JSON
+    if (savedData) {
+      setTextFieldValue(JSON.stringify(savedData, null, 2)); // Directly set savedData in JSON format to the text field
     } else {
-      const preLoadedData = '{"key": "value"}';
+      const preLoadedData = '{"key": "field"}'; // If no savedData is present, use a default JSON value
       setTextFieldValue(preLoadedData);
     }
-  }, [location.state]);
+  }, [savedData]);
 
   const handleInputChange = (event) => {
     setTextFieldValue(event.target.value);
@@ -64,6 +42,7 @@ const BSONConverter = () => {
     try {
       const data = JSON.parse(textFieldValue);
       const bsonData = BSON.serialize(data);
+      const bsonHex = Buffer.from(bsonData).toString('hex');
       const blob = new Blob([bsonData.buffer], { type: 'application/bson' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -71,49 +50,52 @@ const BSONConverter = () => {
       link.download = 'content.bson';
       link.click();
       URL.revokeObjectURL(url);
+      setConversionResult(bsonHex); 
     } catch (error) {
       console.error('Error generating BSON:', error);
       alert('Invalid JSON. Please check your input.');
     }
   };
 
-  const handleConvert = async () => {
-    try {
-      const response = await axios.post('http://localhost:8000/api/convert/', {
-        data: textFieldValue,
-      });
-
-      setConversionResult(response.data.converted_data);
-    } catch (error) {
-      console.error('Error during conversion:', error);
-      alert('An error occurred during conversion. Please check the console for more details.');
-    }
-  };
-
   return (
     <Container>
-      <Row>
-        <Form.Group className="bsonTextField" controlId="exampleForm.ControlTextarea1">
-          <Form.Control
-            as="textarea"
-            rows={10}
-            value={textFieldValue}
-            onChange={handleInputChange}
-            placeholder="Enter JSON data"
-          />
-        </Form.Group>
+      <Row className="mt-5">
+        <Col className="text-center mt-4">
+          <h1>BSON Converter Page</h1>
+        </Col>
       </Row>
-      <Row>
-        <div className="bsonbtns">
-          <button onClick={handleGenerateSave}>Save JSON Document</button>
-          <button onClick={handleGenerateBSONFile}>Generate BSON Document</button>
-        </div>
-      {conversionResult && (
-        <div className="conversionResult">
-          <h3>Conversion Result (BSON as hex):</h3>
-          <pre>{conversionResult}</pre>
-        </div>
-      )}
+      <Row className="justify-content-center">
+        <Col md={8}> {/* Center the form by controlling column width */}
+          <Form.Group className="bsonTextField" controlId="exampleForm.ControlTextarea1">
+            <Form.Control
+              as="textarea"
+              rows={10}
+              value={textFieldValue}
+              onChange={handleInputChange}
+              placeholder="Enter JSON data"
+            />
+          </Form.Group>
+        </Col>
+      </Row>
+
+      <Row className="justify-content-center">
+        <Col className="text-center"> {/* Ensure buttons are centered */}
+          <div className="bsonbtns">
+            <button onClick={handleGenerateSave}>Save JSON Document</button>
+            <button onClick={handleGenerateBSONFile}>Generate BSON Document</button>
+          </div>
+        </Col>
+      </Row>
+
+      <Row className="justify-content-center">
+        <Col md={8}>
+          {conversionResult && (
+            <div className="conversionResult">
+              <h3>Conversion Result (BSON as hex):</h3>
+              <pre>{conversionResult}</pre>
+            </div>
+          )}
+        </Col>
       </Row>
     </Container>
   );

@@ -37,23 +37,24 @@ function DinoNavbar() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto dinonavbar-menu">
             <Nav.Link href='/homepage' className={isActive('/homepage') ? 'active' : ''}>Home</Nav.Link>
-            <Nav.Link href='/JSONEditor' className={isActive('/JSONEditor') ? 'active' : ''}>JSON Editor</Nav.Link>
+            <Nav.Link href='/JSONEditor' className={isActive('/JSONEditor') ? 'active' : ''}>Schema Editor</Nav.Link>
             <Nav.Link href='/generate' className={isActive('/generate') ? 'active' : ''}>AI Generator</Nav.Link>
-            <Nav.Link href='/domain-generate' className={isActive('/domain-generate') ? 'active' : ''}>Domain Generator</Nav.Link>
+            {/* <Nav.Link href='/domain-generate' className={isActive('/domain-generate') ? 'active' : ''}>Domain Generator</Nav.Link> */}
             <Nav.Link href='/converter' className={isActive('/converter') ? 'active' : ''}>Converter</Nav.Link>
+            <Nav.Link href='/docs' className={isActive('/docs') ? 'active' : ''}>Docs</Nav.Link>
             <Nav.Link href='/contact' className={isActive('/contact') ? 'active' : ''}>Contact</Nav.Link>
             <Nav.Link href='/About' className={isActive('/About') ? 'active' : ''}>About</Nav.Link>
           </Nav>
-          <div className="d-flex align-items-center">
+          <div className="d-flex align-items-center justify-content-center" style={{gap: 25 + 'px'}}>
             {isAuthenticated ? (
-              <>
+              <React.Fragment>
                 <Button variant="link" className="me-2" onClick={handleSignOut}>Sign Out</Button>
-              </>
+              </React.Fragment>
             ) : (
-              <>
-                <Button variant="link" className="me-2" onClick={() => navigate('/signin')}>Login</Button>
-                <Button variant="primary" className="me-3" onClick={() => navigate('/signup')}>Sign up for free</Button>
-              </>
+              <React.Fragment>
+                <Button variant="link" className="" onClick={() => navigate('/signin')}>Login</Button>
+                <Button variant="primary" className="" onClick={() => navigate('/signup')}>Sign up for free</Button>
+              </React.Fragment>
             )}
           </div>
         </Navbar.Collapse>
