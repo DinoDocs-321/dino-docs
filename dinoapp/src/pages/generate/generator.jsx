@@ -5,6 +5,7 @@ import './generator.css';
 import Field from '../../components/field/field';
 import SchemaList from '../../components/schema/schemaList.jsx';
 import { getUniqueId } from '../../utils/uniqueID';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 function Generator() {
 
@@ -232,6 +233,13 @@ function Generator() {
 
             case 'SET_FIELDS':
                 return action.fields;
+
+            case 'REORDER_FIELDS':
+                const { startIndex, endIndex } = action.payload;
+                const result = Array.from(state);
+                const [removed] = result.splice(startIndex, 1);
+                result.splice(endIndex, 0, removed);
+                return result;
 
             default:
                 return state;
@@ -506,9 +514,20 @@ function Generator() {
         }
     };
 
+    // Handle drag end for drag and drop
+    const onDragEnd = (result) => {
+        if (!result.destination) return;
+        dispatch({
+            type: 'REORDER_FIELDS',
+            payload: {
+                startIndex: result.source.index,
+                endIndex: result.destination.index,
+            },
+        });
+    };
+
     return (
         <Container>
-
             <div className="my-container">
                 {showValidationError && (
                     <div className="validation-error-message">
@@ -554,22 +573,54 @@ function Generator() {
                     </div>
                 </div>
 
-                <div className="container">
-                    {fields.map((field, index) => (
-                        <Field
-                            key={field.id}
-                            field={field}
-                            index={index}
-                            dataTypes={dataTypes}
-                            dispatch={dispatch}
-                            onRemove={() => dispatch({ type: 'REMOVE_FIELD', fieldId: field.id })}
-                            parentField={null}
-                            fields={fields}
-                            getUniqueId={getUniqueId}
-                            error={fieldErrors[field.id]}
-                        />
-                    ))}
-                </div>
+                <DragDropContext onDragEnd={onDragEnd}>
+                    <Droppable droppableId="fields">
+                        {(provided, snapshot) => (
+                            <div
+                                className="fields-container"
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                            >
+                                {fields.map((field, index) => (
+                                    <Draggable
+                                        key={field.id}
+                                        draggableId={String(field.id)}
+                                        index={index}
+                                    >
+                                        {(provided, snapshot) => (
+                                            <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                            >
+                                                <Field
+                                                    key={field.id}
+                                                    field={field}
+                                                    index={index}
+                                                    dataTypes={dataTypes}
+                                                    dispatch={dispatch}
+                                                    onRemove={() =>
+                                                        dispatch({
+                                                            type: 'REMOVE_FIELD',
+                                                            fieldId: field.id,
+                                                        })
+                                                    }
+                                                    parentField={null}
+                                                    fields={fields}
+                                                    getUniqueId={getUniqueId}
+                                                    error={fieldErrors[field.id]}
+                                                />
+                                            </div>
+                                        )}
+                                    </Draggable>
+                                ))}
+                                {provided.placeholder}
+                            </div>
+                        )}
+                    </Droppable>
+                </DragDropContext>
+
+
                 <div className="btn-con">
                     <button
                         type="button"
@@ -614,7 +665,6 @@ function Generator() {
                     </div>
                 )}
             </div>
-
         </Container>
     );
 }
