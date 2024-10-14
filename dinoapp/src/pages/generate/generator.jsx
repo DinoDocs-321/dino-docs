@@ -6,17 +6,15 @@ import Field from '../../components/field/field';
 import SchemaList from '../../components/schema/schemaList.jsx';
 import { getUniqueId } from '../../utils/uniqueID';
 
-// Importing react-beautiful-dnd components
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-
 function Generator() {
+
     // States
     const [schemaTitle, setSchemaTitle] = useState('');
     const [schemaDescription, setSchemaDescription] = useState('');
     const [numSamples, setNumSamples] = useState(3);
     const [response, setResponse] = useState(null);
 
-    // Data types for fields
+    // Datatypes for fields
     const [dataTypes, setDataTypes] = useState([]);
 
     // Error handling
@@ -31,7 +29,7 @@ function Generator() {
     const [savedSchemas, setSavedSchemas] = useState([]);
     const [showSchemaModal, setShowSchemaModal] = useState(false);
 
-    // Get data types request
+    // Get datatypes request
     useEffect(() => {
         const fetchDataTypes = async () => {
             try {
@@ -56,7 +54,7 @@ function Generator() {
         try {
             const token = localStorage.getItem('accessToken'); // Token is assumed to be available
             const res = await axios.get('http://127.0.0.1:8000/api/saved-schemas/', {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { 'Authorization': `Bearer ${token}` },
             });
             setSavedSchemas(res.data);
         } catch (err) {
@@ -82,7 +80,7 @@ function Generator() {
         try {
             const token = localStorage.getItem('accessToken'); // Token is assumed to be available
             const res = await axios.get(`http://127.0.0.1:8000/api/saved-schemas/${schemaId}/`, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { 'Authorization': `Bearer ${token}` },
             });
             const schemaData = res.data.json_data;
             importSchema(schemaData);
@@ -181,7 +179,7 @@ function Generator() {
             }
         });
 
-        // Handle nested objects, arrays and lists
+        // Handle nested objects, arrays, and lists
         if (prop.type === 'object' && prop.properties) {
             field.properties = schemaPropertiesToFields(prop.properties);
         }
@@ -264,17 +262,6 @@ function Generator() {
     };
 
     const [fields, dispatch] = useReducer(fieldsReducer, []);
-
-    // Handle drag end
-    const handleDragEnd = (result) => {
-        if (!result.destination) return; // Dropped outside the list
-
-        const reorderedFields = Array.from(fields);
-        const [movedField] = reorderedFields.splice(result.source.index, 1);
-        reorderedFields.splice(result.destination.index, 0, movedField);
-
-        dispatch({ type: 'SET_FIELDS', fields: reorderedFields });
-    };
 
     // Handle form submission
     const handleSubmit = async (event) => {
@@ -424,7 +411,7 @@ function Generator() {
             }
         }
 
-        // Handle nested fields for object, array and list
+        // Handle nested fields for object, array, and list
         if (dataTypeInfo.type === 'object' && field.properties.length > 0) {
             schemaField.properties = buildProperties(field.properties);
         }
@@ -506,7 +493,7 @@ function Generator() {
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
+                        'Authorization': `Bearer ${token}`,
                     },
                 }
             );
@@ -519,14 +506,9 @@ function Generator() {
         }
     };
 
-    // Ensure field IDs are strings
-    const generateUniqueId = () => {
-        // Modify getUniqueId to ensure it returns a string
-        return Date.now().toString() + Math.random().toString(36).substr(2, 9);
-    };
-
     return (
         <Container>
+
             <div className="my-container">
                 {showValidationError && (
                     <div className="validation-error-message">
@@ -572,40 +554,22 @@ function Generator() {
                     </div>
                 </div>
 
-                <DragDropContext onDragEnd={handleDragEnd}>
-                    <Droppable droppableId="fieldsList">
-                        {(provided) => (
-                            <div {...provided.droppableProps} ref={provided.innerRef} className="container">
-                                {fields.map((field, index) => (
-                                    <Draggable key={field.id} draggableId={field.id.toString()} index={index}>
-                                        {(provided) => (
-                                            <div
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                            >
-                                                <Field
-                                                    key={field.id}
-                                                    field={field}
-                                                    index={index}
-                                                    dataTypes={dataTypes}
-                                                    dispatch={dispatch}
-                                                    onRemove={() => dispatch({ type: 'REMOVE_FIELD', fieldId: field.id })}
-                                                    parentField={null}
-                                                    fields={fields}
-                                                    getUniqueId={generateUniqueId}
-                                                    error={fieldErrors[field.id]}
-                                                />
-                                            </div>
-                                        )}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                </DragDropContext>
-
+                <div className="container">
+                    {fields.map((field, index) => (
+                        <Field
+                            key={field.id}
+                            field={field}
+                            index={index}
+                            dataTypes={dataTypes}
+                            dispatch={dispatch}
+                            onRemove={() => dispatch({ type: 'REMOVE_FIELD', fieldId: field.id })}
+                            parentField={null}
+                            fields={fields}
+                            getUniqueId={getUniqueId}
+                            error={fieldErrors[field.id]}
+                        />
+                    ))}
+                </div>
                 <div className="btn-con">
                     <button
                         type="button"
@@ -650,6 +614,7 @@ function Generator() {
                     </div>
                 )}
             </div>
+
         </Container>
     );
 }
