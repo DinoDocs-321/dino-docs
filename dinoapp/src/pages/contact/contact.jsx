@@ -128,7 +128,7 @@ const Contact = () => {
               onChange={handleChange}
             />
           </Form.Group>
-          <Button type="submit" className='me-2 btn btn-primary'>Submit</Button>
+          <Button type="submit" className='me-2 btn btn-link cus-btn'>Submit</Button>
         </Form>
 
         {/* Status Message Display */}

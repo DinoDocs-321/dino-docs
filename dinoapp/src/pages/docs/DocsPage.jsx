@@ -9,11 +9,12 @@ const MainDocsPage = () => {
       <p>Welcome to the documentation center. Select a guide below to get started:</p>
       <ul className="docs-list">
         <li>
-          <Link to="/jsonschema-docs">JSON Schema Creation Guide</Link>
-        </li>
-        <li>
           <Link to="/getting-started">Getting Started Guide</Link>
         </li>
+        <li>
+          <Link to="/jsonschema-docs">JSON Schema Creation Guide</Link>
+        </li>
+        
         {/* Add more links to other guides as needed */}
       </ul>
     </div>

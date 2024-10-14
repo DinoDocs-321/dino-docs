@@ -7,7 +7,7 @@ import Homepage from './pages/homepage/homepage';
 import BSONConverter from './pages/converter/BSONConverter';
 import JSONConverter from './pages/converter/JSONConverter';
 import Contact from './pages/contact/contact';
-import JSONEditor from './pages/jsoneditor/App';
+import SchemaEditor from './pages/schemaEditor/App';
 import SchemaForm from './pages/SchemaForm/App';
 import SignIn from './pages/signin/signin';
 import SignUp from './pages/signup/signup'
@@ -22,7 +22,7 @@ import DocsPage from './pages/docs/DocsPage';
 import JSONSchemaDocs from'./pages/docs/JSONSchemaDocs'; 
 import GettingStarted from'./pages/docs/GettingStarted'; 
 import Converter from './pages/converter/converter';
-import OldEditor from './pages/jsoneditor/works'
+import OldEditor from './pages/schemaEditor/works'
 import About from './pages/about/App'
 
 
@@ -44,7 +44,7 @@ function App() {
         <Route path='/JSONConverter' element={<JSONConverter />} />
         <Route path='/converter' element={<Converter />} />
         <Route path='/contact' element={<Contact />} />
-        <Route path='/JSONEditor' element={<JSONEditor />} />
+        <Route path='/schemaEditor' element={<SchemaEditor />} />
         <Route path='/schema-form' element={<SchemaForm />} />
         <Route path='/signin' element={<SignIn />} />
         <Route path='/signup' element={<SignUp />} />

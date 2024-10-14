@@ -283,12 +283,12 @@ const JSONEditor = () => {
     try {
       const schemaName = prompt('Enter the schema name:', 'GeneratedSchema');
       const token = localStorage.getItem('accessToken');
-  
+
       if (!token) {
         setStatusMessage('Error: No access token found. Please log in.');
         return;
       }
-  
+
       const response = await axios.post(
         'http://localhost:8000/api/save-schema/',
         {
@@ -299,35 +299,31 @@ const JSONEditor = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
+
       setStatusMessage('Schema saved successfully!');
     } catch (error) {
       console.error('Error saving schema:', error);
-  
+
       // Handle 401 Unauthorized error
       if (error.response?.status === 401) {
         setStatusMessage('Error: Unauthorized. Please sign in again.');
         localStorage.removeItem('accessToken');
         window.location.href = '/signin'; // Redirect to the signin page
-      } 
+      }
       // Handle 400 Bad Request with a specific error message
       else if (error.response?.status === 400 && error.response.data?.error === 'A schema with this name already exists.') {
         setStatusMessage('Error: A schema with this name already exists. Please choose a different name.');
-      } 
+      }
       // Handle other errors
       else {
         const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
         setStatusMessage(`Error saving schema: ${errorMessage}`);
       }
     }
-  
+
     // Clear the status message after 10 seconds
     setTimeout(() => setStatusMessage(''), 10000);
   };
-  
-  
-  
-  
 
   const generateJSONData = () => {
     const blob = new Blob([jsonCode], { type: 'application/json' });
@@ -343,7 +339,11 @@ const JSONEditor = () => {
     <div className="mycontainer">
       <div className="editor">
         <div className="container visual-editor">
+          <div className="col-6">
+            <a href="/jsonschema-docs" className="cus-btn ">Read Documentation for Schema Creation</a>
+          </div>
           <div className="visual-editor-header">
+
             <h3>Visual Editor</h3>
             <button className="add-button" onClick={() => addNewField(null)}>
               +
@@ -379,7 +379,7 @@ const JSONEditor = () => {
 
       <div className="cusButtons">
         <button className="cusbtn" onClick={generateJSONData}>
-          Generate JSON Data
+          Download JSON Schema
         </button>
         <button className="cusbtn" onClick={handleSubmit}>
           Save JSON Document

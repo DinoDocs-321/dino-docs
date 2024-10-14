@@ -19,9 +19,15 @@ const Homepage = () => {
             </button>
           </Link>
           <br />
-          <Link to="/domain-generate">
+          <Link to="/schemaEditor">
             <button className='PSbtn'>
-              Provide Schema
+              Make Schema
+            </button>
+          </Link>
+          <br />
+          <Link to="/docs">
+            <button className='new-btn'>
+              Read Docs
             </button>
           </Link>
           <p className="text-center mt-4 mb-4">Login or Sign Up to save in cloud your generated data</p>

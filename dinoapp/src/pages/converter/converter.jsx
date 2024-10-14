@@ -119,7 +119,7 @@ const Converter = () => {
             <Row>
                 {isValidJson && (
                      <div className="buttons">
-                        <button onClick={handleGenerateFile} className="me-2 btn btn-link">
+                        <button onClick={handleGenerateFile} className="me-2 btn btn-link cus-btn">
                             {fileType === 'json' ? 'Generate BSON File' : 'Generate JSON File'}
                         </button>
                     </div>

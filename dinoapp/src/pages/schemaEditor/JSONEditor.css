@@ -245,3 +245,18 @@ h3 {
   background-color: #f8d7da; /* Light red background */
   color: #721c24; /* Dark red text */
 }
+
+.cus-btn {
+  text-decoration: none;
+  background-color: #8cb8ca;
+  color: #fff;
+  transition: 250ms ease-in-out;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+
+.cus-btn:hover {
+  background-color: #45879b;
+  color: #ddd;
+}
