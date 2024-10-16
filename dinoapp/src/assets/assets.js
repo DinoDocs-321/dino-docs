@@ -1,5 +1,5 @@
 import homepageimg from './homepageimg.png'
-import dinologo from './dinologo.png'
+import dinologo from './DinoDocs_logo_beside_nobg.png'
 import Rectangle from './Rectangle.png'
 import ForgotPWD from './forgotpwd.png'
 
