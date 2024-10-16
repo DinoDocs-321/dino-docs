@@ -1,3 +1,4 @@
+# Stage 1: Build React frontend
 FROM node:16-alpine as frontend-builder
 WORKDIR /usr/src/app
 COPY dinoapp/package.json dinoapp/package-lock.json ./
@@ -5,7 +6,8 @@ RUN npm install
 COPY dinoapp/ .
 RUN npm run build
 
-FROM python:3.12
+# Stage 2: Build Django backend
+FROM python:3.12 as django-backend
 WORKDIR /usr/src/app
 COPY manage.py .
 COPY dino/ dino/
@@ -13,8 +15,11 @@ COPY reactapi/ reactapi/
 COPY --from=frontend-builder /usr/src/app/build /usr/src/app/static
 RUN pip install -r dino/requirements.txt
 RUN pip install python-dotenv
+RUN python manage.py collectstatic --noinput
 
-EXPOSE 8000
-ENV PYTHONUNBUFFERED=1
-
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Stage 3: Nginx to serve static files
+FROM nginx:alpine
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=django-backend /usr/src/app/static /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
